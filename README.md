@@ -19,8 +19,8 @@ Harpy is a meta-framework that extends **NestJS** with **server-side React rende
 
 This monorepo contains:
 
-- **`harpy-core`**: Core rendering engine, hydration system, and build tools
-- **`harpy-cli`**: CLI tool for creating and managing Harpy projects
+- **`@hepta-solutions/harpy-core`**: Core rendering engine, hydration system, and build tools
+- **`@hepta-solutions/harpy-cli`**: CLI tool for creating and managing Harpy projects
 
 ## ⚡ Quick Start
 
@@ -28,13 +28,13 @@ This monorepo contains:
 
 ```bash
 # Using npm
-npm install -g harpy-cli
+npm install -g @hepta-solutions/harpy-cli
 
 # Using pnpm
-pnpm add -g harpy-cli
+pnpm add -g @hepta-solutions/harpy-cli
 
 # Using yarn
-yarn global add harpy-cli
+yarn global add @hepta-solutions/harpy-cli
 ```
 
 ### Create a New Project
