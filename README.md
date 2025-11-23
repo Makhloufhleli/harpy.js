@@ -127,8 +127,8 @@ Built-in Tailwind CSS 4.0 support with automatic compilation and hot reload.
 
 ```bash
 # Clone the repository
-git clone <repository-url>
-cd harpy-monorepo
+git clone https://github.com/Makhloufhleli/harpy.js
+cd harpy.js
 
 # Install dependencies
 pnpm install
