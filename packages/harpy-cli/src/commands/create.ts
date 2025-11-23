@@ -184,6 +184,18 @@ export async function createCommand(projectName: string, options: CreateOptions)
     fs.writeJsonSync(tsconfigPath, tsconfig, { spaces: 2 });
     spinner.succeed('TypeScript configured for JSX');
     
+    // Step 6.6: Update .gitignore to include dist folder
+    spinner.start('Updating .gitignore...');
+    const gitignorePath = path.join(projectPath, '.gitignore');
+    let gitignoreContent = fs.readFileSync(gitignorePath, 'utf-8');
+    
+    // Add dist to gitignore if not already there
+    if (!gitignoreContent.includes('dist')) {
+      gitignoreContent += '\n# Build outputs\ndist\n*.js.map\n';
+      fs.writeFileSync(gitignorePath, gitignoreContent);
+    }
+    spinner.succeed('.gitignore updated');
+    
     // Step 7: Initialize git
     spinner.start('Initializing git repository...');
     await execa('git', ['init'], { cwd: projectPath });

@@ -1,0 +1,19 @@
+{
+  "typescript.preferences.organizeImportsOnSave": false,
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "never"
+  },
+  "files.associations": {
+    "*.tsx": "typescriptreact"
+  },
+  "[typescriptreact]": {
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "never"
+    }
+  },
+  "[typescript]": {
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "never"
+    }
+  }
+}
