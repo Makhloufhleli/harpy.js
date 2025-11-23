@@ -1,3 +1,4 @@
+import React from 'react';
 import AboutCounter from './about-counter';
 import ColorChangeComponent from './color-change';
 

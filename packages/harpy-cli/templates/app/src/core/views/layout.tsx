@@ -1,3 +1,4 @@
+import React from 'react';
 import type { JsxLayoutProps } from '@hepta-solutions/harpy-core';
 
 export default function DefaultLayout({
