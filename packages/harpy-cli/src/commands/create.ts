@@ -161,6 +161,7 @@ export async function createCommand(projectName: string, options: CreateOptions)
       'build:hydration': 'harpy build-hydration',
       'auto-wrap': 'harpy auto-wrap',
       'build:styles': 'harpy build-styles',
+      'start': 'node dist/main',
       'start:dev': 'harpy dev',
       'start:prod': 'node dist/main'
     };
