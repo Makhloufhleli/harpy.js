@@ -7,8 +7,8 @@ dist
 *.js.map
 .tsbuildinfo
 
-# Test app chunks (hydration bundles)
-apps/*/dist/chunks
+# Test apps (generated during development)
+apps/
 
 # Logs
 *.log
@@ -45,3 +45,4 @@ coverage
 tmp
 temp
 *.tmp
+apps/

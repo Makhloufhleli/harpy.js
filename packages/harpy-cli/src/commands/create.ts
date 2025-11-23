@@ -115,6 +115,7 @@ export async function createCommand(projectName: string, options: CreateOptions)
       installCmd,
       '@fastify/static@^8.0.0',
       '-D',
+      'fastify@^5.2.0',
       'tailwindcss@^4.0.0',
       'postcss@^8.4.0',
       '@tailwindcss/postcss@^4.0.0',
@@ -187,7 +188,12 @@ export async function createCommand(projectName: string, options: CreateOptions)
     // Step 6.6: Update .gitignore to include dist folder
     spinner.start('Updating .gitignore...');
     const gitignorePath = path.join(projectPath, '.gitignore');
-    let gitignoreContent = fs.readFileSync(gitignorePath, 'utf-8');
+    
+    // Check if .gitignore exists, if not create it
+    let gitignoreContent = '';
+    if (fs.existsSync(gitignorePath)) {
+      gitignoreContent = fs.readFileSync(gitignorePath, 'utf-8');
+    }
     
     // Add dist to gitignore if not already there
     if (!gitignoreContent.includes('dist')) {
