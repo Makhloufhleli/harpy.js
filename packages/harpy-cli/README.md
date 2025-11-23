@@ -1,4 +1,4 @@
-# NestJSX CLI
+# @hepta-solutions/harpy-cli
 
 A CLI tool to create and manage NestJS projects with React/JSX support and automatic client-side hydration.
 
@@ -13,11 +13,11 @@ A CLI tool to create and manage NestJS projects with React/JSX support and autom
 ## Installation
 
 ```bash
-npm install -g nestjsx-cli
+npm install -g @hepta-solutions/harpy-cli
 # or
-yarn global add nestjsx-cli
+yarn global add @hepta-solutions/harpy-cli
 # or
-pnpm add -g nestjsx-cli
+pnpm add -g @hepta-solutions/harpy-cli
 ```
 
 ## Usage
@@ -25,15 +25,15 @@ pnpm add -g nestjsx-cli
 ### Create a new project
 
 ```bash
-nestjsx create my-app
+harpy create my-app
 ```
 
 With options:
 
 ```bash
-nestjsx create my-app --package-manager pnpm
-nestjsx create my-app --skip-git
-nestjsx create my-app --skip-install
+harpy create my-app --package-manager pnpm
+harpy create my-app --skip-git
+harpy create my-app --skip-install
 ```
 
 ### Options

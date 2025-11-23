@@ -1,4 +1,4 @@
-# NestJSX Core
+# @hepta-solutions/harpy-core
 
 Core package for NestJS + React/JSX with server-side rendering and automatic client-side hydration.
 
@@ -12,11 +12,11 @@ Core package for NestJS + React/JSX with server-side rendering and automatic cli
 ## Installation
 
 ```bash
-npm install harpy-core
+npm install @hepta-solutions/harpy-core
 # or
-yarn add harpy-core
+yarn add @hepta-solutions/harpy-core
 # or
-pnpm add harpy-core
+pnpm add @hepta-solutions/harpy-core
 ```
 
 ## Quick Start
@@ -29,7 +29,7 @@ import {
   FastifyAdapter,
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
-import { withJsxEngine } from 'harpy-core';
+import { withJsxEngine } from '@hepta-solutions/harpy-core';
 import { AppModule } from './app.module';
 import DefaultLayout from './views/layout';
 
@@ -53,7 +53,7 @@ bootstrap();
 ```tsx
 // src/views/layout.tsx
 import React from 'react';
-import { JsxLayoutProps } from 'harpy-core';
+import { JsxLayoutProps } from '@hepta-solutions/harpy-core';
 
 export default function Layout({
   children,
@@ -171,16 +171,16 @@ The package includes CLI commands for building:
 
 ```bash
 # Build hydration bundles
-nestjsx build-hydration
+harpy build-hydration
 
 # Auto-wrap client components
-nestjsx auto-wrap
+harpy auto-wrap
 
 # Build styles
-nestjsx build-styles
+harpy build-styles
 
 # Development mode
-nestjsx dev
+harpy dev
 ```
 
 ## How It Works
