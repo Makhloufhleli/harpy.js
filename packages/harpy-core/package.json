@@ -1,0 +1,48 @@
+{
+  "name": "harpy-core",
+  "version": "0.0.7",
+  "description": "Harpy - A powerful NestJS + React/JSX SSR framework with automatic hydration",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "harpy": "./dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "scripts",
+    "src"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "nestjs",
+    "react",
+    "jsx",
+    "ssr",
+    "hydration"
+  ],
+  "author": "",
+  "license": "MIT",
+  "peerDependencies": {
+    "@nestjs/common": "^11.0.0",
+    "@nestjs/core": "^11.0.0",
+    "@nestjs/platform-fastify": "^11.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "dependencies": {
+    "chokidar": "^3.6.0",
+    "esbuild": "^0.24.2",
+    "tsx": "^4.20.6"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.1",
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.2",
+    "fastify": "^5.6.2",
+    "typescript": "^5.7.2"
+  }
+}

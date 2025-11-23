@@ -1,0 +1,41 @@
+{
+  "name": "harpy-cli",
+  "version": "0.0.1",
+  "description": "Harpy CLI - Create and manage Harpy projects with React/JSX support",
+  "main": "dist/index.js",
+  "bin": {
+    "harpy": "./bin/harpy.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "nestjs",
+    "react",
+    "jsx",
+    "ssr",
+    "cli",
+    "generator"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "chalk": "^4.1.2",
+    "ora": "^5.4.1",
+    "prompts": "^2.4.2",
+    "fs-extra": "^11.2.0",
+    "execa": "^5.1.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.7",
+    "@types/fs-extra": "^11.0.4",
+    "@types/prompts": "^2.4.9",
+    "typescript": "^5.7.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

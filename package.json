@@ -1,0 +1,28 @@
+{
+  "name": "harpy-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "NestJSX - Next.js-style React framework for NestJS",
+  "scripts": {
+    "bootstrap": "lerna bootstrap",
+    "build": "lerna run build",
+    "build:core": "lerna run build --scope=nestjsx-core",
+    "build:cli": "lerna run build --scope=nestjsx-cli",
+    "clean": "lerna clean -y",
+    "test": "lerna run test",
+    "version": "lerna version",
+    "publish": "lerna publish"
+  },
+  "devDependencies": {
+    "lerna": "^8.1.9"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "author": "Makhlouf Hleli",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Makhloufhleli/nestjsx"
+  }
+}
