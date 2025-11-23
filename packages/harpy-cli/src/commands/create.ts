@@ -67,7 +67,7 @@ export async function createCommand(projectName: string, options: CreateOptions)
     });
     spinner.succeed('React dependencies installed');
     
-    // Step 3: Install harpy-core or Fastify adapter
+    // Step 3: Install @hepta-solutions/harpy-core or Fastify adapter
     spinner.start('Installing @nestjs/platform-fastify...');
     await execa(packageManager, [installCmd, '@nestjs/platform-fastify'], {
       cwd: projectPath,
@@ -75,21 +75,21 @@ export async function createCommand(projectName: string, options: CreateOptions)
     });
     spinner.succeed('@nestjs/platform-fastify installed');
     
-    // Install harpy-core
-    spinner.start('Installing harpy-core...');
+    // Install @hepta-solutions/harpy-core
+    spinner.start('Installing @hepta-solutions/harpy-core...');
     
     // Check if there's a local .tgz file (for monorepo development)
-    const localTgzPath = path.join(__dirname, '../../harpy-core-1.0.0.tgz');
-    const parentTgzPath = path.join(__dirname, '../../../harpy-core/harpy-core-1.0.0.tgz');
+    const localTgzPath = path.join(__dirname, '../../@hepta-solutions/harpy-core-1.0.0.tgz');
+    const parentTgzPath = path.join(__dirname, '../../../@hepta-solutions/harpy-core/@hepta-solutions/harpy-core-1.0.0.tgz');
     
-    let packageToInstall = 'harpy-core';
+    let packageToInstall = '@hepta-solutions/harpy-core';
     
     if (fs.existsSync(localTgzPath)) {
       packageToInstall = localTgzPath;
-      spinner.text = 'Installing harpy-core (local package)...';
+      spinner.text = 'Installing @hepta-solutions/harpy-core (local package)...';
     } else if (fs.existsSync(parentTgzPath)) {
       packageToInstall = parentTgzPath;
-      spinner.text = 'Installing harpy-core (local package)...';
+      spinner.text = 'Installing @hepta-solutions/harpy-core (local package)...';
     }
     
     try {
@@ -98,13 +98,13 @@ export async function createCommand(projectName: string, options: CreateOptions)
         stdio: 'pipe'
       });
       spinner.succeed(packageToInstall.endsWith('.tgz') 
-        ? 'harpy-core installed (local package)' 
-        : 'harpy-core installed');
+        ? '@hepta-solutions/harpy-core installed (local package)' 
+        : '@hepta-solutions/harpy-core installed');
     } catch (installError: any) {
-      spinner.fail('Failed to install harpy-core');
+      spinner.fail('Failed to install @hepta-solutions/harpy-core');
       if (!packageToInstall.endsWith('.tgz')) {
-        console.error(chalk.yellow('\n⚠️  harpy-core not found in npm registry.'));
-        console.error(chalk.yellow('For local development, run: npm pack in harpy-core package\n'));
+        console.error(chalk.yellow('\n⚠️  @hepta-solutions/harpy-core not found in npm registry.'));
+        console.error(chalk.yellow('For local development, run: npm pack in @hepta-solutions/harpy-core package\n'));
       }
       throw installError;
     }

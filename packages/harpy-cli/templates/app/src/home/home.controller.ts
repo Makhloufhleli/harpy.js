@@ -1,4 +1,4 @@
-import { JsxRender } from 'nestjsx-core';
+import { JsxRender } from '@hepta-solutions/harpy-core';
 import { Controller, Get } from '@nestjs/common';
 import { HomeService } from './home.service';
 import Homepage, { type PageProps } from './views/homepage';

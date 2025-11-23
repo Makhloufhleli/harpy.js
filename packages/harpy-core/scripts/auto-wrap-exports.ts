@@ -96,8 +96,8 @@ function transformCompiledFile(
       return true;
     }
 
-    // Import the wrapper from harpy-core package instead of relative path
-    const normalizedRelativePath = 'harpy-core';
+    // Import the wrapper from @hepta-solutions/harpy-core package instead of relative path
+    const normalizedRelativePath = '@hepta-solutions/harpy-core';
 
     // Add the require at the top of the file (after the 'use strict' and initial Object.defineProperty)
     const requireStatement = `var { autoWrapClientComponent: _autoWrapClientComponent } = require("${normalizedRelativePath}");`;

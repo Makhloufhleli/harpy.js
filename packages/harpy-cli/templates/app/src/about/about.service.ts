@@ -1,4 +1,4 @@
-import type { MetaOptions } from 'nestjsx-core';
+import type { MetaOptions } from '@hepta-solutions/harpy-core';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()

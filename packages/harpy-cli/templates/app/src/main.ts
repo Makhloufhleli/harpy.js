@@ -4,7 +4,7 @@ import {
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
 import { AppModule } from './app.module';
-import { withJsxEngine } from 'nestjsx-core';
+import { withJsxEngine } from '@hepta-solutions/harpy-core';
 import DefaultLayout from './core/views/layout';
 
 async function bootstrap() {
