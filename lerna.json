@@ -6,6 +6,13 @@
     "packages/*"
   ],
   "command": {
+    "version": {
+      "allowBranch": "main",
+      "conventionalCommits": true,
+      "createRelease": "github",
+      "message": "chore(release): publish %s",
+      "ignoreChanges": ["*.md", "*.test.ts", "*.spec.ts", "**/__tests__/**"]
+    },
     "publish": {
       "registry": "https://registry.npmjs.org/",
       "ignoreChanges": ["*.md", "*.test.ts", "*.spec.ts"]
