@@ -181,7 +181,15 @@ pnpm build
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please read our contributing guidelines before submitting PRs.
+We welcome contributions from the community! Please read our [Contributing Guidelines](./CONTRIBUTING.md) for detailed information on:
+
+- Development workflow
+- Branch naming conventions
+- Commit message format
+- Pull request process
+- Code style guidelines
+
+Before submitting a PR, make sure to review the full guidelines in [CONTRIBUTING.md](./CONTRIBUTING.md).
 
 ## 📄 License
 
