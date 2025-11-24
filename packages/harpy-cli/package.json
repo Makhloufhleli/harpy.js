@@ -9,6 +9,9 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
     "prepublishOnly": "npm run build"
   },
   "keywords": [
