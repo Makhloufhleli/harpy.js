@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@source "../../dist/**/*.js";
+@source "../**/*.{ts,tsx}";
 
 /* Custom global styles */
 html {

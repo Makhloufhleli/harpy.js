@@ -5,6 +5,8 @@ import { renderToPipeableStream, renderToString } from 'react-dom/server';
 import { MetaOptions, RenderOptions } from '../decorators/jsx.decorator';
 import { hydrationContext, initializeHydrationContext } from './hydration';
 import { getChunkPath } from './hydration-manifest';
+import { LiveReloadController } from './live-reload.controller';
+import { StaticAssetsController } from './static-assets.controller';
 
 export interface JsxLayoutProps {
   children: React.ReactNode;
@@ -17,6 +19,29 @@ export function withJsxEngine(
   app: NestFastifyApplication,
   defaultLayout: JsxLayout,
 ) {
+  const isDev = process.env.NODE_ENV !== 'production';
+  
+  // Register live reload controllers in development mode
+  if (isDev) {
+    const httpAdapter = app.getHttpAdapter();
+    const liveReloadController = new LiveReloadController();
+    const staticAssetsController = new StaticAssetsController();
+    
+    // Register routes manually
+    httpAdapter.get('/__harpy/live-reload', (req: any, reply: any) => {
+      liveReloadController.liveReload(reply);
+    });
+    
+    httpAdapter.post('/__harpy/live-reload/trigger', (req: any, reply: any) => {
+      liveReloadController.notifyReload();
+      reply.send({ status: 'ok' });
+    });
+    
+    httpAdapter.get('/__harpy/live-reload.js', (req: any, reply: any) => {
+      staticAssetsController.liveReloadScript(reply);
+    });
+  }
+  
   // Override the render method to use the jsx engine
   // @ts-expect-error Monkey patch to make render method use jsx
   app.getHttpAdapter().render = async function (
@@ -142,22 +167,40 @@ export function withJsxEngine(
     // Render with a fresh context for the actual output
     // This ensures components render cleanly for the client
     const finalHydrationCtx = initializeHydrationContext();
-    hydrationContext.run(finalHydrationCtx, () => {
-      const { pipe } = renderToPipeableStream(finalHtml, {
-        onShellReady() {
-          res.setHeader('content-type', 'text/html');
-          reply.status(reply.statusCode || 200);
-          pipe(res);
-        },
-        onError(error) {
-          console.error(error);
-          if (!res.headersSent) {
-            reply.status(500).send({ error: 'Internal Server Error' });
-          } else {
-            res.end();
-          }
-        },
+    
+    if (isDev) {
+      // In development, render to string first to inject live reload
+      let htmlString = '';
+      hydrationContext.run(finalHydrationCtx, () => {
+        htmlString = renderToString(finalHtml);
       });
-    });
+      
+      // Inject live reload script before closing body tag
+      const liveReloadScript = '<script src="/__harpy/live-reload.js"></script>';
+      htmlString = htmlString.replace('</body>', `${liveReloadScript}</body>`);
+      
+      res.setHeader('content-type', 'text/html');
+      reply.status(reply.statusCode || 200);
+      res.end(htmlString);
+    } else {
+      // In production, use streaming for better performance
+      hydrationContext.run(finalHydrationCtx, () => {
+        const { pipe } = renderToPipeableStream(finalHtml, {
+          onShellReady() {
+            res.setHeader('content-type', 'text/html');
+            reply.status(reply.statusCode || 200);
+            pipe(res);
+          },
+          onError(error) {
+            console.error(error);
+            if (!res.headersSent) {
+              reply.status(500).send({ error: 'Internal Server Error' });
+            } else {
+              res.end();
+            }
+          },
+        });
+      });
+    }
   };
 }
