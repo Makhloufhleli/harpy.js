@@ -62,7 +62,7 @@ export async function createCommand(projectName: string, options: CreateOptions)
       '@types/react@^19.0.0',
       '@types/react-dom@^19.0.0',
       '@hepta-solutions/harpy-core@latest',
-      '@fastify/static@^7.0.4',
+      '@fastify/static@^8.0.0',
       '@types/node'
     ], {
       cwd: projectPath,
