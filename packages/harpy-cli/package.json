@@ -7,7 +7,7 @@
     "harpy": "./bin/harpy.js"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && cp -r templates dist/",
     "dev": "tsc --watch",
     "test": "jest",
     "test:watch": "jest --watch",
