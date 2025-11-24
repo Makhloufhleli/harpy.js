@@ -5,7 +5,7 @@ import {
 } from '@nestjs/platform-fastify';
 import { AppModule } from './app.module';
 import { withJsxEngine } from '@hepta-solutions/harpy-core';
-import DefaultLayout from './core/views/layout';
+import DefaultLayout from './layouts/layout';
 import * as path from 'path';
 import fastifyStatic from '@fastify/static';
 
