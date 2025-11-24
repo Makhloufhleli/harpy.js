@@ -1,0 +1,40 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# 0.2.0 (2025-11-24)
+
+
+### Bug Fixes
+
+* Add React imports to template files ([084aaec](https://github.com/Makhloufhleli/harpy.js/commit/084aaec74457cb7bee67fb0991c45586c31d9ce5))
+* **cli:** Fix linting errors and add dist to .gitignore (v0.0.9) ([4c465fa](https://github.com/Makhloufhleli/harpy.js/commit/4c465fa5a7c055ce2f799275ec163f6c0f6f30a5))
+* **cli:** Move static file registration to main.ts and add fastify types ([d449099](https://github.com/Makhloufhleli/harpy.js/commit/d449099cdaf50fcd493e87c99c1f21fa0c5200f6))
+
+
+### Features
+
+* add comprehensive testing infrastructure with Jest, Husky, and CI/CD ([d03d3f3](https://github.com/Makhloufhleli/harpy.js/commit/d03d3f37179010bc6525e2506b4b640727783f75))
+* add multi-layout support with features-based architecture ([a9af7dd](https://github.com/Makhloufhleli/harpy.js/commit/a9af7dd415d91d88da67555be38354a979aa33dc))
+* **cli:** Add React imports to templates and 'start' script (v0.0.8) ([6ab4456](https://github.com/Makhloufhleli/harpy.js/commit/6ab44569ac499bd54fbaaaacf4db669962f1e023))
+
+
+
+
+
+# 0.1.0 (2025-11-24)
+
+
+### Bug Fixes
+
+* Add React imports to template files ([084aaec](https://github.com/Makhloufhleli/harpy.js/commit/084aaec74457cb7bee67fb0991c45586c31d9ce5))
+* **cli:** Fix linting errors and add dist to .gitignore (v0.0.9) ([4c465fa](https://github.com/Makhloufhleli/harpy.js/commit/4c465fa5a7c055ce2f799275ec163f6c0f6f30a5))
+* **cli:** Move static file registration to main.ts and add fastify types ([d449099](https://github.com/Makhloufhleli/harpy.js/commit/d449099cdaf50fcd493e87c99c1f21fa0c5200f6))
+
+
+### Features
+
+* add comprehensive testing infrastructure with Jest, Husky, and CI/CD ([d03d3f3](https://github.com/Makhloufhleli/harpy.js/commit/d03d3f37179010bc6525e2506b4b640727783f75))
+* add multi-layout support with features-based architecture ([a9af7dd](https://github.com/Makhloufhleli/harpy.js/commit/a9af7dd415d91d88da67555be38354a979aa33dc))
+* **cli:** Add React imports to templates and 'start' script (v0.0.8) ([6ab4456](https://github.com/Makhloufhleli/harpy.js/commit/6ab44569ac499bd54fbaaaacf4db669962f1e023))

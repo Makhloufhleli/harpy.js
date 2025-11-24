@@ -7,6 +7,7 @@ import { AppModule } from './app.module';
 import { withJsxEngine } from '@hepta-solutions/harpy-core';
 import DefaultLayout from './core/views/layout';
 import * as path from 'path';
+import fastifyStatic from '@fastify/static';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -19,7 +20,7 @@ async function bootstrap() {
 
   // Register static file serving
   const fastify = app.getHttpAdapter().getInstance();
-  await fastify.register(require('@fastify/static'), {
+  await fastify.register(fastifyStatic, {
     root: path.join(process.cwd(), 'dist'),
     prefix: '/',
     decorateReply: false,
