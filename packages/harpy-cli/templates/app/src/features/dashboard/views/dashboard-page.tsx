@@ -39,13 +39,20 @@ export default function DashboardPage({ stats }: DashboardPageProps) {
         </h2>
         <p className="text-gray-600 mb-4">
           This page uses the <strong>DashboardLayout</strong> with a sidebar navigation.
-          The layout is defined at the controller level:
+          The layout is specified in the @JsxRender decorator:
         </p>
         <pre className="bg-gray-50 p-4 rounded-lg overflow-x-auto text-sm">
 {`@Controller('dashboard')
-@WithLayout(DashboardLayout)
 export class DashboardController {
-  // All routes use DashboardLayout
+  
+  @Get()
+  @JsxRender(DashboardPage, {
+    layout: DashboardLayout,  // Specify custom layout
+    meta: { title: 'Dashboard - Harpy App' }
+  })
+  dashboard(): DashboardPageProps {
+    return { stats: this.dashboardService.getStats() };
+  }
 }`}
         </pre>
       </div>
