@@ -13,7 +13,7 @@
     "src"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && cp src/core/live-reload-client.js dist/core/",
     "dev": "tsc --watch",
     "test": "jest",
     "test:watch": "jest --watch",

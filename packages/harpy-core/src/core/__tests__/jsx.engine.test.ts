@@ -23,6 +23,8 @@ describe('JSX Engine', () => {
 
     mockAdapter = {
       render: null,
+      get: jest.fn(),
+      post: jest.fn(),
     };
 
     mockApp = {

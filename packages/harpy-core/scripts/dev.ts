@@ -2,9 +2,32 @@
 
 import { spawn } from 'child_process';
 import * as fs from 'fs';
+import * as http from 'http';
 
 let nestProcess: any = null;
 let isRebuilding = false;
+
+/**
+ * Trigger browser reload by sending notification to LiveReloadController
+ */
+function triggerBrowserReload(): void {
+  const options = {
+    hostname: '127.0.0.1',
+    port: 3000,
+    path: '/__harpy/live-reload/trigger',
+    method: 'POST',
+  };
+
+  const req = http.request(options, () => {
+    // Silently succeed
+  });
+
+  req.on('error', () => {
+    // Silently fail - server might not be ready yet
+  });
+
+  req.end();
+}
 
 async function runCommand(cmd: string, args: string[] = []): Promise<void> {
   return new Promise((resolve, reject) => {
@@ -89,6 +112,7 @@ async function startNestServer(): Promise<void> {
               await autoWrap();
               await buildStyles();
               console.log('✅ Assets rebuilt\n');
+              triggerBrowserReload();
             } catch (error) {
               console.error('❌ Asset rebuild failed:', error);
             } finally {
@@ -149,6 +173,7 @@ function watchSourceChanges(): void {
       try {
         await buildStyles();
         console.log('✅ Styles rebuilt\n');
+        triggerBrowserReload();
       } catch (error) {
         console.error('Build error:', error);
       } finally {
