@@ -40,7 +40,7 @@ export default function LoginPage() {
 
       <div className="mt-6 p-4 bg-blue-50 rounded-lg text-sm text-blue-900">
         <strong>💡 Layout Notice:</strong> This page uses the <strong>AuthLayout</strong> 
-        defined at the controller level using <code className="bg-blue-100 px-1 rounded">@WithLayout(AuthLayout)</code>.
+        by passing it as an option to <code className="bg-blue-100 px-1 rounded">@JsxRender(LoginPage, {'{ layout: AuthLayout }'})</code>.
       </div>
     </div>
   );
