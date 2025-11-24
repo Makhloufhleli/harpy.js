@@ -6,6 +6,7 @@ export { withJsxEngine } from './core/jsx.engine';
 
 // Decorators
 export { JsxRender } from './decorators/jsx.decorator';
+export { WithLayout } from './decorators/layout.decorator';
 export type { MetaOptions, RenderOptions } from './decorators/jsx.decorator';
 
 // Types

@@ -63,6 +63,12 @@ export default function DefaultLayout({
                 <a href="/about" className="text-slate-600 hover:text-amber-600 font-medium transition-colors">
                   About
                 </a>
+                <a href="/auth/login" className="text-slate-600 hover:text-amber-600 font-medium transition-colors">
+                  Login
+                </a>
+                <a href="/dashboard" className="text-slate-600 hover:text-amber-600 font-medium transition-colors">
+                  Dashboard
+                </a>
               </nav>
             </div>
           </div>

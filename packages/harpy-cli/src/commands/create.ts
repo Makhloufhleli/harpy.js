@@ -79,8 +79,8 @@ export async function createCommand(projectName: string, options: CreateOptions)
     spinner.start('Installing @hepta-solutions/harpy-core...');
     
     // Check if there's a local .tgz file (for monorepo development)
-    const localTgzPath = path.join(__dirname, '../../@hepta-solutions/harpy-core-1.0.0.tgz');
-    const parentTgzPath = path.join(__dirname, '../../../@hepta-solutions/harpy-core/@hepta-solutions/harpy-core-1.0.0.tgz');
+    const localTgzPath = path.join(__dirname, '../../hepta-solutions-harpy-core-0.0.9.tgz');
+    const parentTgzPath = path.join(__dirname, '../../../harpy-core/hepta-solutions-harpy-core-0.0.9.tgz');
     
     let packageToInstall = '@hepta-solutions/harpy-core';
     
@@ -151,6 +151,19 @@ export async function createCommand(projectName: string, options: CreateOptions)
     
     spinner.succeed('Project structure created');
     
+    // Remove default NestJS boilerplate files
+    const filesToRemove = [
+      path.join(projectPath, 'src/app.controller.ts'),
+      path.join(projectPath, 'src/app.service.ts'),
+      path.join(projectPath, 'src/app.controller.spec.ts')
+    ];
+    
+    filesToRemove.forEach(file => {
+      if (fs.existsSync(file)) {
+        fs.unlinkSync(file);
+      }
+    });
+    
     // Step 6: Update package.json scripts
     spinner.start('Updating package.json...');
     const packageJsonPath = path.join(projectPath, 'package.json');
@@ -163,7 +176,7 @@ export async function createCommand(projectName: string, options: CreateOptions)
       'auto-wrap': 'harpy auto-wrap',
       'build:styles': 'harpy build-styles',
       'start': 'node dist/main',
-      'start:dev': 'harpy dev',
+      'dev': 'harpy dev',
       'start:prod': 'node dist/main'
     };
     
