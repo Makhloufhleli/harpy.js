@@ -3,7 +3,7 @@ import { Controller, Get } from '@nestjs/common';
 import { DashboardService } from './dashboard.service';
 import DashboardPage, { type DashboardPageProps } from './views/dashboard-page';
 import AnalyticsPage from './views/analytics-page';
-import DashboardLayout from '../../core/views/dashboard-layout';
+import DashboardLayout from '../../layouts/dashboard-layout';
 
 @Controller('dashboard')
 export class DashboardController {

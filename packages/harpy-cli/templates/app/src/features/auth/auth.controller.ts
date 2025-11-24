@@ -3,7 +3,7 @@ import { Controller, Get } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import LoginPage from './views/login-page';
 import RegisterPage from './views/register-page';
-import AuthLayout from '../../core/views/auth-layout';
+import AuthLayout from '../../layouts/auth-layout';
 
 @Controller('auth')
 export class AuthController {
