@@ -52,22 +52,25 @@ export async function createCommand(projectName: string, options: CreateOptions)
     });
     spinner.succeed('NestJS project created');
     
-    // Step 2: Install React dependencies
-    spinner.start('Installing React and dependencies...');
+    // Step 2: Install React and Harpy dependencies
+    spinner.start('Installing React, Harpy, and other dependencies...');
     const installCmd = packageManager === 'yarn' ? 'add' : 'install';
     await execa(packageManager, [
       installCmd,
       'react@^19.0.0',
       'react-dom@^19.0.0',
       '@types/react@^19.0.0',
-      '@types/react-dom@^19.0.0'
+      '@types/react-dom@^19.0.0',
+      '@hepta-solutions/harpy-core@latest',
+      '@fastify/static@^7.0.4',
+      '@types/node'
     ], {
       cwd: projectPath,
       stdio: 'pipe'
     });
-    spinner.succeed('React dependencies installed');
+    spinner.succeed('React and Harpy dependencies installed');
     
-    // Step 3: Install @hepta-solutions/harpy-core or Fastify adapter
+    // Step 3: Install @nestjs/platform-fastify
     spinner.start('Installing @nestjs/platform-fastify...');
     await execa(packageManager, [installCmd, '@nestjs/platform-fastify'], {
       cwd: projectPath,
@@ -75,45 +78,10 @@ export async function createCommand(projectName: string, options: CreateOptions)
     });
     spinner.succeed('@nestjs/platform-fastify installed');
     
-    // Install @hepta-solutions/harpy-core
-    spinner.start('Installing @hepta-solutions/harpy-core...');
-    
-    // Check if there's a local .tgz file (for monorepo development)
-    const localTgzPath = path.join(__dirname, '../../hepta-solutions-harpy-core-0.0.9.tgz');
-    const parentTgzPath = path.join(__dirname, '../../../harpy-core/hepta-solutions-harpy-core-0.0.9.tgz');
-    
-    let packageToInstall = '@hepta-solutions/harpy-core';
-    
-    if (fs.existsSync(localTgzPath)) {
-      packageToInstall = localTgzPath;
-      spinner.text = 'Installing @hepta-solutions/harpy-core (local package)...';
-    } else if (fs.existsSync(parentTgzPath)) {
-      packageToInstall = parentTgzPath;
-      spinner.text = 'Installing @hepta-solutions/harpy-core (local package)...';
-    }
-    
-    try {
-      await execa(packageManager, [installCmd, packageToInstall], {
-        cwd: projectPath,
-        stdio: 'pipe'
-      });
-      spinner.succeed(packageToInstall.endsWith('.tgz') 
-        ? '@hepta-solutions/harpy-core installed (local package)' 
-        : '@hepta-solutions/harpy-core installed');
-    } catch (installError: any) {
-      spinner.fail('Failed to install @hepta-solutions/harpy-core');
-      if (!packageToInstall.endsWith('.tgz')) {
-        console.error(chalk.yellow('\n⚠️  @hepta-solutions/harpy-core not found in npm registry.'));
-        console.error(chalk.yellow('For local development, run: npm pack in @hepta-solutions/harpy-core package\n'));
-      }
-      throw installError;
-    }
-    
-    // Step 4: Install Tailwind CSS, @fastify/static, tsx, esbuild, and postcss-cli
-    spinner.start('Installing Tailwind CSS, Fastify plugins, and build tools...');
+    // Step 4: Install Tailwind CSS and build tools
+    spinner.start('Installing Tailwind CSS and build tools...');
     await execa(packageManager, [
       installCmd,
-      '@fastify/static@^8.0.0',
       '-D',
       'fastify@^5.2.0',
       'tailwindcss@^4.0.0',
@@ -126,7 +94,7 @@ export async function createCommand(projectName: string, options: CreateOptions)
       cwd: projectPath,
       stdio: 'pipe'
     });
-    spinner.succeed('Tailwind CSS, Fastify plugins, and build tools installed');
+    spinner.succeed('Tailwind CSS and build tools installed');
     
     // Step 5: Copy template files
     spinner.start('Setting up project structure...');
