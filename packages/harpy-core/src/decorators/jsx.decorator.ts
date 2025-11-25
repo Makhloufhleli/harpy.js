@@ -1,5 +1,4 @@
 import { RENDER_METADATA } from '@nestjs/common/constants';
-import 'reflect-metadata';
 import { JsxLayout } from '../core/jsx.engine';
 
 export interface MetaOptions {

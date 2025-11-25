@@ -71,13 +71,13 @@ export async function createCommand(projectName: string, options: CreateOptions)
     });
     spinner.succeed('React and Harpy dependencies installed');
     
-    // Step 3: Install @nestjs/platform-fastify
-    spinner.start('Installing @nestjs/platform-fastify...');
-    await execa(packageManager, [installCmd, '@nestjs/platform-fastify'], {
+    // Step 3: Install @nestjs/platform-fastify and reflect-metadata
+    spinner.start('Installing @nestjs/platform-fastify and reflect-metadata...');
+    await execa(packageManager, [installCmd, '@nestjs/platform-fastify', 'reflect-metadata'], {
       cwd: projectPath,
       stdio: 'pipe'
     });
-    spinner.succeed('@nestjs/platform-fastify installed');
+    spinner.succeed('@nestjs/platform-fastify and reflect-metadata installed');
     
     // Step 4: Install Tailwind CSS and build tools
     spinner.start('Installing Tailwind CSS and build tools...');

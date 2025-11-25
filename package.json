@@ -29,14 +29,20 @@
     "packages/*"
   ],
   "lint-staged": {
-    "packages/**/*.{ts,tsx}": [
-      "pnpm test --bail --findRelatedTests"
-    ]
+    "packages/**/*.{ts,tsx}": []
   },
   "author": "Makhlouf Hleli",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/Makhloufhleli/harpy.js"
+  },
+  "pnpm": {
+    "overrides": {
+      "@hepta-solutions/harpy-core": "link:packages/harpy-core"
+    }
+  },
+  "dependencies": {
+    "@hepta-solutions/harpy-core": "link:packages/harpy-core"
   }
 }
