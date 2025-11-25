@@ -30,11 +30,15 @@ describe('I18nInterceptor', () => {
     interceptor = module.get<I18nInterceptor>(I18nInterceptor);
   });
 
-  const createMockContext = (request: any): ExecutionContext => {
+  const createMockContext = (request: any, response?: any): ExecutionContext => {
+    const mockResponse = response || {
+      header: jest.fn(),
+    };
+    
     return {
       switchToHttp: () => ({
         getRequest: () => request,
-        getResponse: jest.fn(),
+        getResponse: () => mockResponse,
         getNext: jest.fn(),
       }),
     } as any;
@@ -111,7 +115,13 @@ describe('I18nInterceptor', () => {
   });
 
   describe('Header locale detection', () => {
-    it('should extract locale from x-lang header', (done) => {
+    it('should extract locale from x-lang header when using header pattern', (done) => {
+      // Create interceptor with header pattern
+      const headerInterceptor = new I18nInterceptor({
+        ...mockOptions,
+        urlPattern: 'header',
+      });
+      
       const mockRequest: any = {
         query: {},
         headers: {
@@ -121,13 +131,13 @@ describe('I18nInterceptor', () => {
       const context = createMockContext(mockRequest);
       const next = createMockCallHandler();
 
-      interceptor.intercept(context, next).subscribe(() => {
+      headerInterceptor.intercept(context, next).subscribe(() => {
         expect(mockRequest.locale).toBe('fr');
         done();
       });
     });
 
-    it('should extract locale from accept-language header', (done) => {
+    it('should extract locale from accept-language header as fallback', (done) => {
       const mockRequest: any = {
         query: {},
         headers: {
@@ -161,12 +171,12 @@ describe('I18nInterceptor', () => {
       });
     });
 
-    it('should prioritize cookie over x-lang header', (done) => {
+    it('should prioritize cookie over accept-language header', (done) => {
       const mockRequest: any = {
         query: {},
         headers: {
           cookie: 'locale=fr',
-          'x-lang': 'es',
+          'accept-language': 'es-ES,es;q=0.9,en;q=0.8',
         },
       };
       const context = createMockContext(mockRequest);
@@ -188,6 +198,27 @@ describe('I18nInterceptor', () => {
 
       interceptor.intercept(context, next).subscribe(() => {
         expect(mockRequest.locale).toBe('en');
+        done();
+      });
+    });
+
+    it('should set cookie when locale is found in URL', (done) => {
+      const mockResponse = {
+        header: jest.fn(),
+      };
+      const mockRequest: any = {
+        query: { lang: 'fr' },
+        headers: {},
+      };
+      const context = createMockContext(mockRequest, mockResponse);
+      const next = createMockCallHandler();
+
+      interceptor.intercept(context, next).subscribe(() => {
+        expect(mockRequest.locale).toBe('fr');
+        expect(mockResponse.header).toHaveBeenCalledWith(
+          'Set-Cookie',
+          expect.stringContaining('locale=fr'),
+        );
         done();
       });
     });

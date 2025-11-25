@@ -130,19 +130,26 @@ Use the `useI18n()` hook to switch locales:
 import { useI18n } from '@hepta-solutions/harpy-core/client';
 
 export function LanguageSwitcher() {
-  const { switchLocale, isLoading } = useI18n();
+  const { switchLocale } = useI18n();
 
   return (
     <div>
-      <button onClick={() => switchLocale('en')} disabled={isLoading}>
+      <button onClick={() => switchLocale('en')}>
         English
       </button>
-      <button onClick={() => switchLocale('fr')} disabled={isLoading}>
+      <button onClick={() => switchLocale('fr')}>
         Français
       </button>
     </div>
   );
 }
+```
+
+**How it works:**
+- When you click a language button, it updates the URL with `?lang=fr` and reloads the page
+- The server-side interceptor detects the language from the URL and automatically sets a cookie
+- On subsequent visits, the language is remembered via the cookie
+- All navigation links automatically preserve the language parameter via a script in the layout
 ```
 
 ### Dynamic Metadata with Translations
