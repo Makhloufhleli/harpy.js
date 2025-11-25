@@ -64,5 +64,8 @@
     "ts-jest": "^29.1.0",
     "typescript": "^5.7.2"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "gitHead": "d7a4f2ad108c68f2b441ad0c24385b45b1e046a3"
 }
