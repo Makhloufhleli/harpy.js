@@ -3,8 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# 0.2.0 (2025-11-24)
+# 0.2.0 (2025-11-25)
 
+### Features
+
+* **i18n**: add i18n support to project templates ([HASH](URL))
+  * Templates now include pre-configured i18n setup
+  * Added `@fastify/cookie` dependency for locale persistence
+  * Includes English and French dictionaries by default
+  * Language switcher component example
+  * Integration with `@hepta-solutions/harpy-core@0.3.0` i18n module
+  * Updated `create` command to install i18n dependencies
+
+### Dependencies
+
+* Updated peer dependency to `@hepta-solutions/harpy-core@^0.3.0`
+
+# 0.1.5 (2025-11-24)
 
 ### Bug Fixes
 

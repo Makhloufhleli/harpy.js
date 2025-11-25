@@ -1,7 +1,9 @@
-import { JsxRender } from '@hepta-solutions/harpy-core';
+import { JsxRender, CurrentLocale } from '@hepta-solutions/harpy-core';
 import { Controller, Get } from '@nestjs/common';
 import { HomeService } from './home.service';
 import Homepage, { type PageProps } from './views/homepage';
+import { getDictionary, type Dictionary } from '../../i18n/get-dictionary';
+import { t } from '@hepta-solutions/harpy-core';
 
 @Controller()
 export class HomeController {
@@ -9,25 +11,34 @@ export class HomeController {
 
   @Get()
   @JsxRender(Homepage, {
-    meta: {
-      title: 'Welcome to My App',
-      description: 'This is the homepage of my awesome app.',
-      openGraph: {
-        title: 'Welcome to My App',
-        description: 'This is the homepage of my awesome app.',
-        type: 'website',
-        url: 'https://example.com',
-      },
-      twitter: {
-        card: 'summary_large_image',
-        title: 'Welcome to My App',
-        description: 'This is the homepage of my awesome app.',
-      },
+    // Dynamic metadata that uses translations
+    meta: async (req, data: PageProps) => {
+      const dict = data.dict;
+      return {
+        title: t(dict, 'hero.meta.title'),
+        description: t(dict, 'hero.meta.description'),
+        openGraph: {
+          title: t(dict, 'hero.meta.title'),
+          description: t(dict, 'hero.meta.description'),
+          type: 'website',
+          url: 'https://example.com',
+        },
+        twitter: {
+          card: 'summary_large_image',
+          title: t(dict, 'hero.meta.title'),
+          description: t(dict, 'hero.meta.description'),
+        },
+      };
     },
   })
-  homepage(): PageProps {
+  async homepage(@CurrentLocale() locale: string): Promise<PageProps> {
+    // Get dictionary for type-safe translations
+    const dict = await getDictionary(locale);
+
     return {
       items: this.homeService.getItems(),
+      dict,
+      locale,
     };
   }
 }
