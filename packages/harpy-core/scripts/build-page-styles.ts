@@ -26,7 +26,7 @@ async function main(): Promise<void> {
     // Compile Tailwind CSS
     console.log('   Compiling Tailwind CSS...');
     execSync(
-      `postcss ${path.join(srcAssetsDir, 'styles.css')} -o ${outputCssPath}`,
+      `NODE_ENV=production postcss ${path.join(srcAssetsDir, 'styles.css')} -o ${outputCssPath}`,
       {
         stdio: 'inherit',
       },

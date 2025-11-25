@@ -168,39 +168,48 @@ export function withJsxEngine(
     // This ensures components render cleanly for the client
     const finalHydrationCtx = initializeHydrationContext();
     
+    // Build hydration scripts HTML (vendor bundle + component chunks)
+    let hydrationScriptsHtml = '';
+    if (hydrationScripts.length > 0) {
+      // Always load vendor bundle first (contains React + ReactDOM)
+      hydrationScriptsHtml = '<script src="/chunks/vendor.js"></script>';
+      // Then load component-specific chunks
+      hydrationScripts.forEach(script => {
+        hydrationScriptsHtml += `<script src="${script.path}"></script>`;
+      });
+    }
+    
     if (isDev) {
-      // In development, render to string first to inject live reload
+      // In development, render to string first to inject scripts
       let htmlString = '';
       hydrationContext.run(finalHydrationCtx, () => {
         htmlString = renderToString(finalHtml);
       });
       
-      // Inject live reload script before closing body tag
+      // Inject live reload and hydration scripts before closing body tag
       const liveReloadScript = '<script src="/__harpy/live-reload.js"></script>';
-      htmlString = htmlString.replace('</body>', `${liveReloadScript}</body>`);
+      const scriptsToInject = `${hydrationScriptsHtml}${liveReloadScript}`;
+      htmlString = htmlString.replace('</body>', `${scriptsToInject}</body>`);
       
       res.setHeader('content-type', 'text/html');
       reply.status(reply.statusCode || 200);
       res.end(htmlString);
     } else {
-      // In production, use streaming for better performance
+      // In production, render to string to inject hydration scripts
+      // (streaming doesn't allow HTML manipulation after render)
+      let htmlString = '';
       hydrationContext.run(finalHydrationCtx, () => {
-        const { pipe } = renderToPipeableStream(finalHtml, {
-          onShellReady() {
-            res.setHeader('content-type', 'text/html');
-            reply.status(reply.statusCode || 200);
-            pipe(res);
-          },
-          onError(error) {
-            console.error(error);
-            if (!res.headersSent) {
-              reply.status(500).send({ error: 'Internal Server Error' });
-            } else {
-              res.end();
-            }
-          },
-        });
+        htmlString = renderToString(finalHtml);
       });
+      
+      // Inject hydration scripts before closing body tag
+      if (hydrationScriptsHtml) {
+        htmlString = htmlString.replace('</body>', `${hydrationScriptsHtml}</body>`);
+      }
+      
+      res.setHeader('content-type', 'text/html');
+      reply.status(reply.statusCode || 200);
+      res.end(htmlString);
     }
   };
 }

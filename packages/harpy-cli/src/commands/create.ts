@@ -71,13 +71,13 @@ export async function createCommand(projectName: string, options: CreateOptions)
     });
     spinner.succeed('React and Harpy dependencies installed');
     
-    // Step 3: Install @nestjs/platform-fastify
-    spinner.start('Installing @nestjs/platform-fastify...');
-    await execa(packageManager, [installCmd, '@nestjs/platform-fastify'], {
+    // Step 3: Install @nestjs/platform-fastify and reflect-metadata
+    spinner.start('Installing @nestjs/platform-fastify and reflect-metadata...');
+    await execa(packageManager, [installCmd, '@nestjs/platform-fastify', 'reflect-metadata'], {
       cwd: projectPath,
       stdio: 'pipe'
     });
-    spinner.succeed('@nestjs/platform-fastify installed');
+    spinner.succeed('@nestjs/platform-fastify and reflect-metadata installed');
     
     // Step 4: Install Tailwind CSS and build tools
     spinner.start('Installing Tailwind CSS and build tools...');
@@ -89,6 +89,7 @@ export async function createCommand(projectName: string, options: CreateOptions)
       'postcss@^8.4.0',
       '@tailwindcss/postcss@^4.0.0',
       'postcss-cli@^11.0.0',
+      'cssnano@^7.0.0',
       'tsx@^4.0.0',
       'esbuild@^0.24.0'
     ], {
@@ -159,9 +160,8 @@ export async function createCommand(projectName: string, options: CreateOptions)
     
     tsconfig.compilerOptions = {
       ...tsconfig.compilerOptions,
-      jsx: 'react',
-      jsxFactory: 'React.createElement',
-      jsxFragmentFactory: 'React.Fragment'
+      jsx: 'react-jsx',
+      jsxImportSource: 'react'
     };
     
     fs.writeJsonSync(tsconfigPath, tsconfig, { spaces: 2 });

@@ -1,4 +1,3 @@
-import React from 'react';
 import { t } from '@hepta-solutions/harpy-core';
 import { Dictionary } from '../../../i18n/get-dictionary';
 import Counter from './counter';

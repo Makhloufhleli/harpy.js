@@ -17,10 +17,12 @@ export class I18nInterceptor implements NestInterceptor {
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const request = context.switchToHttp().getRequest();
+    const response = context.switchToHttp().getResponse();
     const locales = this.options.locales;
     const defaultLocale = this.options.defaultLocale;
 
     let locale: string | undefined = undefined;
+    let shouldSetCookie = false;
 
     // Extract locale based on URL pattern
     switch (this.options.urlPattern) {
@@ -29,15 +31,21 @@ export class I18nInterceptor implements NestInterceptor {
         const queryLang = request.query?.[this.options.queryParam || 'lang'];
         if (queryLang && locales.includes(queryLang)) {
           locale = queryLang;
+          shouldSetCookie = true; // Set cookie when lang is in URL
         }
         break;
 
       case 'header':
-        // Use only headers (no URL modification)
+        // Extract from x-lang header
+        const xLang = request.headers['x-lang'];
+        if (xLang && locales.includes(xLang)) {
+          locale = xLang;
+          shouldSetCookie = true; // Set cookie when header is present
+        }
         break;
     }
 
-    // Fallback to cookie if not found in URL
+    // Fallback to cookie if not found in URL/header
     const cookieLang = this.parseCookie(
       request.headers.cookie,
       this.options.cookieName || 'locale',
@@ -48,17 +56,9 @@ export class I18nInterceptor implements NestInterceptor {
       }
     }
 
-    // Fallback to x-lang header
-    const xLang = request.headers['x-lang'];
-    if (!locale) {
-      if (xLang && locales.includes(xLang)) {
-        locale = xLang;
-      }
-    }
-
     // Fallback to accept-language header
-    const acceptLanguage = request.headers['accept-language'];
     if (!locale) {
+      const acceptLanguage = request.headers['accept-language'];
       if (acceptLanguage) {
         const preferredLocale = acceptLanguage
           .split(',')[0]
@@ -78,6 +78,16 @@ export class I18nInterceptor implements NestInterceptor {
 
     // Store locale in request object for later use
     request.locale = locale;
+
+    // Automatically set cookie if locale was found in URL or header
+    if (shouldSetCookie && cookieLang !== locale) {
+      const cookieName = this.options.cookieName || 'locale';
+      const maxAge = 365 * 24 * 60 * 60; // 1 year in seconds
+      response.header(
+        'Set-Cookie',
+        `${cookieName}=${locale}; Path=/; Max-Age=${maxAge}; HttpOnly; SameSite=Lax`,
+      );
+    }
 
     return next.handle();
   }

@@ -1,4 +1,3 @@
-import 'reflect-metadata';
 import { JsxLayout } from '../core/jsx.engine';
 
 export const LAYOUT_METADATA = 'harpy:layout';

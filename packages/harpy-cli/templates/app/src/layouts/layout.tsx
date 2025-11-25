@@ -1,22 +1,15 @@
-import React from 'react';
 import type { JsxLayoutProps } from '@hepta-solutions/harpy-core';
 
 export default function DefaultLayout({
   children,
   meta,
-  hydrationScripts,
-}: JsxLayoutProps & {
-  hydrationScripts?: Array<{ componentName: string; path: string }>;
-}) {
+}: JsxLayoutProps) {
   const title = meta?.title ?? 'Harpy Framework';
   const description = meta?.description ?? 'A powerful NestJS + React framework with automatic hydration. Built for speed, precision, and adaptability.';
   const canonical = meta?.canonical ?? 'https://example.com';
 
   const og = meta?.openGraph ?? {};
   const twitter = meta?.twitter ?? {};
-
-  // Use hydration scripts passed from the engine if available
-  const chunkScripts = hydrationScripts || [];
 
   return (
     <html lang="en">
@@ -114,11 +107,6 @@ export default function DefaultLayout({
             </div>
           </div>
         </footer>
-
-        {/* Auto-injected hydration scripts at end of body to ensure DOM is ready */}
-        {chunkScripts.map((script) => (
-          <script key={script.componentName} src={script.path}></script>
-        ))}
       </body>
     </html>
   );

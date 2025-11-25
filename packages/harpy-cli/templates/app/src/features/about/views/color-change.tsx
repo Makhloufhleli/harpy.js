@@ -1,9 +1,9 @@
 'use client';
 
-import React from 'react';
+import { useState } from 'react';
 
 function ColorChange() {
-  const [color, setColor] = React.useState('text-blue-500');
+  const [color, setColor] = useState('text-blue-500');
   return (
     <div className="rounded-lg shadow-lg p-4">
       <h1>ColorChange</h1>

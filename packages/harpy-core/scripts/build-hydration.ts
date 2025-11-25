@@ -6,6 +6,7 @@
  * 2. Generate separate hydration entry files
  * 3. Bundle them with esbuild to dist/chunks with cache-busted names
  * 4. Create a manifest file for server-side lookup
+ * 5. Create shared vendor bundle for React/ReactDOM to eliminate duplication
  */
 
 import { execSync } from 'child_process';
@@ -20,6 +21,7 @@ const HYDRATION_ENTRIES_DIR = path.join(SRC_DIR, '.hydration-entries');
 const CHUNKS_DIR = path.join(DIST_DIR, 'chunks');
 // Write manifest directly to dist (no need for temp since this runs after nest build)
 const MANIFEST_FILE = path.join(DIST_DIR, 'hydration-manifest.json');
+const VENDOR_BUNDLE = 'vendor.js';
 
 // Check if running in production mode (add cache-busting hashes only in production)
 const IS_PRODUCTION = process.argv.includes('--prod');
@@ -91,6 +93,7 @@ function findClientComponents(): ComponentFile[] {
 
 /**
  * Generate hydration entry file for a client component
+ * Uses window.React from vendor bundle
  */
 function generateHydrationEntry(component: ComponentFile): string {
   const relativePath = path.relative(HYDRATION_ENTRIES_DIR, component.filePath);
@@ -102,8 +105,10 @@ function generateHydrationEntry(component: ComponentFile): string {
     : `import ${component.componentName} from '${importPath}';`;
 
   const content = `
-import React from 'react';
-import { hydrateRoot } from 'react-dom/client';
+// Use React from vendor bundle
+const React = window.React;
+const { hydrateRoot } = window.ReactDOM;
+
 ${importStatement}
 
 /**
@@ -207,8 +212,60 @@ function main(): void {
     console.log(`   ✓ ${component.componentName}.tsx`);
   }
 
+  // Build shared vendor bundle first
+  console.log('\n📦 Building shared vendor bundle...');
+  const vendorEntryPath = path.join(HYDRATION_ENTRIES_DIR, '_vendor.js');
+  const vendorContent = `
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+
+// Expose React and ReactDOM globally for component chunks
+window.React = React;
+window.ReactDOM = ReactDOM;
+`.trim();
+  
+  fs.writeFileSync(vendorEntryPath, vendorContent, 'utf-8');
+  
+  const vendorOutputPath = path.join(CHUNKS_DIR, VENDOR_BUNDLE);
+  try {
+    const vendorCommand = `npx esbuild "${vendorEntryPath}" --bundle --minify --target=es2020 --format=iife --outfile="${vendorOutputPath}" --platform=browser --tree-shaking=true --define:process.env.NODE_ENV=\\"production\\"`;
+    execSync(vendorCommand, { stdio: 'inherit' });
+    console.log(`   ✓ vendor.js (React + ReactDOM)`);
+  } catch (error) {
+    console.error(`   ✗ Failed to bundle vendor:`, error);
+    process.exit(1);
+  }
+
   // Bundle each entry file separately with cache-busted names
-  console.log('\n📦 Bundling hydration scripts with cache busting...');
+  console.log('\n📦 Bundling hydration scripts...');
+
+  // Create React shim files for aliasing
+  const SHIMS_DIR = path.join(DIST_DIR, '.shims');
+  if (!fs.existsSync(SHIMS_DIR)) {
+    fs.mkdirSync(SHIMS_DIR, { recursive: true });
+  }
+
+  // Create shim for react
+  const reactShimPath = path.join(SHIMS_DIR, 'react.js');
+  fs.writeFileSync(reactShimPath, 'module.exports = window.React;', 'utf-8');
+
+  // Create shim for react-dom
+  const reactDomShimPath = path.join(SHIMS_DIR, 'react-dom.js');
+  fs.writeFileSync(reactDomShimPath, 'module.exports = window.ReactDOM;', 'utf-8');
+
+  // Create shim for react-dom/client
+  const reactDomClientShimPath = path.join(SHIMS_DIR, 'react-dom-client.js');
+  fs.writeFileSync(reactDomClientShimPath, 'module.exports = window.ReactDOM;', 'utf-8');
+
+  // Create shim for react/jsx-runtime
+  const jsxRuntimeShimPath = path.join(SHIMS_DIR, 'jsx-runtime.js');
+  fs.writeFileSync(jsxRuntimeShimPath, `
+const React = window.React;
+module.exports = {
+  jsx: React.createElement,
+  jsxs: React.createElement,
+  Fragment: React.Fragment
+};`, 'utf-8');
 
   const manifest: HydrationManifest = {};
 
@@ -217,7 +274,8 @@ function main(): void {
     const outputPath = path.join(CHUNKS_DIR, chunkFilename);
 
     try {
-      const command = `npx esbuild "${entry.path}" --bundle --minify --sourcemap --target=chrome120 --keep-names --outfile="${outputPath}" --platform=browser`;
+      // Use aliases to redirect React imports to window.React from vendor bundle
+      const command = `npx esbuild "${entry.path}" --bundle --minify --target=es2020 --format=iife --keep-names --outfile="${outputPath}" --platform=browser --tree-shaking=true --define:process.env.NODE_ENV=\\"production\\" --alias:react=${reactShimPath} --alias:react-dom=${reactDomShimPath} --alias:react-dom/client=${reactDomClientShimPath} --alias:react/jsx-runtime=${jsxRuntimeShimPath}`;
       execSync(command, { stdio: 'inherit' });
       manifest[entry.componentName] = chunkFilename;
       console.log(`   ✓ ${entry.componentName} -> ${chunkFilename}`);

@@ -1,9 +1,9 @@
 'use client';
 
-import React from 'react';
+import { useState } from 'react';
 
 function AboutCounter() {
-  const [count, setCount] = React.useState(0);
+  const [count, setCount] = useState(0);
   return (
     <div>
       <h1>Counter: {count}</h1>
