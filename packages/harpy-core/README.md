@@ -8,6 +8,8 @@ Core package for NestJS + React/JSX with server-side rendering and automatic cli
 - 🔄 **Auto Hydration** - Client components marked with `'use client'` automatically hydrate
 - ⚡ **Fast Builds** - Optimized build pipeline with esbuild
 - 📦 **Zero Config** - Works out of the box with NestJS
+- 🌐 **I18n Support** - Built-in internationalization with type-safe translations
+- 🍪 **Cookie Management** - Integrated with Fastify for session management
 
 ## Installation
 

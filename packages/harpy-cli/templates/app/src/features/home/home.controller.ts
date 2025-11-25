@@ -1,11 +1,16 @@
-import { JsxRender } from '@hepta-solutions/harpy-core';
+import { JsxRender, I18nService, CurrentLocale } from '@hepta-solutions/harpy-core';
 import { Controller, Get } from '@nestjs/common';
 import { HomeService } from './home.service';
 import Homepage, { type PageProps } from './views/homepage';
+import { getDictionary, type Dictionary } from '../../i18n/get-dictionary';
+import { t } from '@hepta-solutions/harpy-core';
 
 @Controller()
 export class HomeController {
-  constructor(private readonly homeService: HomeService) {}
+  constructor(
+    private readonly homeService: HomeService,
+    private readonly i18n: I18nService,
+  ) {}
 
   @Get()
   @JsxRender(Homepage, {
@@ -25,9 +30,14 @@ export class HomeController {
       },
     },
   })
-  homepage(): PageProps {
+  async homepage(@CurrentLocale() locale: string): Promise<PageProps> {
+    // Get dictionary for type-safe translations
+    const dict = await getDictionary(locale);
+
     return {
       items: this.homeService.getItems(),
+      dict,
+      locale,
     };
   }
 }

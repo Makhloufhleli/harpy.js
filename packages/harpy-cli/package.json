@@ -1,7 +1,7 @@
 {
   "name": "@hepta-solutions/harpy-cli",
-  "version": "0.1.5",
-  "description": "Harpy CLI - Create and manage Harpy projects with React/JSX support",
+  "version": "0.2.0",
+  "description": "Harpy CLI - Create and manage Harpy projects with React/JSX and i18n support",
   "main": "dist/index.js",
   "bin": {
     "harpy": "./bin/harpy.js"
