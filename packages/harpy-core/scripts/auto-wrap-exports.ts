@@ -102,28 +102,41 @@ function transformCompiledFile(
     // Add the require at the top of the file (after the 'use strict' and initial Object.defineProperty)
     const requireStatement = `var { autoWrapClientComponent: _autoWrapClientComponent } = require("${normalizedRelativePath}");`;
 
-    // Check if we have the 'use client' and Object.defineProperty pattern
-    if (
-      content.includes('"use strict"') &&
-      content.includes('Object.defineProperty')
-    ) {
-      // Insert require statement after the initial Object.defineProperty setup
-      content = content.replace(
-        /("use strict";\s*Object\.defineProperty\([^}]+\}\);)/,
-        `$1\n${requireStatement}`,
-      );
-    } else if (!content.includes(requireStatement)) {
-      // Fallback: insert at the beginning after any initial comments
-      const lines = content.split('\n');
-      let insertIndex = 0;
-      for (let i = 0; i < lines.length; i++) {
-        if (lines[i].includes('"use strict"')) {
-          insertIndex = i + 1;
-          break;
+    // Ensure the require statement is added before any wrapping
+    if (!content.includes(requireStatement) && !content.includes('_autoWrapClientComponent')) {
+      // Check if we have the 'use client' and Object.defineProperty pattern
+      if (
+        content.includes('"use strict"') &&
+        content.includes('Object.defineProperty')
+      ) {
+        // Find the last Object.defineProperty line before any exports
+        const lines = content.split('\n');
+        let insertIndex = -1;
+        
+        for (let i = 0; i < lines.length; i++) {
+          if (lines[i].includes('Object.defineProperty(exports')) {
+            insertIndex = i + 1;
+            break;
+          }
         }
+        
+        if (insertIndex !== -1) {
+          lines.splice(insertIndex, 0, requireStatement);
+          content = lines.join('\n');
+        }
+      } else {
+        // Fallback: insert at the beginning after any initial comments
+        const lines = content.split('\n');
+        let insertIndex = 0;
+        for (let i = 0; i < lines.length; i++) {
+          if (lines[i].includes('"use strict"')) {
+            insertIndex = i + 1;
+            break;
+          }
+        }
+        lines.splice(insertIndex, 0, requireStatement);
+        content = lines.join('\n');
       }
-      lines.splice(insertIndex, 0, requireStatement);
-      content = lines.join('\n');
     }
 
     // SWC pattern: const _default = ComponentName;
@@ -169,8 +182,22 @@ function transformCompiledFile(
       return true;
     }
 
+    // Named export pattern: exports.ComponentName = ComponentName;
+    const namedExportPattern = new RegExp(
+      `exports\\.${componentName}\\s*=\\s*${componentName}\\s*;`,
+    );
+    if (namedExportPattern.test(content)) {
+      content = content.replace(
+        namedExportPattern,
+        `exports.${componentName} = _autoWrapClientComponent(${componentName}, '${componentName}');`,
+      );
+      fs.writeFileSync(filePath, content, 'utf-8');
+      console.log(`  ✓ Wrapped: ${path.basename(filePath)}`);
+      return true;
+    }
+
     console.warn(
-      `  ⚠️  Could not find default export pattern for ${componentName} in ${path.basename(filePath)}`,
+      `  ⚠️  Could not find export pattern for ${componentName} in ${path.basename(filePath)}`,
     );
     return false;
   } catch (error) {

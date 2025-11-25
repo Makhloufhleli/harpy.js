@@ -27,6 +27,7 @@ const IS_PRODUCTION = process.argv.includes('--prod');
 interface ComponentFile {
   filePath: string;
   componentName: string;
+  isNamedExport: boolean; // Track if it's a named export
 }
 
 interface HydrationManifest {
@@ -64,9 +65,17 @@ function findClientComponents(): ComponentFile[] {
               .split('-')
               .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
               .join('');
+            
+            // Detect if it's a named export by checking for patterns like:
+            // export function ComponentName or export const ComponentName
+            const hasNamedExport = new RegExp(
+              `export\\s+(function|const|class)\\s+${componentName}\\b`
+            ).test(content);
+            
             components.push({
               filePath: fullPath,
               componentName,
+              isNamedExport: hasNamedExport,
             });
           }
         } catch (error) {
@@ -87,10 +96,15 @@ function generateHydrationEntry(component: ComponentFile): string {
   const relativePath = path.relative(HYDRATION_ENTRIES_DIR, component.filePath);
   const importPath = `./${relativePath.replace(/\\\\/g, '/')}`;
 
+  // Generate appropriate import statement based on export type
+  const importStatement = component.isNamedExport
+    ? `import { ${component.componentName} } from '${importPath}';`
+    : `import ${component.componentName} from '${importPath}';`;
+
   const content = `
 import React from 'react';
 import { hydrateRoot } from 'react-dom/client';
-import ${component.componentName} from '${importPath}';
+${importStatement}
 
 /**
  * Auto-generated hydration entry for ${component.componentName}
