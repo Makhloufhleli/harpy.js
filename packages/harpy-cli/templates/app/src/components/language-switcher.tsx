@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import { useI18n } from '@hepta-solutions/harpy-core/client';
 
 /**

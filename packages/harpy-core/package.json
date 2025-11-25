@@ -1,9 +1,19 @@
 {
   "name": "@hepta-solutions/harpy-core",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Harpy - A powerful NestJS + React/JSX SSR framework with automatic hydration and i18n support",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./client": {
+      "types": "./dist/client/use-i18n.d.ts",
+      "default": "./dist/client/use-i18n.js"
+    }
+  },
   "bin": {
     "harpy": "./dist/cli.js"
   },

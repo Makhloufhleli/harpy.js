@@ -56,11 +56,19 @@ export class I18nSwitcherController {
 
     try {
       const refererUrl = new URL(referer);
-      currentPath = refererUrl.pathname;
-      // Parse query params from referer
-      refererUrl.searchParams.forEach((value, key) => {
-        query[key] = value;
-      });
+      // Security check: validate it's from the same origin to prevent open redirect
+      const requestOrigin = `${req.protocol}://${req.hostname}${req.hostname === 'localhost' && req.port ? ':' + req.port : ''}`;
+      
+      if (refererUrl.origin !== requestOrigin) {
+        // External origin - use root path for security
+        currentPath = '/';
+      } else {
+        currentPath = refererUrl.pathname;
+        // Parse query params from referer
+        refererUrl.searchParams.forEach((value, key) => {
+          query[key] = value;
+        });
+      }
     } catch {
       // If referer is not a valid URL, use root path
       currentPath = '/';

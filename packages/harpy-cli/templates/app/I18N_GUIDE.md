@@ -145,6 +145,64 @@ export function LanguageSwitcher() {
 }
 ```
 
+### Dynamic Metadata with Translations
+
+You can translate page metadata (title, description, Open Graph, Twitter cards) using a dynamic meta function:
+
+```tsx
+import { Controller, Get } from '@nestjs/common';
+import { JsxRender, CurrentLocale, t } from '@hepta-solutions/harpy-core';
+import { getDictionary } from '../i18n/get-dictionary';
+import MyPage, { type PageProps } from './views/my-page';
+
+@Controller()
+export class MyController {
+  @Get()
+  @JsxRender(MyPage, {
+    // Dynamic metadata that uses translations
+    meta: async (req, data: PageProps) => {
+      const dict = data.dict;
+      return {
+        title: t(dict, 'hero.meta.title'),
+        description: t(dict, 'hero.meta.description'),
+        openGraph: {
+          title: t(dict, 'hero.meta.title'),
+          description: t(dict, 'hero.meta.description'),
+          type: 'website',
+          url: 'https://example.com',
+        },
+        twitter: {
+          card: 'summary_large_image',
+          title: t(dict, 'hero.meta.title'),
+          description: t(dict, 'hero.meta.description'),
+        },
+      };
+    },
+  })
+  async getPage(@CurrentLocale() locale: string): Promise<PageProps> {
+    const dict = await getDictionary(locale);
+    
+    return {
+      dict,
+      locale,
+    };
+  }
+}
+```
+
+Add the translations to your dictionary:
+
+```json
+{
+  "hero": {
+    "meta": {
+      "title": "Welcome to My App",
+      "description": "This is the homepage of my awesome app."
+    }
+  }
+}
+```
+
 ## URL Patterns
 
 ### Query Pattern (Recommended)

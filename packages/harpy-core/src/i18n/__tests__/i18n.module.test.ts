@@ -2,10 +2,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { I18nModule } from '../i18n.module';
 import { I18nService } from '../i18n.service';
 import { I18nHelper } from '../i18n.helper';
-import { I18nInterceptor } from '../i18n.interceptor';
 import { I18nSwitcherController } from '../i18n-switcher.controller';
 import { I18N_MODULE_OPTIONS } from '../i18n-module.options';
-import { APP_INTERCEPTOR } from '@nestjs/core';
 
 describe('I18nModule', () => {
   it('should be defined', () => {

@@ -63,9 +63,8 @@ export function useI18n(): UseI18nReturn {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error';
       setError(errorMessage);
-      console.error('Failed to switch locale:', err);
-    } finally {
       setIsLoading(false);
+      console.error('Failed to switch locale:', err);
     }
   };
 

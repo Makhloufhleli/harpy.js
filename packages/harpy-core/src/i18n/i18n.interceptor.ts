@@ -20,7 +20,7 @@ export class I18nInterceptor implements NestInterceptor {
     const locales = this.options.locales;
     const defaultLocale = this.options.defaultLocale;
 
-    let locale: string = defaultLocale;
+    let locale: string | undefined = undefined;
 
     // Extract locale based on URL pattern
     switch (this.options.urlPattern) {
@@ -42,7 +42,7 @@ export class I18nInterceptor implements NestInterceptor {
       request.headers.cookie,
       this.options.cookieName || 'locale',
     );
-    if (!locale || locale === defaultLocale) {
+    if (!locale) {
       if (cookieLang && locales.includes(cookieLang)) {
         locale = cookieLang;
       }
@@ -50,7 +50,7 @@ export class I18nInterceptor implements NestInterceptor {
 
     // Fallback to x-lang header
     const xLang = request.headers['x-lang'];
-    if (!locale || locale === defaultLocale) {
+    if (!locale) {
       if (xLang && locales.includes(xLang)) {
         locale = xLang;
       }
@@ -58,7 +58,7 @@ export class I18nInterceptor implements NestInterceptor {
 
     // Fallback to accept-language header
     const acceptLanguage = request.headers['accept-language'];
-    if (!locale || locale === defaultLocale) {
+    if (!locale) {
       if (acceptLanguage) {
         const preferredLocale = acceptLanguage
           .split(',')[0]
@@ -69,6 +69,11 @@ export class I18nInterceptor implements NestInterceptor {
           locale = preferredLocale;
         }
       }
+    }
+
+    // Use default locale if nothing matched
+    if (!locale) {
+      locale = defaultLocale;
     }
 
     // Store locale in request object for later use
@@ -86,6 +91,14 @@ export class I18nInterceptor implements NestInterceptor {
     const cookies = cookieHeader.split(';').map((c) => c.trim());
     const cookie = cookies.find((c) => c.startsWith(`${name}=`));
 
-    return cookie ? cookie.split('=')[1] : undefined;
+    if (!cookie) return undefined;
+    const eqIndex = cookie.indexOf('=');
+    if (eqIndex === -1) return undefined;
+    const value = cookie.slice(eqIndex + 1);
+    try {
+      return decodeURIComponent(value);
+    } catch {
+      return value; // Return as-is if decoding fails
+    }
   }
 }

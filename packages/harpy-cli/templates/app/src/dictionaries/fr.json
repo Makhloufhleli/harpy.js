@@ -5,7 +5,11 @@
   "hero": {
     "title": "Bienvenue sur Harpy",
     "subtitle": "Un framework puissant NestJS + React avec hydratation automatique.",
-    "description": "Conçu pour la vitesse, la précision et l'adaptabilité."
+    "description": "Conçu pour la vitesse, la précision et l'adaptabilité.",
+    "meta": {
+      "title": "Bienvenue dans Mon Application",
+      "description": "Ceci est la page d'accueil de mon application géniale."
+    }
   },
   "features": {
     "title": "Pourquoi choisir Harpy ?",
