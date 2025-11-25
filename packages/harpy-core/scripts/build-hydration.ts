@@ -6,6 +6,7 @@
  * 2. Generate separate hydration entry files
  * 3. Bundle them with esbuild to dist/chunks with cache-busted names
  * 4. Create a manifest file for server-side lookup
+ * 5. Create shared vendor bundle for React/ReactDOM to eliminate duplication
  */
 
 import { execSync } from 'child_process';
@@ -20,6 +21,7 @@ const HYDRATION_ENTRIES_DIR = path.join(SRC_DIR, '.hydration-entries');
 const CHUNKS_DIR = path.join(DIST_DIR, 'chunks');
 // Write manifest directly to dist (no need for temp since this runs after nest build)
 const MANIFEST_FILE = path.join(DIST_DIR, 'hydration-manifest.json');
+const VENDOR_BUNDLE = 'vendor.js';
 
 // Check if running in production mode (add cache-busting hashes only in production)
 const IS_PRODUCTION = process.argv.includes('--prod');
@@ -91,6 +93,7 @@ function findClientComponents(): ComponentFile[] {
 
 /**
  * Generate hydration entry file for a client component
+ * React and ReactDOM are imported from the shared vendor bundle
  */
 function generateHydrationEntry(component: ComponentFile): string {
   const relativePath = path.relative(HYDRATION_ENTRIES_DIR, component.filePath);
@@ -102,8 +105,9 @@ function generateHydrationEntry(component: ComponentFile): string {
     : `import ${component.componentName} from '${importPath}';`;
 
   const content = `
-import React from 'react';
-import { hydrateRoot } from 'react-dom/client';
+// React and ReactDOM are loaded from the shared vendor bundle
+const React = window.React;
+const { hydrateRoot } = window.ReactDOM;
 ${importStatement}
 
 /**
@@ -207,8 +211,32 @@ function main(): void {
     console.log(`   ✓ ${component.componentName}.tsx`);
   }
 
+  // Build shared vendor bundle first
+  console.log('\n📦 Building shared vendor bundle...');
+  const vendorEntryPath = path.join(HYDRATION_ENTRIES_DIR, '_vendor.js');
+  const vendorContent = `
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+
+// Expose React and ReactDOM globally for component chunks
+window.React = React;
+window.ReactDOM = ReactDOM;
+`.trim();
+  
+  fs.writeFileSync(vendorEntryPath, vendorContent, 'utf-8');
+  
+  const vendorOutputPath = path.join(CHUNKS_DIR, VENDOR_BUNDLE);
+  try {
+    const vendorCommand = `npx esbuild "${vendorEntryPath}" --bundle --minify --target=es2020 --format=iife --outfile="${vendorOutputPath}" --platform=browser --tree-shaking=true --define:process.env.NODE_ENV="production"`;
+    execSync(vendorCommand, { stdio: 'inherit' });
+    console.log(`   ✓ vendor.js (React + ReactDOM)`);
+  } catch (error) {
+    console.error(`   ✗ Failed to bundle vendor:`, error);
+    process.exit(1);
+  }
+
   // Bundle each entry file separately with cache-busted names
-  console.log('\n📦 Bundling hydration scripts with cache busting...');
+  console.log('\n📦 Bundling hydration scripts...');
 
   const manifest: HydrationManifest = {};
 
@@ -217,7 +245,8 @@ function main(): void {
     const outputPath = path.join(CHUNKS_DIR, chunkFilename);
 
     try {
-      const command = `npx esbuild "${entry.path}" --bundle --minify --sourcemap --target=chrome120 --keep-names --outfile="${outputPath}" --platform=browser`;
+      // External React/ReactDOM since they're in vendor bundle, add production optimizations
+      const command = `npx esbuild "${entry.path}" --bundle --minify --target=es2020 --format=iife --keep-names --outfile="${outputPath}" --platform=browser --external:react --external:react-dom --external:react-dom/client --tree-shaking=true --define:process.env.NODE_ENV="production"`;
       execSync(command, { stdio: 'inherit' });
       manifest[entry.componentName] = chunkFilename;
       console.log(`   ✓ ${entry.componentName} -> ${chunkFilename}`);

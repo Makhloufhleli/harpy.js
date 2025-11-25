@@ -1,10 +1,10 @@
 'use client';
 
-import React from 'react';
+import { useState } from 'react';
 
 function Counter() {
-  const [flights, setFlights] = React.useState(0);
-  const [isFlying, setIsFlying] = React.useState(false);
+  const [flights, setFlights] = useState(0);
+  const [isFlying, setIsFlying] = useState(false);
 
   const handleFlight = () => {
     setIsFlying(true);

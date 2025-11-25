@@ -89,6 +89,7 @@ export async function createCommand(projectName: string, options: CreateOptions)
       'postcss@^8.4.0',
       '@tailwindcss/postcss@^4.0.0',
       'postcss-cli@^11.0.0',
+      'cssnano@^7.0.0',
       'tsx@^4.0.0',
       'esbuild@^0.24.0'
     ], {
@@ -159,9 +160,8 @@ export async function createCommand(projectName: string, options: CreateOptions)
     
     tsconfig.compilerOptions = {
       ...tsconfig.compilerOptions,
-      jsx: 'react',
-      jsxFactory: 'React.createElement',
-      jsxFragmentFactory: 'React.Fragment'
+      jsx: 'react-jsx',
+      jsxImportSource: 'react'
     };
     
     fs.writeJsonSync(tsconfigPath, tsconfig, { spaces: 2 });
