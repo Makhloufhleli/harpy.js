@@ -1,6 +1,6 @@
 # @hepta-solutions/harpy-cli
 
-> Version 0.3.1
+> Version 0.3.2
 
 A CLI tool to create and manage NestJS projects with React/JSX support and automatic client-side hydration.
 
