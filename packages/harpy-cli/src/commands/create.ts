@@ -13,13 +13,15 @@ export async function createCommand(projectName: string, options: CreateOptions)
   const spinner = ora();
   
   try {
-    console.log(chalk.bold.cyan('\n🚀 Creating Harpy project...\n'));
+    console.log('');
+    console.log(chalk.green('🦅  Harpy CLI'));
+    console.log('');
     
     const projectPath = path.resolve(process.cwd(), projectName);
     
     // Check if directory exists
     if (fs.existsSync(projectPath)) {
-      console.error(chalk.red(`❌ Directory ${projectName} already exists!`));
+      console.error(chalk.red(`\n✖ Directory ${projectName} already exists!`));
       process.exit(1);
     }
     
@@ -41,19 +43,19 @@ export async function createCommand(projectName: string, options: CreateOptions)
     }
     
     if (!packageManager) {
-      console.error(chalk.red('❌ Package manager selection cancelled'));
+      console.error(chalk.red('\n✖ Package manager selection cancelled'));
       process.exit(1);
     }
     
     // Step 1: Create NestJS project
-    spinner.start('Creating NestJS project...');
+    console.log(chalk.gray('CREATE Creating NestJS project...'));
     await execa('npx', ['@nestjs/cli', 'new', projectName, '--package-manager', packageManager, '--skip-git'], {
       stdio: 'inherit'
     });
-    spinner.succeed('NestJS project created');
+    console.log(chalk.green('✔ NestJS project created'));
     
     // Step 2: Install React and Harpy dependencies
-    spinner.start('Installing React, Harpy, and other dependencies...');
+    console.log(chalk.gray('INSTALL Installing React, Harpy, and other dependencies...'));
     const installCmd = packageManager === 'yarn' ? 'add' : 'install';
     await execa(packageManager, [
       installCmd,
@@ -69,18 +71,18 @@ export async function createCommand(projectName: string, options: CreateOptions)
       cwd: projectPath,
       stdio: 'pipe'
     });
-    spinner.succeed('React and Harpy dependencies installed');
+    console.log(chalk.green('✔ React and Harpy dependencies installed'));
     
     // Step 3: Install @nestjs/platform-fastify and reflect-metadata
-    spinner.start('Installing @nestjs/platform-fastify and reflect-metadata...');
+    console.log(chalk.gray('INSTALL Installing @nestjs/platform-fastify and reflect-metadata...'));
     await execa(packageManager, [installCmd, '@nestjs/platform-fastify', 'reflect-metadata'], {
       cwd: projectPath,
       stdio: 'pipe'
     });
-    spinner.succeed('@nestjs/platform-fastify and reflect-metadata installed');
+    console.log(chalk.green('✔ @nestjs/platform-fastify and reflect-metadata installed'));
     
     // Step 4: Install Tailwind CSS and build tools
-    spinner.start('Installing Tailwind CSS and build tools...');
+    console.log(chalk.gray('INSTALL Installing Tailwind CSS and build tools...'));
     await execa(packageManager, [
       installCmd,
       '-D',
@@ -96,10 +98,10 @@ export async function createCommand(projectName: string, options: CreateOptions)
       cwd: projectPath,
       stdio: 'pipe'
     });
-    spinner.succeed('Tailwind CSS and build tools installed');
+    console.log(chalk.green('✔ Tailwind CSS and build tools installed'));
     
     // Step 5: Copy template files
-    spinner.start('Setting up project structure...');
+    console.log(chalk.gray('CREATE Setting up project structure...'));
     const templatePath = path.join(__dirname, '../../templates/app');
     
     // Copy src directory
@@ -119,7 +121,25 @@ export async function createCommand(projectName: string, options: CreateOptions)
       path.join(projectPath, 'swc-client-component-plugin.js')
     );
     
-    spinner.succeed('Project structure created');
+    // Replace default NestJS README with Harpy README
+    const readmePath = path.join(templatePath, 'README.md');
+    if (fs.existsSync(readmePath)) {
+      fs.copyFileSync(
+        readmePath,
+        path.join(projectPath, 'README.md')
+      );
+    }
+    
+    // Copy I18N_GUIDE.md if exists
+    const i18nGuidePath = path.join(templatePath, 'I18N_GUIDE.md');
+    if (fs.existsSync(i18nGuidePath)) {
+      fs.copyFileSync(
+        i18nGuidePath,
+        path.join(projectPath, 'I18N_GUIDE.md')
+      );
+    }
+    
+    console.log(chalk.green('✔ Project structure created'));
     
     // Remove default NestJS boilerplate files
     const filesToRemove = [
@@ -135,7 +155,7 @@ export async function createCommand(projectName: string, options: CreateOptions)
     });
     
     // Step 6: Update package.json scripts
-    spinner.start('Updating package.json...');
+    console.log(chalk.gray('UPDATE Updating package.json...'));
     const packageJsonPath = path.join(projectPath, 'package.json');
     const packageJson = fs.readJsonSync(packageJsonPath);
     
@@ -151,10 +171,10 @@ export async function createCommand(projectName: string, options: CreateOptions)
     };
     
     fs.writeJsonSync(packageJsonPath, packageJson, { spaces: 2 });
-    spinner.succeed('package.json updated');
+    console.log(chalk.green('✔ package.json updated'));
     
     // Step 6.5: Update tsconfig.json for JSX support
-    spinner.start('Configuring TypeScript for JSX...');
+    console.log(chalk.gray('UPDATE Configuring TypeScript for JSX...'));
     const tsconfigPath = path.join(projectPath, 'tsconfig.json');
     const tsconfig = fs.readJsonSync(tsconfigPath);
     
@@ -165,10 +185,10 @@ export async function createCommand(projectName: string, options: CreateOptions)
     };
     
     fs.writeJsonSync(tsconfigPath, tsconfig, { spaces: 2 });
-    spinner.succeed('TypeScript configured for JSX');
+    console.log(chalk.green('✔ TypeScript configured for JSX'));
     
     // Step 6.6: Update .gitignore to include dist folder
-    spinner.start('Updating .gitignore...');
+    console.log(chalk.gray('UPDATE Updating .gitignore...'));
     const gitignorePath = path.join(projectPath, '.gitignore');
     
     // Check if .gitignore exists, if not create it
@@ -182,25 +202,32 @@ export async function createCommand(projectName: string, options: CreateOptions)
       gitignoreContent += '\n# Build outputs\ndist\n*.js.map\n';
       fs.writeFileSync(gitignorePath, gitignoreContent);
     }
-    spinner.succeed('.gitignore updated');
+    console.log(chalk.green('✔ .gitignore updated'));
     
     // Step 7: Initialize git
-    spinner.start('Initializing git repository...');
+    console.log(chalk.gray('GIT Initializing git repository...'));
     await execa('git', ['init'], { cwd: projectPath });
     await execa('git', ['add', '.'], { cwd: projectPath });
     await execa('git', ['commit', '-m', 'Initial commit from harpy-cli'], { cwd: projectPath });
-    spinner.succeed('Git repository initialized');
+    console.log(chalk.green('✔ Git repository initialized'));
     
     // Success message
-    console.log(chalk.green.bold('\n✅ Project created successfully!\n'));
-    console.log(chalk.cyan('To get started:\n'));
-    console.log(chalk.white(`  cd ${projectName}`));
-    console.log(chalk.white(`  ${packageManager} dev`));
-    console.log(chalk.cyan('\nYour app will be available at http://localhost:3000\n'));
+    console.log('');
+    console.log(chalk.green('✔ Project created successfully!'));
+    console.log('');
+    console.log('Get started with the following commands:');
+    console.log('');
+    console.log(chalk.cyan(`$ cd ${projectName}`));
+    console.log(chalk.cyan(`$ ${packageManager} dev`));
+    console.log('');
+    console.log(`Your app will be available at ${chalk.green('http://localhost:3000')}`);
+    console.log('');
     
   } catch (error: any) {
-    spinner.fail('Failed to create project');
-    console.error(chalk.red('\n❌ Error:'), error.message);
+    console.log('');
+    console.error(chalk.red('✖ Failed to create project'));
+    console.error(chalk.red(`✖ Error: ${error.message}`));
+    console.log('');
     process.exit(1);
   }
 }
