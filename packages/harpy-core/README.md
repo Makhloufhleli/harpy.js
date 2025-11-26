@@ -1,6 +1,6 @@
 # @hepta-solutions/harpy-core
 
-> Version 0.4.1
+> Version 0.4.2
 
 Core package for NestJS + React/JSX with server-side rendering and automatic client-side hydration.
 
