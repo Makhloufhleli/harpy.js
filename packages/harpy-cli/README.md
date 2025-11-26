@@ -1,14 +1,19 @@
 # @hepta-solutions/harpy-cli
 
+> Version 0.3.1
+
 A CLI tool to create and manage NestJS projects with React/JSX support and automatic client-side hydration.
 
 ## Features
 
 - 🚀 **Automatic Setup** - Creates a complete NestJS + React/JSX project with one command
 - ⚡ **Fast Development** - Hot reload with automatic asset rebuilding
-- 🎨 **Tailwind CSS** - Pre-configured with Tailwind CSS 4
+- 🎨 **Tailwind CSS v4** - Pre-configured with the latest Tailwind CSS
 - 🔄 **Auto Hydration** - Client components automatically hydrate with `'use client'` directive
+- 🌐 **I18n Ready** - Built-in internationalization with language switching
 - 📦 **Zero Config** - Everything works out of the box
+- 🚀 **Performance Optimized** - Shared vendor bundle + tiny component chunks (1-3KB)
+- 🎯 **Production Ready** - Optimized builds with minification and tree-shaking
 
 ## Installation
 
@@ -55,17 +60,28 @@ my-app/
 │   │   │   └── views/
 │   │   │       ├── homepage.tsx
 │   │   │       └── counter.tsx       # Client component with 'use client'
-│   │   └── about/
-│   │       └── ...
-│   ├── core/
-│   │   └── views/
-│   │       └── layout.tsx            # Default layout
+│   │   ├── about/
+│   │   ├── auth/                     # Login/Register with custom layout
+│   │   └── dashboard/                # Dashboard with custom layout
+│   ├── layouts/
+│   │   ├── layout.tsx                # Default layout
+│   │   ├── auth-layout.tsx           # Auth pages layout
+│   │   └── dashboard-layout.tsx      # Dashboard layout
+│   ├── components/
+│   │   └── language-switcher.tsx     # I18n language switcher
+│   ├── dictionaries/                 # I18n translation files
+│   │   ├── en.json
+│   │   └── fr.json
+│   ├── i18n/
+│   │   └── i18n.config.ts            # I18n configuration
 │   ├── assets/
 │   │   └── styles.css                # Tailwind CSS
 │   ├── app.module.ts
 │   └── main.ts
 ├── dist/                             # Compiled output
 │   ├── chunks/                       # Hydration bundles
+│   │   ├── vendor.js                 # Shared React bundle (188KB)
+│   │   └── *.js                      # Component chunks (1-3KB each)
 │   └── styles/                       # Compiled CSS
 ├── tailwind.config.js
 ├── postcss.config.js
@@ -117,7 +133,63 @@ That's it! The component will automatically:
 
 ```bash
 pnpm build
-pnpm prod
+pnpm start:prod
+```
+
+The production build includes:
+- ✅ Minified JavaScript bundles
+- ✅ Optimized CSS with cssnano
+- ✅ Tree-shaken dependencies
+- ✅ Shared vendor bundle (188KB)
+- ✅ Tiny component chunks (1-3KB each)
+
+## What's Included
+
+Your new project comes with:
+
+- **NestJS 11** with Fastify adapter for high performance
+- **React 19** with automatic hydration
+- **Tailwind CSS v4** with PostCSS
+- **I18n Support** pre-configured with English and French
+- **Example Features**:
+  - Home page with interactive counter
+  - About page with color changer
+  - Auth pages (login/register) with custom layout
+  - Dashboard with analytics and custom layout
+  - Language switcher component
+- **Development Tools**:
+  - Hot reload with file watching
+  - Automatic asset rebuilding
+  - TypeScript with JSX support
+
+## Custom Layouts
+
+Use the `@WithLayout` decorator to specify custom layouts for routes:
+
+```typescript
+import { Controller, Get } from '@nestjs/common';
+import { JsxRender, WithLayout } from '@hepta-solutions/harpy-core';
+import AuthLayout from './layouts/auth-layout';
+import LoginPage from './views/login-page';
+
+@Controller('auth')
+@WithLayout(AuthLayout)  // Apply to entire controller
+export class AuthController {
+  @Get('login')
+  @JsxRender(LoginPage)
+  login() {
+    return { title: 'Login' };
+  }
+}
+```
+
+## Environment Variables
+
+Create a `.env` file:
+
+```env
+PORT=3000
+NODE_ENV=development
 ```
 
 ## License
