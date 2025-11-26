@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# 0.3.4 (2025-11-26)
+
+### Bug Fixes
+
+* **cli-version**: Read version dynamically from package.json
+  * Fixed `harpy --version` displaying incorrect hardcoded version (0.0.1)
+  * Now reads version from package.json at runtime
+  * Ensures version displayed matches published package version
+
 # 0.3.3 (2025-11-26)
 
 ### Performance
