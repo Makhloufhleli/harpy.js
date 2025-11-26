@@ -2,6 +2,13 @@
 
 import { Command } from 'commander';
 import { createCommand } from './commands/create';
+import { readFileSync } from 'fs';
+import { join } from 'path';
+
+// Read version from package.json
+const packageJson = JSON.parse(
+  readFileSync(join(__dirname, '../package.json'), 'utf-8'),
+);
 
 const program = new Command();
 
@@ -10,7 +17,7 @@ program
   .description(
     'Harpy CLI - Create and manage Harpy projects with React/JSX support',
   )
-  .version('0.0.1');
+  .version(packageJson.version);
 
 program
   .command('create')
