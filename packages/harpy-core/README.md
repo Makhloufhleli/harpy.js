@@ -1,5 +1,7 @@
 # @hepta-solutions/harpy-core
 
+> Version 0.4.1
+
 Core package for NestJS + React/JSX with server-side rendering and automatic client-side hydration.
 
 ## Features
@@ -7,25 +9,35 @@ Core package for NestJS + React/JSX with server-side rendering and automatic cli
 - 🎯 **JSX Engine** - Render React components in NestJS controllers
 - 🔄 **Auto Hydration** - Client components marked with `'use client'` automatically hydrate
 - ⚡ **Fast Builds** - Optimized build pipeline with esbuild
+- 🚀 **Performance Optimized** - Shared vendor bundle (188KB) + tiny component chunks (1-3KB)
 - 📦 **Zero Config** - Works out of the box with NestJS
 - 🌐 **I18n Support** - Built-in internationalization with type-safe translations
 - 🍪 **Cookie Management** - Integrated with Fastify for session management
+- 🎨 **CSS Optimization** - Automatic minification with cssnano in production
 
 ## Installation
 
 ```bash
-npm install @hepta-solutions/harpy-core
+npm install @hepta-solutions/harpy-core react react-dom
 # or
-yarn add @hepta-solutions/harpy-core
+yarn add @hepta-solutions/harpy-core react react-dom
 # or
-pnpm add @hepta-solutions/harpy-core
+pnpm add @hepta-solutions/harpy-core react react-dom
 ```
+
+**Required peer dependencies:**
+- `@nestjs/common` ^11.0.0
+- `@nestjs/core` ^11.0.0
+- `@nestjs/platform-fastify` ^11.0.0
+- `react` ^19.0.0
+- `react-dom` ^19.0.0
 
 ## Quick Start
 
 ### 1. Set up the JSX engine in your main.ts
 
 ```typescript
+import 'reflect-metadata'; // Required for NestJS
 import { NestFactory } from '@nestjs/core';
 import {
   FastifyAdapter,
@@ -34,6 +46,8 @@ import {
 import { withJsxEngine } from '@hepta-solutions/harpy-core';
 import { AppModule } from './app.module';
 import DefaultLayout from './views/layout';
+import * as path from 'path';
+import fastifyStatic from '@fastify/static';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -44,7 +58,17 @@ async function bootstrap() {
   // Enable JSX rendering
   withJsxEngine(app, DefaultLayout);
 
-  await app.listen(3000);
+  // Register static file serving
+  const fastify = app.getHttpAdapter().getInstance();
+  await fastify.register(fastifyStatic, {
+    root: path.join(process.cwd(), 'dist'),
+    prefix: '/',
+  });
+
+  await app.listen({
+    port: 3000,
+    host: '0.0.0.0',
+  });
 }
 
 bootstrap();
@@ -66,12 +90,21 @@ export default function Layout({
     <html lang="en">
       <head>
         <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>{meta?.title || 'My App'}</title>
+        {meta?.description && (
+          <meta name="description" content={meta.description} />
+        )}
         <link rel="stylesheet" href="/styles/styles.css" />
       </head>
       <body>
         <main id="body">{children}</main>
-        {hydrationScripts?.map((script) => (
+        {/* Vendor bundle loads React/ReactDOM once */}
+        {hydrationScripts?.vendorScript && (
+          <script src={hydrationScripts.vendorScript} />
+        )}
+        {/* Component-specific hydration scripts */}
+        {hydrationScripts?.componentScripts?.map((script) => (
           <script key={script.componentName} src={script.path} />
         ))}
       </body>
@@ -84,7 +117,7 @@ export default function Layout({
 
 ```typescript
 import { Controller, Get } from '@nestjs/common';
-import { JsxRender } from 'harpy-core';
+import { JsxRender } from '@hepta-solutions/harpy-core';
 import Homepage from './views/homepage';
 
 @Controller()
@@ -190,8 +223,85 @@ harpy dev
 1. **Server-Side Rendering**: Components are rendered to HTML on the server
 2. **Component Registration**: Client components (marked with `'use client'`) register themselves during SSR
 3. **Auto-Wrapping**: Build scripts automatically wrap client components for hydration
-4. **Client Bundling**: Client components are bundled separately with esbuild
-5. **Hydration**: Client bundles are loaded in the browser and hydrate the SSR'd HTML
+4. **Vendor Bundle Optimization**: React and ReactDOM are bundled once (188KB) and shared across all components
+5. **Client Bundling**: Client components are bundled separately with esbuild (1-3KB each)
+6. **Hydration**: Client bundles load React from the shared vendor and hydrate the SSR'd HTML
+
+## Performance Optimizations
+
+The framework implements several performance optimizations:
+
+- **Shared Vendor Bundle**: React (19.x) and ReactDOM are bundled once (188KB minified) instead of being duplicated in each component
+- **Tiny Component Chunks**: Individual components are only 1-3KB each (97% reduction compared to bundling React in each)
+- **Tree Shaking**: Unused code is automatically removed during production builds
+- **CSS Minification**: Stylesheets are automatically minified with cssnano in production
+- **Production Mode**: `process.env.NODE_ENV` is properly set to enable React optimizations
+
+## Internationalization (i18n)
+
+Built-in support for multi-language applications:
+
+```typescript
+// app.module.ts
+import { Module } from '@nestjs/common';
+import { I18nModule } from '@hepta-solutions/harpy-core';
+
+@Module({
+  imports: [
+    I18nModule.forRoot({
+      defaultLocale: 'en',
+      supportedLocales: ['en', 'fr', 'ar'],
+      dictionaries: {
+        en: () => import('./dictionaries/en.json'),
+        fr: () => import('./dictionaries/fr.json'),
+        ar: () => import('./dictionaries/ar.json'),
+      },
+    }),
+  ],
+})
+export class AppModule {}
+```
+
+**Using translations in components:**
+
+```tsx
+// Client component
+'use client';
+import { useI18n } from '@hepta-solutions/harpy-core/client';
+
+export default function MyComponent() {
+  const { t, locale, setLocale } = useI18n();
+  
+  return (
+    <div>
+      <h1>{t('welcome.title')}</h1>
+      <button onClick={() => setLocale('fr')}>
+        Switch to French
+      </button>
+    </div>
+  );
+}
+```
+
+**Using translations in controllers:**
+
+```typescript
+import { Controller, Get } from '@nestjs/common';
+import { JsxRender, t } from '@hepta-solutions/harpy-core';
+import { Locale } from '@hepta-solutions/harpy-core';
+
+@Controller()
+export class HomeController {
+  @Get()
+  @JsxRender(Homepage)
+  home(@Locale() locale: string) {
+    return {
+      title: t('home.title', locale),
+      message: t('home.welcome', locale),
+    };
+  }
+}
+```
 
 ## TypeScript Configuration
 
