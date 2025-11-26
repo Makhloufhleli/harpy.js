@@ -17,5 +17,34 @@ const dictionaries = {
  */
 export type Dictionary = Awaited<ReturnType<typeof dictionaries.en>>;
 
-export const getDictionary = async (locale: string): Promise<Dictionary> =>
-  dictionaries[locale as keyof typeof dictionaries]?.() ?? dictionaries.en();
+/**
+ * In-memory cache for loaded dictionaries
+ * Prevents re-importing on every request
+ */
+const dictionaryCache = new Map<string, Dictionary>();
+
+/**
+ * Load dictionary for a given locale with caching
+ * Dictionary is loaded once and cached in memory
+ */
+export const getDictionary = async (locale: string): Promise<Dictionary> => {
+  // Check cache first
+  if (dictionaryCache.has(locale)) {
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(`[Dictionary] Cache hit for locale: ${locale}`);
+    }
+    return dictionaryCache.get(locale)!;
+  }
+
+  if (process.env.NODE_ENV !== 'production') {
+    console.log(`[Dictionary] Loading and caching locale: ${locale}`);
+  }
+
+  // Load dictionary
+  const dict = await (dictionaries[locale as keyof typeof dictionaries]?.() ?? dictionaries.en());
+  
+  // Cache it
+  dictionaryCache.set(locale, dict);
+  
+  return dict;
+};

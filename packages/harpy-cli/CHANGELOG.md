@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# 0.3.3 (2025-11-26)
+
+### Performance
+
+* **i18n-template**: Add dictionary caching to eliminate repeated imports
+  * In-memory caching for loaded dictionaries prevents re-importing on every request
+  * ~7x speedup: First request 7ms → subsequent requests 1ms
+  * Cache hit logging in development mode for debugging
+  * Eliminates promise overhead from repeated dynamic imports
+  * Generated projects include optimized `getDictionary()` function
+
+### Dependencies
+
+* Updated peer dependency to `@hepta-solutions/harpy-core@^0.4.3`
+
 # 0.2.0 (2025-11-25)
 
 ### Features

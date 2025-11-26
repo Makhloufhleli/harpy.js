@@ -4,7 +4,7 @@ import * as React from 'react';
 import { renderToPipeableStream, renderToString } from 'react-dom/server';
 import { MetaOptions, RenderOptions } from '../decorators/jsx.decorator';
 import { hydrationContext, initializeHydrationContext } from './hydration';
-import { getChunkPath } from './hydration-manifest';
+import { getChunkPath, getHydrationManifest } from './hydration-manifest';
 import { LiveReloadController } from './live-reload.controller';
 import { StaticAssetsController } from './static-assets.controller';
 
@@ -15,11 +15,29 @@ export interface JsxLayoutProps {
 
 export type JsxLayout = (props: JsxLayoutProps) => React.ReactElement;
 
+// Cache for component-to-chunk path mappings (loaded once at startup)
+const chunkPathCache = new Map<string, string>();
+
+// Preload hydration manifest and cache chunk paths
+function initializeChunkCache() {
+  const manifest = getHydrationManifest();
+  Object.keys(manifest).forEach(componentName => {
+    const path = getChunkPath(componentName);
+    if (path) {
+      chunkPathCache.set(componentName, path);
+    }
+  });
+  console.log(`[JSX Engine] Preloaded ${chunkPathCache.size} component chunk mappings`);
+}
+
 export function withJsxEngine(
   app: NestFastifyApplication,
   defaultLayout: JsxLayout,
 ) {
   const isDev = process.env.NODE_ENV !== 'production';
+  
+  // Initialize chunk cache at startup (O(1) lookups for all requests)
+  initializeChunkCache();
   
   // Register live reload controllers in development mode
   if (isDev) {
@@ -94,79 +112,60 @@ export function withJsxEngine(
     const hydrationCtx = initializeHydrationContext();
 
     // Set up component registry for client component wrapping
-    console.log('[JSX Engine] Setting up __COMPONENT_REGISTRY__');
     global.__COMPONENT_REGISTRY__ = (data) => {
-      console.log('[JSX Engine] Registry callback called for:', data.componentName);
       hydrationCtx.clientComponents.set(data.instanceId, data);
     };
 
-    // First pass: render to string to collect which components are used
+    // Single pass: render to string to collect which components are used
     // This renders the component tree and populates hydrationCtx with registered components
-    let hydrationScripts: Array<{ componentName: string; path: string }> = [];
-
-    console.log(
-      '[JSX Engine] Pre-rendering to collect component registrations...',
-      'Registry available:',
-      !!global.__COMPONENT_REGISTRY__,
-    );
+    const startTime = Date.now();
+    let htmlString = '';
+    
     hydrationContext.run(hydrationCtx, () => {
       try {
-        renderToString(html);
+        htmlString = renderToString(html);
       } catch (e) {
-        // Pre-render may fail, we still try to get what was registered
-        console.log(
-          '[JSX Engine] Pre-render error:',
-          (e as Error).message?.split('\n')[0],
-        );
+        console.error('[JSX Engine] Render error:', (e as Error).message?.split('\n')[0]);
+        throw e;
       }
     });
 
-    // Extract registered components from the context we just populated
+    // Extract registered components from the context
     const registeredComponents = Array.from(
       hydrationCtx.clientComponents.values(),
     );
-    console.log(
-      '[JSX Engine] Collected',
-      registeredComponents.length,
-      'component instances:',
-      registeredComponents.map((c) => c.componentName).join(', '),
-    );
-
+    
     const uniqueComponentNames = new Set(
       registeredComponents.map((c) => c.componentName),
     );
-    hydrationScripts = Array.from(uniqueComponentNames)
+    
+    // Use cached chunk paths (O(1) lookups)
+    const hydrationScripts = Array.from(uniqueComponentNames)
       .map((componentName) => {
-        const path = getChunkPath(componentName);
-        console.log('[JSX Engine] Mapping', componentName, '->', path);
-        return path ? { componentName, path } : null;
+        const path = chunkPathCache.get(componentName);
+        if (!path) {
+          // Fallback to live lookup if not in cache (shouldn't happen in production)
+          const livePath = getChunkPath(componentName);
+          if (livePath) {
+            chunkPathCache.set(componentName, livePath);
+            return { componentName, path: livePath };
+          }
+          return null;
+        }
+        return { componentName, path };
       })
       .filter((script) => script !== null) as Array<{
       componentName: string;
       path: string;
     }>;
 
-    console.log(
-      `[JSX Engine] Found ${hydrationScripts.length} hydration scripts to inject`,
-    );
-
-    // Recreate the HTML tree with hydration scripts passed to layout
-    const finalLayoutProps = {
-      ...layoutProps,
-      hydrationScripts,
-    };
-
-    let finalHtml: React.ReactElement;
-    if (layout) {
-      finalLayoutProps.children = React.createElement(component, props);
-      finalHtml = React.createElement(layout, finalLayoutProps);
-    } else {
-      finalHtml = html;
+    const renderTime = Date.now() - startTime;
+    if (isDev) {
+      console.log(
+        `[JSX Engine] Rendered in ${renderTime}ms with ${hydrationScripts.length} scripts for:`,
+        Array.from(uniqueComponentNames).join(', '),
+      );
     }
-
-    // Render with a fresh context for the actual output
-    // This ensures components render cleanly for the client
-    const finalHydrationCtx = initializeHydrationContext();
     
     // Build hydration scripts HTML (vendor bundle + component chunks)
     let hydrationScriptsHtml = '';
@@ -179,37 +178,19 @@ export function withJsxEngine(
       });
     }
     
+    // Inject scripts before closing body tag
     if (isDev) {
-      // In development, render to string first to inject scripts
-      let htmlString = '';
-      hydrationContext.run(finalHydrationCtx, () => {
-        htmlString = renderToString(finalHtml);
-      });
-      
-      // Inject live reload and hydration scripts before closing body tag
+      // In development, add live reload script
       const liveReloadScript = '<script src="/__harpy/live-reload.js"></script>';
       const scriptsToInject = `${hydrationScriptsHtml}${liveReloadScript}`;
       htmlString = htmlString.replace('</body>', `${scriptsToInject}</body>`);
-      
-      res.setHeader('content-type', 'text/html');
-      reply.status(reply.statusCode || 200);
-      res.end(htmlString);
-    } else {
-      // In production, render to string to inject hydration scripts
-      // (streaming doesn't allow HTML manipulation after render)
-      let htmlString = '';
-      hydrationContext.run(finalHydrationCtx, () => {
-        htmlString = renderToString(finalHtml);
-      });
-      
-      // Inject hydration scripts before closing body tag
-      if (hydrationScriptsHtml) {
-        htmlString = htmlString.replace('</body>', `${hydrationScriptsHtml}</body>`);
-      }
-      
-      res.setHeader('content-type', 'text/html');
-      reply.status(reply.statusCode || 200);
-      res.end(htmlString);
+    } else if (hydrationScriptsHtml) {
+      // In production, only inject hydration scripts
+      htmlString = htmlString.replace('</body>', `${hydrationScriptsHtml}</body>`);
     }
+    
+    res.setHeader('content-type', 'text/html');
+    reply.status(reply.statusCode || 200);
+    res.end(htmlString);
   };
 }

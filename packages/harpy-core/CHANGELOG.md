@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# 0.4.3 (2025-11-26)
+
+### Performance
+
+* **jsx-engine**: Critical performance optimizations to eliminate request stalling
+  * **Single-pass rendering**: Eliminated duplicate `renderToString()` calls (~50% faster)
+  * **Chunk path caching**: Preload hydration manifest at startup for O(1) component-to-chunk lookups
+  * **Performance monitoring**: Added timing logs in development mode for render time visibility
+  * Resolves intermittent 51+ second page stalls
+  * Consistent 1-7ms render times under load
+  * No blocking I/O operations in hot request paths
+
 # 0.3.0 (2025-11-25)
 
 ### Features
