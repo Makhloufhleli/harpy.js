@@ -1,10 +1,13 @@
 {
   "name": "@hepta-solutions/harpy-i18n",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Harpy i18n support extracted to its own package",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "files": ["dist", "src"],
+  "files": [
+    "dist",
+    "src"
+  ],
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
