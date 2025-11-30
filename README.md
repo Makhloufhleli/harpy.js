@@ -60,16 +60,12 @@ Simply add `'use client'` to any React component, and Harpy will automatically:
 4. Make it interactive on the client
 
 ```tsx
-'use client';
+"use client";
 
 export default function Counter() {
   const [count, setCount] = useState(0);
-  
-  return (
-    <button onClick={() => setCount(count + 1)}>
-      Count: {count}
-    </button>
-  );
+
+  return <button onClick={() => setCount(count + 1)}>Count: {count}</button>;
 }
 ```
 
@@ -83,9 +79,9 @@ Build on the solid foundation of NestJS:
 - Enterprise-ready patterns
 
 ```typescript
-import { Controller, Get } from '@nestjs/common';
-import { JsxRender } from 'harpy-core';
-import HomePage from './views/homepage';
+import { Controller, Get } from "@nestjs/common";
+import { JsxRender } from "harpy-core";
+import HomePage from "./views/homepage";
 
 @Controller()
 export class HomeController {
@@ -93,7 +89,7 @@ export class HomeController {
   @JsxRender(HomePage)
   getHome() {
     return {
-      props: { items: ['Item 1', 'Item 2', 'Item 3'] }
+      props: { items: ["Item 1", "Item 2", "Item 3"] },
     };
   }
 }
@@ -198,6 +194,7 @@ MIT
 ## 🙏 Credits
 
 Built with:
+
 - [NestJS](https://nestjs.com/)
 - [React](https://react.dev/)
 - [Fastify](https://fastify.dev/)

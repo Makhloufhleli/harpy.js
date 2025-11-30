@@ -49,6 +49,7 @@ git checkout -b fix/your-bug-fix
 ```
 
 **Branch naming conventions:**
+
 - `feature/` - New features (e.g., `feature/add-custom-layout-support`)
 - `fix/` - Bug fixes (e.g., `fix/hydration-race-condition`)
 - `docs/` - Documentation updates (e.g., `docs/update-readme`)
@@ -118,6 +119,7 @@ git commit -m "test(core): add hydration manifest tests"
 ```
 
 **Commit types:**
+
 - `feat:` - New feature
 - `fix:` - Bug fix
 - `docs:` - Documentation changes
@@ -171,24 +173,30 @@ docs(contributing): add branch naming conventions
 
 ```markdown
 ## Description
+
 Brief description of what this PR does
 
 ## Type of Change
+
 - [ ] Bug fix
 - [ ] New feature
 - [ ] Breaking change
 - [ ] Documentation update
 
 ## Related Issues
+
 Fixes #123
 
 ## Testing
+
 Describe how you tested your changes
 
 ## Screenshots (if applicable)
+
 Add screenshots here
 
 ## Checklist
+
 - [ ] Code builds successfully
 - [ ] Tested locally with sample app
 - [ ] Documentation updated
@@ -313,6 +321,7 @@ pnpm publish
 ## 🎉 Recognition
 
 Contributors will be recognized in:
+
 - The project README
 - Release notes
 - GitHub contributors page

@@ -5,6 +5,7 @@ This document explains the testing infrastructure for the Harpy monorepo.
 ## Overview
 
 The project uses:
+
 - **Jest** - Testing framework
 - **ts-jest** - TypeScript support for Jest
 - **Husky** - Git hooks
@@ -16,17 +17,20 @@ The project uses:
 Since there were permission issues with the terminal, you'll need to manually install the dependencies:
 
 ### Option 1: Install from outside VS Code
+
 ```bash
 cd /Users/user/Workspaces/HEPTA/nestjsx-monorepo
 pnpm install
 ```
 
 ### Option 2: Close and reopen VS Code, then:
+
 ```bash
 pnpm install
 ```
 
 This will install all dependencies including:
+
 - `jest@^29.7.0`
 - `@types/jest@^29.5.12`
 - `ts-jest@^29.1.2`
@@ -42,27 +46,32 @@ pnpm run prepare
 ```
 
 This will:
+
 1. Install Husky hooks
 2. Setup the pre-commit hook to run tests
 
 ## Running Tests
 
 ### Run all tests across all packages
+
 ```bash
 pnpm test
 ```
 
 ### Run tests in watch mode
+
 ```bash
 pnpm test:watch
 ```
 
 ### Run tests with coverage
+
 ```bash
 pnpm test:coverage
 ```
 
 ### Run tests for a specific package
+
 ```bash
 cd packages/harpy-core
 pnpm test
@@ -76,6 +85,7 @@ pnpm test
 ## Test Structure
 
 ### harpy-core Tests
+
 Located in: `packages/harpy-core/src/core/__tests__/`
 
 - **jsx.engine.test.ts** - Tests for JSX rendering engine
@@ -83,6 +93,7 @@ Located in: `packages/harpy-core/src/core/__tests__/`
 - **hydration-manifest.test.ts** - Tests for hydration manifest generation
 
 ### harpy-cli Tests
+
 Located in: `packages/harpy-cli/src/__tests__/`
 
 - **create.test.ts** - Tests for project creation command
@@ -90,10 +101,12 @@ Located in: `packages/harpy-cli/src/__tests__/`
 ## CI/CD Pipeline
 
 The GitHub Actions workflow (`.github/workflows/ci.yml`) runs on:
+
 - Push to `main` or `develop` branches
 - Pull requests to `main` or `develop` branches
 
 ### Pipeline Steps:
+
 1. **Test Job** - Runs on Node 18.x and 20.x
    - Install dependencies
    - Run linter
@@ -108,17 +121,17 @@ The GitHub Actions workflow (`.github/workflows/ci.yml`) runs on:
 ## Pre-commit Hooks
 
 Husky runs `lint-staged` before every commit, which:
+
 - Finds all staged `.ts` and `.tsx` files in `packages/`
 - Runs tests for those specific files
 - Prevents commit if tests fail
 
 Configuration in `package.json`:
+
 ```json
 {
   "lint-staged": {
-    "packages/**/*.{ts,tsx}": [
-      "pnpm test --bail --findRelatedTests"
-    ]
+    "packages/**/*.{ts,tsx}": ["pnpm test --bail --findRelatedTests"]
   }
 }
 ```
@@ -128,20 +141,20 @@ Configuration in `package.json`:
 ### Example Test Structure
 
 ```typescript
-describe('MyFeature', () => {
+describe("MyFeature", () => {
   let instance: MyFeature;
 
   beforeEach(() => {
     instance = new MyFeature();
   });
 
-  describe('myMethod', () => {
-    it('should do something', () => {
+  describe("myMethod", () => {
+    it("should do something", () => {
       const result = instance.myMethod();
       expect(result).toBe(expected);
     });
 
-    it('should handle edge cases', () => {
+    it("should handle edge cases", () => {
       expect(() => instance.myMethod(null)).toThrow();
     });
   });
@@ -160,6 +173,7 @@ describe('MyFeature', () => {
 ## Coverage Thresholds
 
 Both packages have coverage thresholds of 70%:
+
 - Branches: 70%
 - Functions: 70%
 - Lines: 70%
@@ -172,6 +186,7 @@ If coverage drops below these thresholds, tests will fail.
 ### "Cannot find type definition file for 'jest'"
 
 This error appears before dependencies are installed. Run:
+
 ```bash
 pnpm install
 ```
@@ -179,11 +194,13 @@ pnpm install
 ### Tests fail on commit
 
 If pre-commit tests fail:
+
 1. Fix the failing tests
 2. Stage the changes: `git add .`
 3. Try committing again
 
 To temporarily skip hooks (not recommended):
+
 ```bash
 git commit --no-verify -m "message"
 ```
@@ -191,6 +208,7 @@ git commit --no-verify -m "message"
 ### Permission errors with pnpm
 
 If you encounter `EPERM` errors:
+
 1. Close VS Code
 2. Open terminal outside VS Code
 3. Run `pnpm install` from project root
@@ -215,6 +233,7 @@ If you encounter `EPERM` errors:
 ## Test Coverage
 
 View coverage reports in:
+
 - `packages/harpy-core/coverage/`
 - `packages/harpy-cli/coverage/`
 

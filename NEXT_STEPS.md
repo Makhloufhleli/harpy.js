@@ -5,29 +5,35 @@
 I've successfully set up a comprehensive testing infrastructure for the Harpy monorepo with:
 
 ### 📦 Package Configuration
+
 - ✅ Updated root `package.json` with testing dependencies and scripts
 - ✅ Updated `harpy-core/package.json` with test scripts
 - ✅ Updated `harpy-cli/package.json` with test scripts
 - ✅ Configured lint-staged to run tests on commit
 
 ### ⚙️ Jest Configuration
+
 - ✅ Created `packages/harpy-core/jest.config.js`
 - ✅ Created `packages/harpy-cli/jest.config.js`
 - ✅ Set 70% coverage thresholds for all metrics
 - ✅ Configured TypeScript support with ts-jest
 
 ### 🧪 Test Files
+
 Created comprehensive test suites with 100+ test cases:
 
 #### harpy-core Tests (`packages/harpy-core/src/core/__tests__/`)
+
 - **jsx.engine.test.ts** - 13 tests covering JSX rendering, layouts, props
 - **component-analyzer.test.ts** - 27 tests for component detection and analysis
 - **hydration-manifest.test.ts** - 22 tests for manifest generation and management
 
 #### harpy-cli Tests (`packages/harpy-cli/src/__tests__/`)
+
 - **create.test.ts** - 30+ tests for project creation and templates
 
 ### 🚀 CI/CD Pipeline
+
 - ✅ Created `.github/workflows/ci.yml`
 - ✅ Tests on multiple Node versions (18.x, 20.x)
 - ✅ Automatic linting and coverage reporting
@@ -35,12 +41,14 @@ Created comprehensive test suites with 100+ test cases:
 - ✅ Codecov integration for coverage tracking
 
 ### 🪝 Git Hooks
+
 - ✅ Configured Husky for pre-commit hooks
 - ✅ Created `.husky/pre-commit` script
 - ✅ Runs tests on staged files only
 - ✅ Prevents commits with failing tests
 
 ### 📚 Documentation
+
 - ✅ `TESTING.md` - Complete testing guide with setup instructions
 - ✅ `TESTING_SUMMARY.md` - Overview of the setup
 - ✅ `NEXT_STEPS.md` (this file) - What to do next
@@ -48,6 +56,7 @@ Created comprehensive test suites with 100+ test cases:
 ## ⚠️ TypeScript Errors (Expected)
 
 You'll see TypeScript errors in test files. This is NORMAL because:
+
 1. Dependencies haven't been installed yet
 2. `@types/jest` is not yet available
 3. Tests reference Jest globals that aren't loaded
@@ -57,12 +66,14 @@ These errors will **disappear** once you install dependencies.
 ## 🔧 NEXT STEPS (Required)
 
 ### Step 1: Install Dependencies
+
 ```bash
 cd /Users/user/Workspaces/HEPTA/nestjsx-monorepo
 pnpm install
 ```
 
 This installs:
+
 - jest@^29.7.0
 - @types/jest@^29.5.12
 - ts-jest@^29.1.2
@@ -70,6 +81,7 @@ This installs:
 - lint-staged@^15.2.0
 
 ### Step 2: Initialize Husky
+
 ```bash
 pnpm run prepare
 ```
@@ -77,6 +89,7 @@ pnpm run prepare
 This sets up the git hooks.
 
 ### Step 3: Run Tests
+
 ```bash
 # Run all tests
 pnpm test
@@ -89,6 +102,7 @@ pnpm test:watch
 ```
 
 ### Step 4: Verify Setup
+
 - ✅ Tests should run without errors
 - ✅ Coverage reports should generate
 - ✅ Try making a commit to test the pre-commit hook
@@ -96,6 +110,7 @@ pnpm test:watch
 ## 📊 Test Coverage Summary
 
 ### Current Test Suite:
+
 - **Total Test Files**: 4
 - **Total Test Cases**: 100+
 - **Packages Covered**: harpy-core, harpy-cli
@@ -104,6 +119,7 @@ pnpm test:watch
 ## 🎯 Testing Features
 
 ### ✨ What You Get:
+
 1. **Automated Testing** - Run tests with simple commands
 2. **Pre-commit Validation** - Tests run automatically before commits
 3. **CI/CD Integration** - GitHub Actions runs tests on every push/PR
@@ -112,6 +128,7 @@ pnpm test:watch
 6. **TypeScript Support** - Full TypeScript testing with ts-jest
 
 ### 🛡️ Safety Features:
+
 - **Can't commit broken code** - Pre-commit hooks catch issues
 - **Can't merge broken PRs** - CI must pass before merging
 - **Coverage enforcement** - Maintains 70% minimum coverage
@@ -120,6 +137,7 @@ pnpm test:watch
 ## 📁 Files Created/Modified
 
 ### Created:
+
 ```
 .github/workflows/ci.yml
 .husky/pre-commit
@@ -135,6 +153,7 @@ NEXT_STEPS.md
 ```
 
 ### Modified:
+
 ```
 package.json
 packages/harpy-core/package.json
@@ -162,6 +181,7 @@ If you see `EPERM: operation not permitted, uv_cwd` errors:
 ## 🧪 Running Tests
 
 ### All Packages:
+
 ```bash
 pnpm test                  # Run all tests
 pnpm test:watch           # Watch mode
@@ -169,6 +189,7 @@ pnpm test:coverage        # With coverage report
 ```
 
 ### Individual Package:
+
 ```bash
 cd packages/harpy-core
 pnpm test                 # Test harpy-core only
@@ -178,6 +199,7 @@ pnpm test                 # Test harpy-cli only
 ```
 
 ### Specific Test File:
+
 ```bash
 cd packages/harpy-core
 pnpm test jsx.engine.test.ts
@@ -198,6 +220,7 @@ open packages/harpy-cli/coverage/lcov-report/index.html
 ## 🔄 Git Workflow
 
 ### With Pre-commit Hooks:
+
 ```bash
 # 1. Make changes
 # 2. Stage files
@@ -215,6 +238,7 @@ git push
 ```
 
 ### Skip Hooks (Not Recommended):
+
 ```bash
 git commit --no-verify -m "message"
 ```
@@ -222,21 +246,22 @@ git commit --no-verify -m "message"
 ## 🎓 Writing New Tests
 
 ### Template:
+
 ```typescript
-describe('FeatureName', () => {
+describe("FeatureName", () => {
   let instance: FeatureClass;
 
   beforeEach(() => {
     instance = new FeatureClass();
   });
 
-  describe('methodName', () => {
-    it('should perform expected behavior', () => {
+  describe("methodName", () => {
+    it("should perform expected behavior", () => {
       const result = instance.methodName();
       expect(result).toBe(expected);
     });
 
-    it('should handle edge cases', () => {
+    it("should handle edge cases", () => {
       expect(() => instance.methodName(null)).toThrow();
     });
   });
@@ -258,20 +283,25 @@ Before considering setup complete, verify:
 ## 📞 Troubleshooting
 
 ### "Cannot find type definition file for 'jest'"
+
 **Solution**: Run `pnpm install`
 
 ### "Tests failed on commit"
+
 **Solution**: Fix failing tests or check test output
 
 ### "Command not found: jest"
+
 **Solution**: Ensure dependencies are installed
 
 ### Permission errors
+
 **Solution**: Run install outside VS Code (see section above)
 
 ## 🎉 You're All Set!
 
 Once you complete the NEXT STEPS above, you'll have:
+
 - ✅ Comprehensive test coverage
 - ✅ Automated testing on commit
 - ✅ CI/CD pipeline on GitHub
@@ -288,6 +318,7 @@ Once you complete the NEXT STEPS above, you'll have:
 ## 🚀 Ready to Test!
 
 Run these commands now:
+
 ```bash
 cd /Users/user/Workspaces/HEPTA/nestjsx-monorepo
 pnpm install
