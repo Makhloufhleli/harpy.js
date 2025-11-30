@@ -1,5 +1,5 @@
-import React from 'react';
-import type { JsxLayoutProps } from '../jsx.engine';
+import React from "react";
+import type { JsxLayoutProps } from "../jsx.engine";
 
 export default function DefaultLayout({
   children,
@@ -8,9 +8,9 @@ export default function DefaultLayout({
 }: JsxLayoutProps & {
   hydrationScripts?: Array<{ componentName: string; path: string }>;
 }) {
-  const title = meta?.title ?? 'My App';
-  const description = meta?.description ?? 'Default app description';
-  const canonical = meta?.canonical ?? 'https://example.com';
+  const title = meta?.title ?? "My App";
+  const description = meta?.description ?? "Default app description";
+  const canonical = meta?.canonical ?? "https://example.com";
 
   const og = meta?.openGraph ?? {};
   const twitter = meta?.twitter ?? {};

@@ -5,11 +5,11 @@
  * This simulates Next.js's automatic client component handling.
  */
 
-import * as fs from 'fs';
-import * as path from 'path';
-import React from 'react';
-import { autoWrapClientComponent } from './client-component-wrapper';
-import { getComponentNameFromPath } from './component-analyzer';
+import * as fs from "fs";
+import * as path from "path";
+import React from "react";
+import { autoWrapClientComponent } from "./client-component-wrapper";
+import { getComponentNameFromPath } from "./component-analyzer";
 
 /**
  * Cache to avoid re-reading files repeatedly
@@ -43,7 +43,7 @@ function detectClientComponent(sourceFilePath: string): {
   let isClientComponent = false;
 
   try {
-    const content = fs.readFileSync(normalizedPath, 'utf-8');
+    const content = fs.readFileSync(normalizedPath, "utf-8");
     isClientComponent = /^['"]use client['"];?\s*/.test(content);
   } catch (error) {
     // File doesn't exist or can't be read - treat as server component

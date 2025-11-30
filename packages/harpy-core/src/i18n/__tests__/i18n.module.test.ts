@@ -1,20 +1,20 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { I18nModule } from '../i18n.module';
-import { I18nService } from '../i18n.service';
-import { I18nHelper } from '../i18n.helper';
-import { I18nSwitcherController } from '../i18n-switcher.controller';
-import { I18N_MODULE_OPTIONS } from '../i18n-module.options';
+import { Test, TestingModule } from "@nestjs/testing";
+import { I18nModule } from "../i18n.module";
+import { I18nService } from "../i18n.service";
+import { I18nHelper } from "../i18n.helper";
+import { I18nSwitcherController } from "../i18n-switcher.controller";
+import { I18N_MODULE_OPTIONS } from "../i18n-module.options";
 
-describe('I18nModule', () => {
-  it('should be defined', () => {
+describe("I18nModule", () => {
+  it("should be defined", () => {
     expect(I18nModule).toBeDefined();
   });
 
-  describe('forRoot', () => {
-    it('should create a dynamic module with default options', async () => {
+  describe("forRoot", () => {
+    it("should create a dynamic module with default options", async () => {
       const module = I18nModule.forRoot({
-        defaultLocale: 'en',
-        locales: ['en', 'fr'],
+        defaultLocale: "en",
+        locales: ["en", "fr"],
       });
 
       expect(module.module).toBe(I18nModule);
@@ -23,12 +23,12 @@ describe('I18nModule', () => {
       expect(module.exports).toBeDefined();
     });
 
-    it('should provide I18nService', async () => {
+    it("should provide I18nService", async () => {
       const testModule: TestingModule = await Test.createTestingModule({
         imports: [
           I18nModule.forRoot({
-            defaultLocale: 'en',
-            locales: ['en', 'fr'],
+            defaultLocale: "en",
+            locales: ["en", "fr"],
           }),
         ],
       }).compile();
@@ -37,12 +37,12 @@ describe('I18nModule', () => {
       expect(service).toBeDefined();
     });
 
-    it('should provide I18nHelper', async () => {
+    it("should provide I18nHelper", async () => {
       const testModule: TestingModule = await Test.createTestingModule({
         imports: [
           I18nModule.forRoot({
-            defaultLocale: 'en',
-            locales: ['en', 'fr'],
+            defaultLocale: "en",
+            locales: ["en", "fr"],
           }),
         ],
       }).compile();
@@ -51,10 +51,10 @@ describe('I18nModule', () => {
       expect(helper).toBeDefined();
     });
 
-    it('should apply default values for missing options', async () => {
+    it("should apply default values for missing options", async () => {
       const module = I18nModule.forRoot({
-        defaultLocale: 'en',
-        locales: ['en'],
+        defaultLocale: "en",
+        locales: ["en"],
       });
 
       const optionsProvider = module.providers?.find(
@@ -62,23 +62,23 @@ describe('I18nModule', () => {
       ) as any;
 
       expect(optionsProvider.useValue).toEqual({
-        defaultLocale: 'en',
-        locales: ['en'],
-        urlPattern: 'query',
-        translationsPath: './dictionaries',
-        cookieName: 'locale',
-        queryParam: 'lang',
+        defaultLocale: "en",
+        locales: ["en"],
+        urlPattern: "query",
+        translationsPath: "./dictionaries",
+        cookieName: "locale",
+        queryParam: "lang",
       });
     });
 
-    it('should preserve custom options', async () => {
+    it("should preserve custom options", async () => {
       const module = I18nModule.forRoot({
-        defaultLocale: 'fr',
-        locales: ['fr', 'en', 'es'],
-        urlPattern: 'header',
-        translationsPath: '../locales',
-        cookieName: 'user_locale',
-        queryParam: 'language',
+        defaultLocale: "fr",
+        locales: ["fr", "en", "es"],
+        urlPattern: "header",
+        translationsPath: "../locales",
+        cookieName: "user_locale",
+        queryParam: "language",
       });
 
       const optionsProvider = module.providers?.find(
@@ -86,12 +86,12 @@ describe('I18nModule', () => {
       ) as any;
 
       expect(optionsProvider.useValue).toEqual({
-        defaultLocale: 'fr',
-        locales: ['fr', 'en', 'es'],
-        urlPattern: 'header',
-        translationsPath: '../locales',
-        cookieName: 'user_locale',
-        queryParam: 'language',
+        defaultLocale: "fr",
+        locales: ["fr", "en", "es"],
+        urlPattern: "header",
+        translationsPath: "../locales",
+        cookieName: "user_locale",
+        queryParam: "language",
       });
     });
   });

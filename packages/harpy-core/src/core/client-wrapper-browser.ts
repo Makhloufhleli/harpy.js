@@ -3,7 +3,7 @@
  * This version is used only for client-side hydration and doesn't import Node modules
  */
 
-import React from 'react';
+import React from "react";
 
 /**
  * Browser-compatible instance ID generator
@@ -25,14 +25,14 @@ export function hydrateClientComponent<T extends React.ComponentType<any>>(
   const instanceId = generateBrowserInstanceId(`hydrate-${componentName}`);
 
   return React.createElement(
-    'div',
+    "div",
     {
       id: instanceId,
       suppressHydrationWarning: true,
     },
     React.createElement(Component, props),
-    React.createElement('script', {
-      type: 'application/json',
+    React.createElement("script", {
+      type: "application/json",
       id: `${instanceId}-props`,
       dangerouslySetInnerHTML: { __html: JSON.stringify(props) },
     }),

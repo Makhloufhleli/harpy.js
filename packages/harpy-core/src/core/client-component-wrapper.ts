@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 /**
  * Generates a unique instance ID (browser-compatible version)
@@ -33,11 +33,16 @@ export function autoWrapClientComponent<T extends React.ComponentType<any>>(
     const instanceId = generateInstanceId(`hydrate-${componentName}`);
 
     // Register on server side if registry is available
-    console.log(`[Wrapper] Rendering ${componentName}, registry available:`, typeof global !== 'undefined' && !!global.__COMPONENT_REGISTRY__);
-    if (typeof global !== 'undefined' && global.__COMPONENT_REGISTRY__) {
-      console.log(`[Wrapper] Registering ${componentName} with id ${instanceId}`);
+    console.log(
+      `[Wrapper] Rendering ${componentName}, registry available:`,
+      typeof global !== "undefined" && !!global.__COMPONENT_REGISTRY__,
+    );
+    if (typeof global !== "undefined" && global.__COMPONENT_REGISTRY__) {
+      console.log(
+        `[Wrapper] Registering ${componentName} with id ${instanceId}`,
+      );
       global.__COMPONENT_REGISTRY__({
-        componentPath: '',
+        componentPath: "",
         componentName,
         instanceId,
         props: props as Record<string, any>,
@@ -48,14 +53,14 @@ export function autoWrapClientComponent<T extends React.ComponentType<any>>(
     const propsJson = JSON.stringify(props);
 
     return React.createElement(
-      'div',
+      "div",
       {
         id: instanceId,
         suppressHydrationWarning: true,
       },
       React.createElement(Component, props),
-      React.createElement('script', {
-        type: 'application/json',
+      React.createElement("script", {
+        type: "application/json",
         id: `${instanceId}-props`,
         dangerouslySetInnerHTML: { __html: propsJson },
       }),

@@ -1,4 +1,4 @@
-import type { NestedKeyOf, DeepValue, ExtractVariables } from './i18n-types';
+import type { NestedKeyOf, DeepValue, ExtractVariables } from "./i18n-types";
 
 /**
  * Type-safe translation function - extracts translated values from dictionary
@@ -35,11 +35,11 @@ export function t<
 ): string {
   // Resolve nested keys
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access
-  const value = key.split('.').reduce((acc, k) => acc?.[k], dict as any);
+  const value = key.split(".").reduce((acc, k) => acc?.[k], dict as any);
 
-  if (typeof value !== 'string') return '';
+  if (typeof value !== "string") return "";
   return value.replace(/\{\{(.*?)\}\}/g, (_match: string, k: string) =>
-    String(vars?.[k.trim()] ?? ''),
+    String(vars?.[k.trim()] ?? ""),
   );
 }
 
@@ -53,10 +53,10 @@ export function tUnsafe(
   vars?: Record<string, string | number>,
 ): string {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access
-  const value = key.split('.').reduce((acc, k) => acc?.[k], dict as any);
+  const value = key.split(".").reduce((acc, k) => acc?.[k], dict as any);
 
-  if (typeof value !== 'string') return '';
+  if (typeof value !== "string") return "";
   return value.replace(/\{\{(.*?)\}\}/g, (_match: string, k: string) =>
-    String(vars?.[k.trim()] ?? ''),
+    String(vars?.[k.trim()] ?? ""),
   );
 }

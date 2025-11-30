@@ -1,4 +1,4 @@
-import { FastifyReply } from 'fastify';
+import { FastifyReply } from "fastify";
 
 /**
  * Live Reload Controller - Provides SSE endpoint for development hot-reload
@@ -11,19 +11,19 @@ export class LiveReloadController {
   liveReload(reply: FastifyReply): void {
     // Set headers for SSE
     reply.raw.writeHead(200, {
-      'Content-Type': 'text/event-stream',
-      'Cache-Control': 'no-cache',
-      Connection: 'keep-alive',
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache",
+      Connection: "keep-alive",
     });
 
     // Add client to list
     this.clients.push(reply);
 
     // Send initial connection message
-    reply.raw.write(`data: ${JSON.stringify({ type: 'connected' })}\n\n`);
+    reply.raw.write(`data: ${JSON.stringify({ type: "connected" })}\n\n`);
 
     // Remove client on close
-    reply.raw.on('close', () => {
+    reply.raw.on("close", () => {
       const index = this.clients.indexOf(reply);
       if (index !== -1) {
         this.clients.splice(index, 1);
@@ -42,7 +42,7 @@ export class LiveReloadController {
 
   public notifyReload() {
     this.lastReloadTime = Date.now();
-    const message = `data: ${JSON.stringify({ type: 'reload', timestamp: this.lastReloadTime })}\n\n`;
+    const message = `data: ${JSON.stringify({ type: "reload", timestamp: this.lastReloadTime })}\n\n`;
 
     this.clients.forEach((client) => {
       try {

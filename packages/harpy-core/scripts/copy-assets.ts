@@ -1,11 +1,11 @@
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from "fs";
+import * as path from "path";
 
-const src = 'public';
-const dest = path.join('dist', 'public');
+const src = "public";
+const dest = path.join("dist", "public");
 
 if (!fs.existsSync(src)) {
-  console.log('No public folder to copy');
+  console.log("No public folder to copy");
   process.exit(0);
 }
 
@@ -31,4 +31,4 @@ const copy = (source: string, target: string): void => {
 
 copy(src, dest);
 
-console.log('Assets copied successfully');
+console.log("Assets copied successfully");

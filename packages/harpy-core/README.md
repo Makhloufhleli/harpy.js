@@ -24,6 +24,7 @@ pnpm add @hepta-solutions/harpy-core react react-dom
 ```
 
 **Required peer dependencies:**
+
 - `@nestjs/common` ^11.0.0
 - `@nestjs/core` ^11.0.0
 - `@nestjs/platform-fastify` ^11.0.0
@@ -35,17 +36,17 @@ pnpm add @hepta-solutions/harpy-core react react-dom
 ### 1. Set up the JSX engine in your main.ts
 
 ```typescript
-import 'reflect-metadata'; // Required for NestJS
-import { NestFactory } from '@nestjs/core';
+import "reflect-metadata"; // Required for NestJS
+import { NestFactory } from "@nestjs/core";
 import {
   FastifyAdapter,
   NestFastifyApplication,
-} from '@nestjs/platform-fastify';
-import { withJsxEngine } from '@hepta-solutions/harpy-core';
-import { AppModule } from './app.module';
-import DefaultLayout from './views/layout';
-import * as path from 'path';
-import fastifyStatic from '@fastify/static';
+} from "@nestjs/platform-fastify";
+import { withJsxEngine } from "@hepta-solutions/harpy-core";
+import { AppModule } from "./app.module";
+import DefaultLayout from "./views/layout";
+import * as path from "path";
+import fastifyStatic from "@fastify/static";
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -59,13 +60,13 @@ async function bootstrap() {
   // Register static file serving
   const fastify = app.getHttpAdapter().getInstance();
   await fastify.register(fastifyStatic, {
-    root: path.join(process.cwd(), 'dist'),
-    prefix: '/',
+    root: path.join(process.cwd(), "dist"),
+    prefix: "/",
   });
 
   await app.listen({
     port: 3000,
-    host: '0.0.0.0',
+    host: "0.0.0.0",
   });
 }
 
@@ -76,8 +77,8 @@ bootstrap();
 
 ```tsx
 // src/views/layout.tsx
-import React from 'react';
-import { JsxLayoutProps } from '@hepta-solutions/harpy-core';
+import React from "react";
+import { JsxLayoutProps } from "@hepta-solutions/harpy-core";
 
 export default function Layout({
   children,
@@ -89,7 +90,7 @@ export default function Layout({
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>{meta?.title || 'My App'}</title>
+        <title>{meta?.title || "My App"}</title>
         {meta?.description && (
           <meta name="description" content={meta.description} />
         )}
@@ -114,22 +115,22 @@ export default function Layout({
 ### 3. Create a controller with JSX rendering
 
 ```typescript
-import { Controller, Get } from '@nestjs/common';
-import { JsxRender } from '@hepta-solutions/harpy-core';
-import Homepage from './views/homepage';
+import { Controller, Get } from "@nestjs/common";
+import { JsxRender } from "@hepta-solutions/harpy-core";
+import Homepage from "./views/homepage";
 
 @Controller()
 export class HomeController {
   @Get()
   @JsxRender(Homepage, {
     meta: {
-      title: 'Welcome',
-      description: 'My homepage',
+      title: "Welcome",
+      description: "My homepage",
     },
   })
   home() {
     return {
-      message: 'Hello World',
+      message: "Hello World",
     };
   }
 }
@@ -139,8 +140,8 @@ export class HomeController {
 
 ```tsx
 // src/features/home/views/homepage.tsx
-import React from 'react';
-import Counter from './counter';
+import React from "react";
+import Counter from "./counter";
 
 export default function Homepage({ message }) {
   return (
@@ -156,9 +157,9 @@ export default function Homepage({ message }) {
 
 ```tsx
 // src/features/home/views/counter.tsx
-'use client';
+"use client";
 
-import React from 'react';
+import React from "react";
 
 export default function Counter() {
   const [count, setCount] = React.useState(0);
@@ -241,18 +242,18 @@ Built-in support for multi-language applications:
 
 ```typescript
 // app.module.ts
-import { Module } from '@nestjs/common';
-import { I18nModule } from '@hepta-solutions/harpy-i18n';
+import { Module } from "@nestjs/common";
+import { I18nModule } from "@hepta-solutions/harpy-i18n";
 
 @Module({
   imports: [
     I18nModule.forRoot({
-      defaultLocale: 'en',
-      supportedLocales: ['en', 'fr', 'ar'],
+      defaultLocale: "en",
+      supportedLocales: ["en", "fr", "ar"],
       dictionaries: {
-        en: () => import('./dictionaries/en.json'),
-        fr: () => import('./dictionaries/fr.json'),
-        ar: () => import('./dictionaries/ar.json'),
+        en: () => import("./dictionaries/en.json"),
+        fr: () => import("./dictionaries/fr.json"),
+        ar: () => import("./dictionaries/ar.json"),
       },
     }),
   ],
@@ -264,18 +265,16 @@ export class AppModule {}
 
 ```tsx
 // Client component
-'use client';
-import { useI18n } from '@hepta-solutions/harpy-core/client';
+"use client";
+import { useI18n } from "@hepta-solutions/harpy-core/client";
 
 export default function MyComponent() {
   const { t, locale, setLocale } = useI18n();
-  
+
   return (
     <div>
-      <h1>{t('welcome.title')}</h1>
-      <button onClick={() => setLocale('fr')}>
-        Switch to French
-      </button>
+      <h1>{t("welcome.title")}</h1>
+      <button onClick={() => setLocale("fr")}>Switch to French</button>
     </div>
   );
 }
@@ -284,10 +283,10 @@ export default function MyComponent() {
 **Using translations in controllers (server-side):**
 
 ```typescript
-import { Controller, Get } from '@nestjs/common';
-import { JsxRender } from '@hepta-solutions/harpy-core';
-import { CurrentLocale, t } from '@hepta-solutions/harpy-i18n';
-import { getDictionary } from './i18n/get-dictionary';
+import { Controller, Get } from "@nestjs/common";
+import { JsxRender } from "@hepta-solutions/harpy-core";
+import { CurrentLocale, t } from "@hepta-solutions/harpy-i18n";
+import { getDictionary } from "./i18n/get-dictionary";
 
 @Controller()
 export class HomeController {
@@ -297,8 +296,8 @@ export class HomeController {
     const dict = await getDictionary(locale);
 
     return {
-      title: t(dict, 'home.title'),
-      message: t(dict, 'home.welcome'),
+      title: t(dict, "home.title"),
+      message: t(dict, "home.welcome"),
       dict,
       locale,
     };

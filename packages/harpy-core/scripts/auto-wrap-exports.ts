@@ -9,12 +9,12 @@
  * 3. Allows developers to write components without manual wrapping
  */
 
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from "fs";
+import * as path from "path";
 
 const PROJECT_ROOT = process.cwd();
-const SRC_DIR = path.join(PROJECT_ROOT, 'src');
-const DIST_DIR = path.join(PROJECT_ROOT, 'dist');
+const SRC_DIR = path.join(PROJECT_ROOT, "src");
+const DIST_DIR = path.join(PROJECT_ROOT, "dist");
 
 interface ClientComponentInfo {
   sourceFile: string;
@@ -27,7 +27,7 @@ interface ClientComponentInfo {
  */
 function findClientComponentsInSource(): Map<string, string> {
   const clientComponents = new Map<string, string>(); // compiledFile -> componentName
-  const extensions = ['.ts', '.tsx'];
+  const extensions = [".ts", ".tsx"];
 
   function walkDir(dir: string) {
     if (!fs.existsSync(dir)) return;
@@ -38,27 +38,27 @@ function findClientComponentsInSource(): Map<string, string> {
       const fullPath = path.join(dir, entry.name);
 
       if (entry.isDirectory()) {
-        if (!entry.name.startsWith('.') && entry.name !== 'node_modules') {
+        if (!entry.name.startsWith(".") && entry.name !== "node_modules") {
           walkDir(fullPath);
         }
       } else if (extensions.includes(path.extname(entry.name))) {
         try {
-          const content = fs.readFileSync(fullPath, 'utf-8');
+          const content = fs.readFileSync(fullPath, "utf-8");
 
           // Check for 'use client' directive at the start of the file
           if (/^['"]use client['"]/.test(content.trim())) {
             const fileName = path.basename(fullPath, path.extname(fullPath));
             // Convert kebab-case to PascalCase
             const componentName = fileName
-              .split('-')
+              .split("-")
               .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-              .join('');
+              .join("");
 
             // Calculate the corresponding compiled file path
             const relativePath = path.relative(SRC_DIR, fullPath);
             const compiledPath = path.join(
               DIST_DIR,
-              relativePath.replace(/\.tsx?$/, '.js'),
+              relativePath.replace(/\.tsx?$/, ".js"),
             );
 
             clientComponents.set(compiledPath, componentName);
@@ -88,45 +88,48 @@ function transformCompiledFile(
       return false;
     }
 
-    let content = fs.readFileSync(filePath, 'utf-8');
+    let content = fs.readFileSync(filePath, "utf-8");
 
     // Skip if already wrapped (contains autoWrapClientComponent)
-    if (content.includes('autoWrapClientComponent')) {
+    if (content.includes("autoWrapClientComponent")) {
       console.log(`  ✓ Already wrapped: ${path.basename(filePath)}`);
       return true;
     }
 
     // Import the wrapper from @hepta-solutions/harpy-core package instead of relative path
-    const normalizedRelativePath = '@hepta-solutions/harpy-core';
+    const normalizedRelativePath = "@hepta-solutions/harpy-core";
 
     // Add the require at the top of the file (after the 'use strict' and initial Object.defineProperty)
     const requireStatement = `var { autoWrapClientComponent: _autoWrapClientComponent } = require("${normalizedRelativePath}");`;
 
     // Ensure the require statement is added before any wrapping
-    if (!content.includes(requireStatement) && !content.includes('_autoWrapClientComponent')) {
+    if (
+      !content.includes(requireStatement) &&
+      !content.includes("_autoWrapClientComponent")
+    ) {
       // Check if we have the 'use client' and Object.defineProperty pattern
       if (
         content.includes('"use strict"') &&
-        content.includes('Object.defineProperty')
+        content.includes("Object.defineProperty")
       ) {
         // Find the last Object.defineProperty line before any exports
-        const lines = content.split('\n');
+        const lines = content.split("\n");
         let insertIndex = -1;
-        
+
         for (let i = 0; i < lines.length; i++) {
-          if (lines[i].includes('Object.defineProperty(exports')) {
+          if (lines[i].includes("Object.defineProperty(exports")) {
             insertIndex = i + 1;
             break;
           }
         }
-        
+
         if (insertIndex !== -1) {
           lines.splice(insertIndex, 0, requireStatement);
-          content = lines.join('\n');
+          content = lines.join("\n");
         }
       } else {
         // Fallback: insert at the beginning after any initial comments
-        const lines = content.split('\n');
+        const lines = content.split("\n");
         let insertIndex = 0;
         for (let i = 0; i < lines.length; i++) {
           if (lines[i].includes('"use strict"')) {
@@ -135,7 +138,7 @@ function transformCompiledFile(
           }
         }
         lines.splice(insertIndex, 0, requireStatement);
-        content = lines.join('\n');
+        content = lines.join("\n");
       }
     }
 
@@ -151,7 +154,7 @@ function transformCompiledFile(
         `const _default = _autoWrapClientComponent(${componentName}, '${componentName}');`,
       );
 
-      fs.writeFileSync(filePath, content, 'utf-8');
+      fs.writeFileSync(filePath, content, "utf-8");
       console.log(`  ✓ Wrapped: ${path.basename(filePath)}`);
       return true;
     }
@@ -165,7 +168,7 @@ function transformCompiledFile(
         pattern1,
         `var { autoWrapClientComponent } = require("${normalizedRelativePath}");\nexports.default = autoWrapClientComponent(${componentName}, '${componentName}');`,
       );
-      fs.writeFileSync(filePath, content, 'utf-8');
+      fs.writeFileSync(filePath, content, "utf-8");
       console.log(`  ✓ Wrapped: ${path.basename(filePath)}`);
       return true;
     }
@@ -177,7 +180,7 @@ function transformCompiledFile(
         `export default ${componentName};`,
         `import { autoWrapClientComponent as _autoWrapClientComponent } from "${normalizedRelativePath}";\nexport default _autoWrapClientComponent(${componentName}, '${componentName}');`,
       );
-      fs.writeFileSync(filePath, content, 'utf-8');
+      fs.writeFileSync(filePath, content, "utf-8");
       console.log(`  ✓ Wrapped: ${path.basename(filePath)}`);
       return true;
     }
@@ -191,7 +194,7 @@ function transformCompiledFile(
         namedExportPattern,
         `exports.${componentName} = _autoWrapClientComponent(${componentName}, '${componentName}');`,
       );
-      fs.writeFileSync(filePath, content, 'utf-8');
+      fs.writeFileSync(filePath, content, "utf-8");
       console.log(`  ✓ Wrapped: ${path.basename(filePath)}`);
       return true;
     }
@@ -210,12 +213,12 @@ function transformCompiledFile(
  * Main function
  */
 function main(): void {
-  console.log('🔄 Auto-wrapping client component exports...\n');
+  console.log("🔄 Auto-wrapping client component exports...\n");
 
   const clientComponents = findClientComponentsInSource();
 
   if (clientComponents.size === 0) {
-    console.log('⚠️  No client components found\n');
+    console.log("⚠️  No client components found\n");
     return;
   }
 

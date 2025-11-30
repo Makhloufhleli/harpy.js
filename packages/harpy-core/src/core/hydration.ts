@@ -1,5 +1,5 @@
-import { AsyncLocalStorage } from 'async_hooks';
-import * as crypto from 'crypto';
+import { AsyncLocalStorage } from "async_hooks";
+import * as crypto from "crypto";
 
 /**
  * Tracks client components during SSR rendering
@@ -23,7 +23,7 @@ export const hydrationContext = new AsyncLocalStorage<HydrationContext>();
  * Generate a unique instance ID for a component
  */
 export function generateInstanceId(componentPath: string): string {
-  return `${crypto.randomBytes(4).toString('hex')}-${Date.now()}`;
+  return `${crypto.randomBytes(4).toString("hex")}-${Date.now()}`;
 }
 
 /**

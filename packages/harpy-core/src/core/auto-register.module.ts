@@ -1,6 +1,6 @@
-import { OnModuleInit } from '@nestjs/common';
-import { NavigationService } from './navigation.service';
-import type { NavigationRegistry } from './types/nav.types';
+import { OnModuleInit } from "@nestjs/common";
+import { NavigationService } from "./navigation.service";
+import type { NavigationRegistry } from "./types/nav.types";
 
 /**
  * Base module that automatically registers navigation on module init.
@@ -24,7 +24,7 @@ export abstract class AutoRegisterModule implements OnModuleInit {
       // Don't let registration errors break app startup; surface via console for now.
       // Consumers can still throw if they want startup to fail.
       // eslint-disable-next-line no-console
-      console.warn('[AutoRegisterModule] registerNavigation failed:', err);
+      console.warn("[AutoRegisterModule] registerNavigation failed:", err);
     }
   }
 }

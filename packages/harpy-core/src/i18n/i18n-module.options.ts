@@ -3,7 +3,7 @@
  * - 'query': /path?lang=en
  * - 'header': Uses headers only (x-lang, accept-language)
  */
-export type I18nUrlPattern = 'query' | 'header';
+export type I18nUrlPattern = "query" | "header";
 
 /**
  * Configuration options for I18nModule
@@ -50,4 +50,4 @@ export interface I18nModuleOptions {
 /**
  * Token for injecting I18n module options
  */
-export const I18N_MODULE_OPTIONS = 'I18N_MODULE_OPTIONS';
+export const I18N_MODULE_OPTIONS = "I18N_MODULE_OPTIONS";
