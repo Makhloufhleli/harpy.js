@@ -18,7 +18,7 @@ Harpy comes with built-in internationalization (i18n) support powered by TypeScr
 The i18n module is already configured in `src/app.module.ts`:
 
 ```typescript
-import { I18nModule } from '@hepta-solutions/harpy-core';
+import { I18nModule } from '@hepta-solutions/harpy-i18n';
 import { i18nConfig } from './i18n/i18n.config';
 
 @Module({

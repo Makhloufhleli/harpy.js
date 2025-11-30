@@ -7,6 +7,9 @@ import execa = require('execa');
 
 interface CreateOptions {
   packageManager?: 'npm' | 'pnpm' | 'yarn';
+  includeI18n?: boolean;
+  skipInstall?: boolean;
+  skipGit?: boolean;
 }
 
 export async function createCommand(projectName: string, options: CreateOptions) {
@@ -46,6 +49,18 @@ export async function createCommand(projectName: string, options: CreateOptions)
       console.error(chalk.red('\n✖ Package manager selection cancelled'));
       process.exit(1);
     }
+
+    // Decide whether to include i18n: prefer CLI option, otherwise ask interactively
+    let includeI18n = Boolean(options.includeI18n);
+    if (options.includeI18n === undefined) {
+      const i18nResponse = await prompts({
+        type: 'confirm',
+        name: 'includeI18n',
+        message: 'Would you like to include internationalization (i18n)?',
+        initial: true,
+      });
+      includeI18n = Boolean(i18nResponse.includeI18n);
+    }
     
     // Step 1: Create NestJS project
     console.log(chalk.gray('CREATE Creating NestJS project...'));
@@ -57,8 +72,7 @@ export async function createCommand(projectName: string, options: CreateOptions)
     // Step 2: Install React and Harpy dependencies
     console.log(chalk.gray('INSTALL Installing React, Harpy, and other dependencies...'));
     const installCmd = packageManager === 'yarn' ? 'add' : 'install';
-    await execa(packageManager, [
-      installCmd,
+    const baseDeps = [
       'react@^19.0.0',
       'react-dom@^19.0.0',
       '@types/react@^19.0.0',
@@ -66,11 +80,21 @@ export async function createCommand(projectName: string, options: CreateOptions)
       '@hepta-solutions/harpy-core@latest',
       '@fastify/static@^8.0.0',
       '@fastify/cookie@^11.0.0',
-      '@types/node'
-    ], {
-      cwd: projectPath,
-      stdio: 'pipe'
-    });
+      '@types/node',
+    ];
+
+    if (includeI18n) {
+      baseDeps.push('@hepta-solutions/harpy-i18n@latest');
+    }
+
+    if (!options.skipInstall) {
+      await execa(packageManager, [installCmd, ...baseDeps], {
+        cwd: projectPath,
+        stdio: 'pipe'
+      });
+    } else {
+      console.log(chalk.yellow('⚠ Skipping dependency installation (--skip-install)'));
+    }
     console.log(chalk.green('✔ React and Harpy dependencies installed'));
     
     // Step 3: Install @nestjs/platform-fastify and reflect-metadata
@@ -203,13 +227,74 @@ export async function createCommand(projectName: string, options: CreateOptions)
       fs.writeFileSync(gitignorePath, gitignoreContent);
     }
     console.log(chalk.green('✔ .gitignore updated'));
+
+    // Post-process templates depending on i18n selection
+    const appModulePath = path.join(projectPath, 'src', 'app.module.ts');
+    if (includeI18n) {
+      // If i18n is included as a separate package, update imports in
+      // `app.module.ts` and `src/i18n/i18n.config.ts` to point to the new
+      // package `@hepta-solutions/harpy-i18n` instead of `harpy-core`.
+      try {
+        if (fs.existsSync(appModulePath)) {
+          let appModuleContent = fs.readFileSync(appModulePath, 'utf-8');
+          appModuleContent = appModuleContent.replace(
+            /from '\@hepta-solutions\/harpy-core'/g,
+            "from '@hepta-solutions/harpy-i18n'",
+          );
+          fs.writeFileSync(appModulePath, appModuleContent, 'utf-8');
+        }
+
+        const i18nConfigPath = path.join(projectPath, 'src', 'i18n', 'i18n.config.ts');
+        if (fs.existsSync(i18nConfigPath)) {
+          let i18nContent = fs.readFileSync(i18nConfigPath, 'utf-8');
+          i18nContent = i18nContent.replace(
+            /from '\@hepta-solutions\/harpy-core'/g,
+            "from '@hepta-solutions/harpy-i18n'",
+          );
+          fs.writeFileSync(i18nConfigPath, i18nContent, 'utf-8');
+        }
+      } catch (err) {
+        // Non-fatal: proceed without blocking project creation
+        console.warn(chalk.yellow('⚠ Failed to adjust i18n imports automatically.'));
+      }
+    } else {
+      // Remove i18n template files and references from AppModule
+      try {
+        const i18nDir = path.join(projectPath, 'src', 'i18n');
+        if (fs.existsSync(i18nDir)) {
+          fs.removeSync(i18nDir);
+        }
+
+        // Remove I18N guide if present
+        const i18nGuideTarget = path.join(projectPath, 'I18N_GUIDE.md');
+        if (fs.existsSync(i18nGuideTarget)) {
+          fs.unlinkSync(i18nGuideTarget);
+        }
+
+        if (fs.existsSync(appModulePath)) {
+          let appModuleContent = fs.readFileSync(appModulePath, 'utf-8');
+          // Remove import lines for I18nModule and i18nConfig
+          appModuleContent = appModuleContent.replace(/import\s+\{[^}]*I18nModule[^}]*\}[^;]*;\s*/g, '');
+          appModuleContent = appModuleContent.replace(/import\s+\{[^}]*i18nConfig[^}]*\}[^;]*;\s*/g, '');
+          // Remove the I18nModule.forRoot(...) entry from the imports array
+          appModuleContent = appModuleContent.replace(/\s*I18nModule\.forRoot\([^)]*\),?/g, '');
+          fs.writeFileSync(appModulePath, appModuleContent, 'utf-8');
+        }
+      } catch (err) {
+        console.warn(chalk.yellow('⚠ Failed to strip i18n templates automatically.'));
+      }
+    }
     
     // Step 7: Initialize git
-    console.log(chalk.gray('GIT Initializing git repository...'));
-    await execa('git', ['init'], { cwd: projectPath });
-    await execa('git', ['add', '.'], { cwd: projectPath });
-    await execa('git', ['commit', '-m', 'Initial commit from harpy-cli'], { cwd: projectPath });
-    console.log(chalk.green('✔ Git repository initialized'));
+    if (!options.skipGit) {
+      console.log(chalk.gray('GIT Initializing git repository...'));
+      await execa('git', ['init'], { cwd: projectPath });
+      await execa('git', ['add', '.'], { cwd: projectPath });
+      await execa('git', ['commit', '-m', 'Initial commit from harpy-cli'], { cwd: projectPath });
+      console.log(chalk.green('✔ Git repository initialized'));
+    } else {
+      console.log(chalk.yellow('⚠ Skipping git initialization (--skip-git)'));
+    }
     
     // Success message
     console.log('');
