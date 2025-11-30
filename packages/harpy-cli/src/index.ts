@@ -31,6 +31,7 @@ program
   .option('--include-i18n', 'Include i18n support in the generated project')
   .option('--skip-git', 'Skip git repository initialization')
   .option('--skip-install', 'Skip dependency installation')
+  .option('--no-examples', 'Do not include example pages in the generated project')
   .action(createCommand);
 
 program.parse(process.argv);
