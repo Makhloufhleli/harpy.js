@@ -28,6 +28,7 @@ program
     'Package manager to use (npm, yarn, pnpm)',
     'pnpm',
   )
+  .option('--include-i18n', 'Include i18n support in the generated project')
   .option('--skip-git', 'Skip git repository initialization')
   .option('--skip-install', 'Skip dependency installation')
   .action(createCommand);
