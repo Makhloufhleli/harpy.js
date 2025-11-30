@@ -1,11 +1,11 @@
-import { JsxRender } from '@hepta-solutions/harpy-core';
-import { Controller, Get } from '@nestjs/common';
-import { DashboardService } from './dashboard.service';
-import DashboardPage, { type DashboardPageProps } from './views/dashboard-page';
-import AnalyticsPage from './views/analytics-page';
-import DashboardLayout from '../../layouts/dashboard-layout';
+import { JsxRender } from "@hepta-solutions/harpy-core";
+import { Controller, Get } from "@nestjs/common";
+import { DashboardService } from "./dashboard.service";
+import DashboardPage, { type DashboardPageProps } from "./views/dashboard-page";
+import AnalyticsPage from "./views/analytics-page";
+import DashboardLayout from "../../layouts/dashboard-layout";
 
-@Controller('dashboard')
+@Controller("dashboard")
 export class DashboardController {
   constructor(private readonly dashboardService: DashboardService) {}
 
@@ -13,8 +13,8 @@ export class DashboardController {
   @JsxRender(DashboardPage, {
     layout: DashboardLayout,
     meta: {
-      title: 'Dashboard - Harpy App',
-      description: 'Your dashboard overview',
+      title: "Dashboard - Harpy App",
+      description: "Your dashboard overview",
     },
   })
   dashboard(): DashboardPageProps {
@@ -23,12 +23,12 @@ export class DashboardController {
     };
   }
 
-  @Get('analytics')
+  @Get("analytics")
   @JsxRender(AnalyticsPage, {
     layout: DashboardLayout,
     meta: {
-      title: 'Analytics - Dashboard',
-      description: 'View your analytics data',
+      title: "Analytics - Dashboard",
+      description: "View your analytics data",
     },
   })
   analytics() {

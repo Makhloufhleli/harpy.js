@@ -87,8 +87,8 @@ export default function MyComponent({ data }: Props) {
 Add `'use client'` at the top:
 
 ```tsx
-'use client';
-import { useState } from 'react';
+"use client";
+import { useState } from "react";
 
 export default function Counter() {
   const [count, setCount] = useState(0);
@@ -101,10 +101,10 @@ export default function Counter() {
 Harpy.js includes built-in i18n support. See `I18N_GUIDE.md` for details.
 
 ```tsx
-import { t } from '@hepta-solutions/harpy-i18n';
+import { t } from "@hepta-solutions/harpy-i18n";
 
 // In your component
-<h1>{t(dict.welcome)}</h1>
+<h1>{t(dict.welcome)}</h1>;
 ```
 
 ## 🔧 Adding New Routes
@@ -117,21 +117,21 @@ import { t } from '@hepta-solutions/harpy-i18n';
 Example controller:
 
 ```typescript
-import { Controller, Get } from '@nestjs/common';
-import { JsxRender } from '@hepta-solutions/harpy-core';
-import MyPage from './views/mypage';
+import { Controller, Get } from "@nestjs/common";
+import { JsxRender } from "@hepta-solutions/harpy-core";
+import MyPage from "./views/mypage";
 
-@Controller('my-route')
+@Controller("my-route")
 export class MyController {
   @Get()
   @JsxRender(MyPage, {
     meta: async () => ({
-      title: 'My Page',
-      description: 'Page description'
-    })
+      title: "My Page",
+      description: "Page description",
+    }),
   })
   async index() {
-    return { data: 'Hello World' };
+    return { data: "Hello World" };
   }
 }
 ```

@@ -1,32 +1,32 @@
-import { JsxRender } from '@hepta-solutions/harpy-core';
-import { Controller, Get } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import LoginPage from './views/login-page';
-import RegisterPage from './views/register-page';
-import AuthLayout from '../../layouts/auth-layout';
+import { JsxRender } from "@hepta-solutions/harpy-core";
+import { Controller, Get } from "@nestjs/common";
+import { AuthService } from "./auth.service";
+import LoginPage from "./views/login-page";
+import RegisterPage from "./views/register-page";
+import AuthLayout from "../../layouts/auth-layout";
 
-@Controller('auth')
+@Controller("auth")
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Get('login')
+  @Get("login")
   @JsxRender(LoginPage, {
     layout: AuthLayout,
     meta: {
-      title: 'Login - Harpy App',
-      description: 'Sign in to your account',
+      title: "Login - Harpy App",
+      description: "Sign in to your account",
     },
   })
   login() {
     return {};
   }
 
-  @Get('register')
+  @Get("register")
   @JsxRender(RegisterPage, {
     layout: AuthLayout,
     meta: {
-      title: 'Register - Harpy App',
-      description: 'Create a new account',
+      title: "Register - Harpy App",
+      description: "Create a new account",
     },
   })
   register() {

@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
+import { useState } from "react";
 
 function Counter() {
   const [flights, setFlights] = useState(0);
@@ -22,17 +22,17 @@ function Counter() {
           Client-side interactivity powered by Harpy
         </p>
       </div>
-      
-      <div 
+
+      <div
         className={`text-8xl transition-all duration-500 ${
-          isFlying 
-            ? 'transform -translate-y-12 scale-110 opacity-80' 
-            : 'transform translate-y-0 scale-100 opacity-100'
+          isFlying
+            ? "transform -translate-y-12 scale-110 opacity-80"
+            : "transform translate-y-0 scale-100 opacity-100"
         }`}
       >
         🦅
       </div>
-      
+
       <div className="text-center">
         <p className="text-5xl font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
           {flights}
@@ -43,21 +43,29 @@ function Counter() {
           {flights > 1 && `Harpy flew ${flights} times 🚀`}
         </p>
       </div>
-      
+
       <button
         onClick={handleFlight}
         disabled={isFlying}
         className={`px-8 py-4 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-bold text-lg rounded-xl shadow-lg transition-all duration-200 ${
-          isFlying ? 'opacity-50 cursor-not-allowed' : 'hover:shadow-xl hover:scale-105'
+          isFlying
+            ? "opacity-50 cursor-not-allowed"
+            : "hover:shadow-xl hover:scale-105"
         }`}
       >
-        {isFlying ? '✨ Flying...' : '🦅 Take Flight!'}
+        {isFlying ? "✨ Flying..." : "🦅 Take Flight!"}
       </button>
-      
+
       <div className="mt-4 p-4 bg-white rounded-lg border border-slate-200">
         <p className="text-xs text-slate-500 text-center">
-          This component is <span className="font-semibold text-amber-600">automatically hydrated</span> by Harpy.<br/>
-          No manual wrapping required - just add <code className="px-1 bg-slate-100 rounded">'use client'</code>
+          This component is{" "}
+          <span className="font-semibold text-amber-600">
+            automatically hydrated
+          </span>{" "}
+          by Harpy.
+          <br />
+          No manual wrapping required - just add{" "}
+          <code className="px-1 bg-slate-100 rounded">'use client'</code>
         </p>
       </div>
     </div>

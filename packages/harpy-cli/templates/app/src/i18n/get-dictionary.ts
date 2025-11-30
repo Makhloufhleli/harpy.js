@@ -2,11 +2,11 @@
 // We also get the default import for cleaner types
 const dictionaries = {
   en: () =>
-    import('../dictionaries/en.json', { with: { type: 'json' } }).then(
+    import("../dictionaries/en.json", { with: { type: "json" } }).then(
       (module) => module.default,
     ),
   fr: () =>
-    import('../dictionaries/fr.json', { with: { type: 'json' } }).then(
+    import("../dictionaries/fr.json", { with: { type: "json" } }).then(
       (module) => module.default,
     ),
 };
@@ -30,21 +30,22 @@ const dictionaryCache = new Map<string, Dictionary>();
 export const getDictionary = async (locale: string): Promise<Dictionary> => {
   // Check cache first
   if (dictionaryCache.has(locale)) {
-    if (process.env.NODE_ENV !== 'production') {
+    if (process.env.NODE_ENV !== "production") {
       console.log(`[Dictionary] Cache hit for locale: ${locale}`);
     }
     return dictionaryCache.get(locale)!;
   }
 
-  if (process.env.NODE_ENV !== 'production') {
+  if (process.env.NODE_ENV !== "production") {
     console.log(`[Dictionary] Loading and caching locale: ${locale}`);
   }
 
   // Load dictionary
-  const dict = await (dictionaries[locale as keyof typeof dictionaries]?.() ?? dictionaries.en());
-  
+  const dict = await (dictionaries[locale as keyof typeof dictionaries]?.() ??
+    dictionaries.en());
+
   // Cache it
   dictionaryCache.set(locale, dict);
-  
+
   return dict;
 };

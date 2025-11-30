@@ -18,8 +18,8 @@ Harpy comes with built-in internationalization (i18n) support powered by TypeScr
 The i18n module is already configured in `src/app.module.ts`:
 
 ```typescript
-import { I18nModule } from '@hepta-solutions/harpy-i18n';
-import { i18nConfig } from './i18n/i18n.config';
+import { I18nModule } from "@hepta-solutions/harpy-i18n";
+import { i18nConfig } from "./i18n/i18n.config";
 
 @Module({
   imports: [
@@ -36,12 +36,12 @@ Edit `src/i18n/i18n.config.ts` to customize:
 
 ```typescript
 export const i18nConfig: I18nModuleOptions = {
-  defaultLocale: 'en',          // Fallback locale
-  locales: ['en', 'fr'],        // Supported locales
-  urlPattern: 'query',          // 'query' or 'header'
-  translationsPath: '../dictionaries',
-  cookieName: 'locale',         // Cookie name for persistence
-  queryParam: 'lang',           // Query param name (if using 'query' pattern)
+  defaultLocale: "en", // Fallback locale
+  locales: ["en", "fr"], // Supported locales
+  urlPattern: "query", // 'query' or 'header'
+  translationsPath: "../dictionaries",
+  cookieName: "locale", // Cookie name for persistence
+  queryParam: "lang", // Query param name (if using 'query' pattern)
 };
 ```
 
@@ -50,6 +50,7 @@ export const i18nConfig: I18nModuleOptions = {
 Create translation files in `src/dictionaries/`:
 
 **en.json:**
+
 ```json
 {
   "welcome": "Welcome",
@@ -58,6 +59,7 @@ Create translation files in `src/dictionaries/`:
 ```
 
 **fr.json:**
+
 ```json
 {
   "welcome": "Bienvenue",
@@ -69,8 +71,14 @@ Update `src/i18n/get-dictionary.ts` to include your locales:
 
 ```typescript
 const dictionaries = {
-  en: () => import('../dictionaries/en.json', { with: { type: 'json' } }).then(m => m.default),
-  fr: () => import('../dictionaries/fr.json', { with: { type: 'json' } }).then(m => m.default),
+  en: () =>
+    import("../dictionaries/en.json", { with: { type: "json" } }).then(
+      (m) => m.default,
+    ),
+  fr: () =>
+    import("../dictionaries/fr.json", { with: { type: "json" } }).then(
+      (m) => m.default,
+    ),
 };
 ```
 
@@ -79,11 +87,11 @@ const dictionaries = {
 ### In Controllers (Server-Side)
 
 ```typescript
-import { Controller, Get } from '@nestjs/common';
-import { JsxRender } from '@hepta-solutions/harpy-core';
-import { CurrentLocale, t } from '@hepta-solutions/harpy-i18n';
-import { getDictionary } from '../i18n/get-dictionary';
-import MyPage from './views/my-page';
+import { Controller, Get } from "@nestjs/common";
+import { JsxRender } from "@hepta-solutions/harpy-core";
+import { CurrentLocale, t } from "@hepta-solutions/harpy-i18n";
+import { getDictionary } from "../i18n/get-dictionary";
+import MyPage from "./views/my-page";
 
 @Controller()
 export class MyController {
@@ -91,7 +99,7 @@ export class MyController {
   @JsxRender(MyPage)
   async getPage(@CurrentLocale() locale: string) {
     const dict = await getDictionary(locale);
-    
+
     return {
       dict,
       locale,
@@ -103,8 +111,8 @@ export class MyController {
 ### In Server Components (TSX)
 
 ```tsx
-import { t } from '@hepta-solutions/harpy-i18n';
-import { Dictionary } from '../i18n/get-dictionary';
+import { t } from "@hepta-solutions/harpy-i18n";
+import { Dictionary } from "../i18n/get-dictionary";
 
 interface PageProps {
   dict: Dictionary;
@@ -114,8 +122,8 @@ interface PageProps {
 export default function MyPage({ dict, locale }: PageProps) {
   return (
     <div>
-      <h1>{t(dict, 'welcome')}</h1>
-      <p>{t(dict, 'greeting', { name: 'John' })}</p>
+      <h1>{t(dict, "welcome")}</h1>
+      <p>{t(dict, "greeting", { name: "John" })}</p>
     </div>
   );
 }
@@ -126,32 +134,30 @@ export default function MyPage({ dict, locale }: PageProps) {
 Use the `useI18n()` hook to switch locales:
 
 ```tsx
-'use client';
+"use client";
 
-import { useI18n } from '@hepta-solutions/harpy-core/client';
+import { useI18n } from "@hepta-solutions/harpy-core/client";
 
 export function LanguageSwitcher() {
   const { switchLocale } = useI18n();
 
   return (
     <div>
-      <button onClick={() => switchLocale('en')}>
-        English
-      </button>
-      <button onClick={() => switchLocale('fr')}>
-        Français
-      </button>
+      <button onClick={() => switchLocale("en")}>English</button>
+      <button onClick={() => switchLocale("fr")}>Français</button>
     </div>
   );
 }
 ```
 
 **How it works:**
+
 - When you click a language button, it updates the URL with `?lang=fr` and reloads the page
 - The server-side interceptor detects the language from the URL and automatically sets a cookie
 - On subsequent visits, the language is remembered via the cookie
 - All navigation links automatically preserve the language parameter via a script in the layout
-```
+
+````
 
 ### Dynamic Metadata with Translations
 
@@ -190,14 +196,14 @@ export class MyController {
   })
   async getPage(@CurrentLocale() locale: string): Promise<PageProps> {
     const dict = await getDictionary(locale);
-    
+
     return {
       dict,
       locale,
     };
   }
 }
-```
+````
 
 Add the translations to your dictionary:
 
@@ -236,19 +242,19 @@ The `t()` function provides full TypeScript support:
 
 ```typescript
 // ✅ Autocomplete for keys
-t(dict, 'welcome')  // ✓
+t(dict, "welcome"); // ✓
 
 // ✅ Nested keys
-t(dict, 'user.profile.name')  // ✓
+t(dict, "user.profile.name"); // ✓
 
 // ✅ Variable validation
-t(dict, 'greeting', { name: 'John' })  // ✓
+t(dict, "greeting", { name: "John" }); // ✓
 
 // ❌ Invalid keys caught at compile time
-t(dict, 'invalid.key')  // Type error!
+t(dict, "invalid.key"); // Type error!
 
 // ❌ Missing variables caught at compile time
-t(dict, 'greeting')  // Type error: missing 'name' variable
+t(dict, "greeting"); // Type error: missing 'name' variable
 ```
 
 ## Cookie Persistence
@@ -288,9 +294,9 @@ myRoute(@CurrentLocale() locale: string) {
 Type-safe translation function:
 
 ```typescript
-t(dict, 'key')                    // Simple translation
-t(dict, 'nested.key')             // Nested keys
-t(dict, 'greeting', { name: 'John' })  // With variables
+t(dict, "key"); // Simple translation
+t(dict, "nested.key"); // Nested keys
+t(dict, "greeting", { name: "John" }); // With variables
 ```
 
 ### `useI18n()` Hook
@@ -300,7 +306,7 @@ Client-side hook for locale switching:
 ```typescript
 const { switchLocale, isLoading, error } = useI18n();
 
-await switchLocale('fr');  // Switch to French
+await switchLocale("fr"); // Switch to French
 ```
 
 ## Adding More Languages
@@ -312,14 +318,26 @@ await switchLocale('fr');  // Switch to French
 
 ```typescript
 // i18n.config.ts
-locales: ['en', 'fr', 'es', 'de']
+locales: ["en", "fr", "es", "de"];
 
 // get-dictionary.ts
 const dictionaries = {
-  en: () => import('../dictionaries/en.json', { with: { type: 'json' } }).then(m => m.default),
-  fr: () => import('../dictionaries/fr.json', { with: { type: 'json' } }).then(m => m.default),
-  es: () => import('../dictionaries/es.json', { with: { type: 'json' } }).then(m => m.default),
-  de: () => import('../dictionaries/de.json', { with: { type: 'json' } }).then(m => m.default),
+  en: () =>
+    import("../dictionaries/en.json", { with: { type: "json" } }).then(
+      (m) => m.default,
+    ),
+  fr: () =>
+    import("../dictionaries/fr.json", { with: { type: "json" } }).then(
+      (m) => m.default,
+    ),
+  es: () =>
+    import("../dictionaries/es.json", { with: { type: "json" } }).then(
+      (m) => m.default,
+    ),
+  de: () =>
+    import("../dictionaries/de.json", { with: { type: "json" } }).then(
+      (m) => m.default,
+    ),
 };
 ```
 
@@ -336,6 +354,7 @@ const dictionaries = {
 ### Translations not updating
 
 Make sure you've built the project after adding new translations:
+
 ```bash
 npm run build
 ```
@@ -343,6 +362,7 @@ npm run build
 ### Cookie not persisting
 
 Ensure `@fastify/cookie` is registered in `main.ts`:
+
 ```typescript
 await fastify.register(fastifyCookie);
 ```
