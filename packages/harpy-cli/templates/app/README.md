@@ -101,7 +101,7 @@ export default function Counter() {
 Harpy.js includes built-in i18n support. See `I18N_GUIDE.md` for details.
 
 ```tsx
-import { t } from '@hepta-solutions/harpy-core';
+import { t } from '@hepta-solutions/harpy-i18n';
 
 // In your component
 <h1>{t(dict.welcome)}</h1>

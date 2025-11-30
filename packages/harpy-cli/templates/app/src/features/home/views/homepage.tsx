@@ -1,4 +1,4 @@
-import { t } from '@hepta-solutions/harpy-core';
+import { t } from '@hepta-solutions/harpy-i18n';
 import { Dictionary } from '../../../i18n/get-dictionary';
 import Counter from './counter';
 import { LanguageSwitcher } from '../../../components/language-switcher';

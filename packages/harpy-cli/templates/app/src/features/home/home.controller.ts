@@ -1,9 +1,10 @@
-import { JsxRender, CurrentLocale } from '@hepta-solutions/harpy-core';
+import { JsxRender } from '@hepta-solutions/harpy-core';
+import { CurrentLocale, t } from '@hepta-solutions/harpy-i18n';
 import { Controller, Get } from '@nestjs/common';
 import { HomeService } from './home.service';
 import Homepage, { type PageProps } from './views/homepage';
 import { getDictionary, type Dictionary } from '../../i18n/get-dictionary';
-import { t } from '@hepta-solutions/harpy-core';
+// `t` is provided by `@hepta-solutions/harpy-i18n` above; remove duplicate import
 
 @Controller()
 export class HomeController {

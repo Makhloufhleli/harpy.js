@@ -8,6 +8,7 @@ import execa = require('execa');
 interface CreateOptions {
   packageManager?: 'npm' | 'pnpm' | 'yarn';
   includeI18n?: boolean;
+  examples?: boolean;
   skipInstall?: boolean;
   skipGit?: boolean;
 }
@@ -60,6 +61,20 @@ export async function createCommand(projectName: string, options: CreateOptions)
         initial: true,
       });
       includeI18n = Boolean(i18nResponse.includeI18n);
+    }
+
+    // Decide whether to include example pages: prefer CLI option, otherwise ask interactively
+    let includeExamples = true;
+    if (typeof options.examples === 'boolean') {
+      includeExamples = options.examples;
+    } else {
+      const examplesResponse = await prompts({
+        type: 'confirm',
+        name: 'includeExamples',
+        message: 'Include example pages and features in the generated project?',
+        initial: true,
+      });
+      includeExamples = Boolean(examplesResponse.includeExamples);
     }
     
     // Step 1: Create NestJS project
@@ -164,6 +179,82 @@ export async function createCommand(projectName: string, options: CreateOptions)
     }
     
     console.log(chalk.green('✔ Project structure created'));
+
+    // If the user opted out of example pages, replace the features folder
+    if (!includeExamples) {
+      try {
+        const featuresDir = path.join(projectPath, 'src', 'features');
+        if (fs.existsSync(featuresDir)) {
+          fs.removeSync(featuresDir);
+        }
+
+        const homeDir = path.join(projectPath, 'src', 'features', 'home');
+        fs.mkdirpSync(homeDir);
+
+        // home.module.ts
+        const homeModule = `import { Module } from '@nestjs/common';
+import { HomeController } from './home.controller';
+import { HomeService } from './home.service';
+
+@Module({
+  controllers: [HomeController],
+  providers: [HomeService],
+})
+export class HomeModule {}`;
+        fs.writeFileSync(path.join(homeDir, 'home.module.ts'), homeModule, 'utf-8');
+
+        // home.service.ts
+        const homeService = `import { Injectable } from '@nestjs/common';
+
+@Injectable()
+export class HomeService {
+  getItems() {
+    return ['Item A', 'Item B'];
+  }
+}`;
+        fs.writeFileSync(path.join(homeDir, 'home.service.ts'), homeService, 'utf-8');
+
+        // home.controller.ts
+        const homeController = `import { JsxRender } from '@hepta-solutions/harpy-core';
+import { Controller, Get } from '@nestjs/common';
+import Homepage, { type PageProps } from './views/homepage';
+import { HomeService } from './home.service';
+
+@Controller()
+export class HomeController {
+  constructor(private readonly homeService: HomeService) {}
+
+  @Get()
+  @JsxRender(Homepage)
+  async homepage(): Promise<PageProps> {
+    return { items: this.homeService.getItems() };
+  }
+}`;
+        fs.writeFileSync(path.join(homeDir, 'home.controller.ts'), homeController, 'utf-8');
+
+        // views/homepage.tsx
+        const viewsDir = path.join(homeDir, 'views');
+        fs.mkdirpSync(viewsDir);
+        const homepageView = `import React from 'react';
+
+type Props = { items?: string[] };
+
+export default function Homepage({ items = [] }: Props) {
+  return (
+    <div className="p-8">
+      <h1 className="text-2xl font-bold">Welcome</h1>
+      <ul>
+        {items.map(it => <li key={it}>{it}</li>)}
+      </ul>
+    </div>
+  );
+}
+`;
+        fs.writeFileSync(path.join(viewsDir, 'homepage.tsx'), homepageView, 'utf-8');
+      } catch (err) {
+        console.warn(chalk.yellow('⚠ Failed to create minimal home feature.'));
+      }
+    }
     
     // Remove default NestJS boilerplate files
     const filesToRemove = [

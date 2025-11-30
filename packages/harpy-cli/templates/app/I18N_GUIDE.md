@@ -80,7 +80,8 @@ const dictionaries = {
 
 ```typescript
 import { Controller, Get } from '@nestjs/common';
-import { JsxRender, CurrentLocale } from '@hepta-solutions/harpy-core';
+import { JsxRender } from '@hepta-solutions/harpy-core';
+import { CurrentLocale, t } from '@hepta-solutions/harpy-i18n';
 import { getDictionary } from '../i18n/get-dictionary';
 import MyPage from './views/my-page';
 
@@ -102,7 +103,7 @@ export class MyController {
 ### In Server Components (TSX)
 
 ```tsx
-import { t } from '@hepta-solutions/harpy-core';
+import { t } from '@hepta-solutions/harpy-i18n';
 import { Dictionary } from '../i18n/get-dictionary';
 
 interface PageProps {
@@ -158,7 +159,8 @@ You can translate page metadata (title, description, Open Graph, Twitter cards) 
 
 ```tsx
 import { Controller, Get } from '@nestjs/common';
-import { JsxRender, CurrentLocale, t } from '@hepta-solutions/harpy-core';
+import { JsxRender } from '@hepta-solutions/harpy-core';
+import { CurrentLocale, t } from '@hepta-solutions/harpy-i18n';
 import { getDictionary } from '../i18n/get-dictionary';
 import MyPage, { type PageProps } from './views/my-page';
 
