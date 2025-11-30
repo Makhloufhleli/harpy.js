@@ -242,7 +242,7 @@ Built-in support for multi-language applications:
 ```typescript
 // app.module.ts
 import { Module } from '@nestjs/common';
-import { I18nModule } from '@hepta-solutions/harpy-core';
+import { I18nModule } from '@hepta-solutions/harpy-i18n';
 
 @Module({
   imports: [
@@ -281,21 +281,26 @@ export default function MyComponent() {
 }
 ```
 
-**Using translations in controllers:**
+**Using translations in controllers (server-side):**
 
 ```typescript
 import { Controller, Get } from '@nestjs/common';
-import { JsxRender, t } from '@hepta-solutions/harpy-core';
-import { Locale } from '@hepta-solutions/harpy-core';
+import { JsxRender } from '@hepta-solutions/harpy-core';
+import { CurrentLocale, t } from '@hepta-solutions/harpy-i18n';
+import { getDictionary } from './i18n/get-dictionary';
 
 @Controller()
 export class HomeController {
   @Get()
   @JsxRender(Homepage)
-  home(@Locale() locale: string) {
+  async home(@CurrentLocale() locale: string) {
+    const dict = await getDictionary(locale);
+
     return {
-      title: t('home.title', locale),
-      message: t('home.welcome', locale),
+      title: t(dict, 'home.title'),
+      message: t(dict, 'home.welcome'),
+      dict,
+      locale,
     };
   }
 }
