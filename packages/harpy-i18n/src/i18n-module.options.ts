@@ -1,4 +1,4 @@
-export type I18nUrlPattern = 'query' | 'header';
+export type I18nUrlPattern = "query" | "header";
 
 export interface I18nModuleOptions {
   defaultLocale: string;
@@ -9,4 +9,4 @@ export interface I18nModuleOptions {
   queryParam?: string;
 }
 
-export const I18N_MODULE_OPTIONS = 'I18N_MODULE_OPTIONS';
+export const I18N_MODULE_OPTIONS = "I18N_MODULE_OPTIONS";
