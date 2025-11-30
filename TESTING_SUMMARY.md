@@ -3,25 +3,30 @@
 ## ✅ Completed Setup
 
 ### 1. Package Configuration
+
 - **Root package.json**: Added test scripts, Jest/Husky dependencies, lint-staged config
 - **harpy-core package.json**: Added test scripts
 - **harpy-cli package.json**: Added test scripts
 
 ### 2. Jest Configuration
+
 - **packages/harpy-core/jest.config.js**: TypeScript preset, 70% coverage thresholds
 - **packages/harpy-cli/jest.config.js**: TypeScript preset, 70% coverage thresholds
 
 ### 3. Test Files Created
 
 #### harpy-core Tests (`packages/harpy-core/src/core/__tests__/`)
+
 - **jsx.engine.test.ts**: 13 test cases covering JSX rendering, layouts, props handling
 - **component-analyzer.test.ts**: 25+ test cases for client component detection
 - **hydration-manifest.test.ts**: 20+ test cases for manifest generation
 
 #### harpy-cli Tests (`packages/harpy-cli/src/__tests__/`)
+
 - **create.test.ts**: 30+ test cases for project creation, templates, validation
 
 ### 4. CI/CD Pipeline
+
 - **.github/workflows/ci.yml**: GitHub Actions workflow
   - Tests on Node 18.x and 20.x
   - Runs tests, linting, and coverage
@@ -29,12 +34,14 @@
   - Uploads coverage to Codecov
 
 ### 5. Git Hooks
+
 - **.husky/pre-commit**: Pre-commit hook script
   - Runs `lint-staged` on commit
   - Tests only changed files
   - Prevents commits with failing tests
 
 ### 6. TypeScript Configuration
+
 - Updated both tsconfigs to include Jest types
 - Configured for test file recognition
 
@@ -55,17 +62,20 @@
 ## 🚀 Next Steps (Manual)
 
 ### 1. Install Dependencies
+
 ```bash
 cd /Users/user/Workspaces/HEPTA/nestjsx-monorepo
 pnpm install
 ```
 
 ### 2. Initialize Husky
+
 ```bash
 pnpm run prepare
 ```
 
 ### 3. Run Tests
+
 ```bash
 # All tests
 pnpm test
@@ -80,11 +90,13 @@ pnpm test:watch
 ## 📊 Test Coverage
 
 ### harpy-core (58 test cases)
+
 - JSX Engine: 13 tests
 - Component Analyzer: 25 tests
 - Hydration Manifest: 20 tests
 
 ### harpy-cli (30+ test cases)
+
 - Create Command: 30+ tests
 - Template handling
 - Project structure validation
@@ -105,6 +117,7 @@ pnpm test:watch
 ## 📝 Files Modified/Created
 
 ### Modified
+
 - `/package.json` - Root config
 - `/packages/harpy-core/package.json`
 - `/packages/harpy-cli/package.json`
@@ -112,6 +125,7 @@ pnpm test:watch
 - `/packages/harpy-cli/tsconfig.json`
 
 ### Created
+
 - `/packages/harpy-core/jest.config.js`
 - `/packages/harpy-cli/jest.config.js`
 - `/packages/harpy-core/src/core/__tests__/jsx.engine.test.ts`
@@ -125,16 +139,20 @@ pnpm test:watch
 ## ⚠️ Known Issues
 
 ### TypeScript Errors in Test Files
+
 The test files show TypeScript errors because:
+
 1. Dependencies haven't been installed yet (`@types/jest` missing)
 2. Some test implementations need adjustment to match actual API
 
 ### Resolution
+
 Once you run `pnpm install`, the Jest types will be available and most errors will resolve. Some tests may need minor adjustments based on the actual implementation details.
 
 ## 🎯 Coverage Goals
 
 Each package is configured with 70% coverage thresholds for:
+
 - Branches
 - Functions
 - Lines
@@ -153,6 +171,7 @@ Each package is configured with 70% coverage thresholds for:
 ## 📚 Documentation
 
 See `TESTING.md` for:
+
 - Detailed setup instructions
 - How to write new tests
 - Troubleshooting guide

@@ -55,6 +55,7 @@ harpy-monorepo/
 ### Dependencies
 
 **Peer Dependencies:**
+
 - `@nestjs/common` ^11.0.0
 - `@nestjs/core` ^11.0.0
 - `@nestjs/platform-fastify` ^11.0.0
@@ -62,6 +63,7 @@ harpy-monorepo/
 - `react-dom` ^19.0.0
 
 **Direct Dependencies:**
+
 - `esbuild` ^0.24.2 (client component bundling)
 - `chokidar` ^3.6.0 (file watching in dev mode)
 
@@ -76,17 +78,17 @@ harpy-monorepo/
 
 ```typescript
 // Engine
-export { withJsxEngine } from './core/jsx.engine';
-export { HydrationProvider } from './core/hydration';
+export { withJsxEngine } from "./core/jsx.engine";
+export { HydrationProvider } from "./core/hydration";
 
 // Decorator
-export { JsxRender } from './decorators/jsx.decorator';
+export { JsxRender } from "./decorators/jsx.decorator";
 
 // Client wrapper
-export { autoWrapClientComponent } from './core/client-component-wrapper';
+export { autoWrapClientComponent } from "./core/client-component-wrapper";
 
 // Manifest utilities
-export { getChunkPath } from './core/hydration-manifest';
+export { getChunkPath } from "./core/hydration-manifest";
 ```
 
 ## Package: harpy-cli
@@ -164,6 +166,7 @@ templates/app/
 ### Build Pipeline
 
 **Production Build:**
+
 ```bash
 nest build                    # Compile TypeScript with SWC
 → harpy build-hydration    # Detect 'use client', bundle components
@@ -172,6 +175,7 @@ nest build                    # Compile TypeScript with SWC
 ```
 
 **Development Mode:**
+
 ```bash
 harpy dev                  # Start NestJS in watch mode
                             # Auto-rebuild assets on file changes
@@ -184,8 +188,10 @@ harpy dev                  # Start NestJS in watch mode
 2. TypeScript/SWC compiles to: `const _default = ComponentName;`
 3. `auto-wrap-exports.ts` transforms to:
    ```javascript
-   var { autoWrapClientComponent: _autoWrapClientComponent } = require("../../core/client-component-wrapper");
-   const _default = _autoWrapClientComponent(ComponentName, 'ComponentName');
+   var {
+     autoWrapClientComponent: _autoWrapClientComponent,
+   } = require("../../core/client-component-wrapper");
+   const _default = _autoWrapClientComponent(ComponentName, "ComponentName");
    ```
 4. During SSR, wrapper tracks component usage
 5. Hydration scripts injected into HTML
@@ -194,6 +200,7 @@ harpy dev                  # Start NestJS in watch mode
 ### Hydration Flow
 
 **Server-Side (SSR):**
+
 1. Request comes in, controller calls `@JsxRender()` decorated method
 2. `HydrationProvider` context tracks component registrations
 3. Components call `registerComponent()` during render
@@ -201,6 +208,7 @@ harpy dev                  # Start NestJS in watch mode
 5. Inject hydration scripts into HTML via `getHydrationScripts()`
 
 **Client-Side:**
+
 1. Page loads with hydration scripts
 2. Each script loads and hydrates its component
 3. Uses `hydrateRoot()` from React 19
@@ -247,17 +255,19 @@ None - All compilation errors resolved!
    - Fix `cli.ts` type annotations
 
 2. **Build Packages:**
+
    ```bash
    cd /Users/user/Workspaces/HEPTA/harpy-monorepo
    pnpm run build
    ```
 
 3. **Test Locally:**
+
    ```bash
    # Link packages
    cd packages/harpy-core && npm link
    cd ../harpy-cli && npm link
-   
+
    # Create test project
    mkdir -p /tmp/harpy-test
    cd /tmp/harpy-test
@@ -274,10 +284,11 @@ None - All compilation errors resolved!
    - Production build works
 
 5. **Prepare for Publishing:**
+
    ```bash
    # Version packages
    pnpm run version
-   
+
    # Publish to npm
    pnpm run publish
    ```
@@ -285,6 +296,7 @@ None - All compilation errors resolved!
 ## Development Workflow
 
 **Add new feature to core:**
+
 ```bash
 cd packages/harpy-core
 # Edit files in src/
@@ -292,6 +304,7 @@ pnpm build
 ```
 
 **Update CLI templates:**
+
 ```bash
 cd packages/harpy-cli
 # Edit files in templates/app/
@@ -299,6 +312,7 @@ pnpm build
 ```
 
 **Test changes:**
+
 ```bash
 # From monorepo root
 pnpm run build

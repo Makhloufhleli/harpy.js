@@ -15,7 +15,8 @@
     "version": "lerna version",
     "publish": "lerna publish",
     "prepare": "husky install",
-    "lint": "lerna run lint"
+    "lint": "lerna run lint",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,css}\""
   },
   "devDependencies": {
     "@types/jest": "^29.5.12",
@@ -23,6 +24,7 @@
     "jest": "^29.7.0",
     "lerna": "^8.1.9",
     "lint-staged": "^15.2.0",
+    "prettier": "^3.7.3",
     "ts-jest": "^29.1.2"
   },
   "workspaces": [
@@ -44,5 +46,6 @@
   },
   "dependencies": {
     "@hepta-solutions/harpy-core": "link:packages/harpy-core"
-  }
+  },
+  "packageManager": "pnpm@10.24.0+sha512.01ff8ae71b4419903b65c60fb2dc9d34cf8bb6e06d03bde112ef38f7a34d6904c424ba66bea5cdcf12890230bf39f9580473140ed9c946fef328b6e5238a345a"
 }
