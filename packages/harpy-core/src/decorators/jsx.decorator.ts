@@ -1,5 +1,5 @@
-import { RENDER_METADATA } from '@nestjs/common/constants';
-import { JsxLayout } from '../core/jsx.engine';
+import { RENDER_METADATA } from "@nestjs/common/constants";
+import { JsxLayout } from "../core/jsx.engine";
 
 export interface MetaOptions {
   title?: string;

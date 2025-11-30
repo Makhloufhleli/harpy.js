@@ -1,4 +1,4 @@
-import React, { AnchorHTMLAttributes, MouseEvent, useCallback } from 'react';
+import React, { AnchorHTMLAttributes, MouseEvent, useCallback } from "react";
 
 export type LinkProps = AnchorHTMLAttributes<HTMLAnchorElement> & {
   replace?: boolean;
@@ -11,8 +11,13 @@ export type LinkProps = AnchorHTMLAttributes<HTMLAnchorElement> & {
  * are used. This keeps behaviour identical to a native `<a>` while
  * enabling SPA-style history navigation when appropriate.
  */
-export default function Link({ href = '#', onClick, replace, ...rest }: LinkProps) {
-  const isLocal = typeof href === 'string' && href.startsWith('/');
+export default function Link({
+  href = "#",
+  onClick,
+  replace,
+  ...rest
+}: LinkProps) {
+  const isLocal = typeof href === "string" && href.startsWith("/");
 
   const handleClick = useCallback(
     (e: MouseEvent<HTMLAnchorElement>) => {
@@ -25,13 +30,7 @@ export default function Link({ href = '#', onClick, replace, ...rest }: LinkProp
 
       // Let the browser handle clicks that intend to open a new tab/window
       // or use a non-primary button.
-      if (
-        e.button !== 0 ||
-        e.metaKey ||
-        e.altKey ||
-        e.ctrlKey ||
-        e.shiftKey
-      ) {
+      if (e.button !== 0 || e.metaKey || e.altKey || e.ctrlKey || e.shiftKey) {
         return;
       }
 
@@ -42,11 +41,11 @@ export default function Link({ href = '#', onClick, replace, ...rest }: LinkProp
       e.preventDefault();
 
       try {
-        const method = replace ? 'replaceState' : 'pushState';
+        const method = replace ? "replaceState" : "pushState";
         // @ts-ignore DOM typings are available in consumer environments
-        window.history[method]({}, '', href as string);
+        window.history[method]({}, "", href as string);
         // Inform any listeners (e.g., client-side router) that the location changed.
-        window.dispatchEvent(new PopStateEvent('popstate'));
+        window.dispatchEvent(new PopStateEvent("popstate"));
       } catch (err) {
         // If anything goes wrong, fall back to normal navigation.
         // Do a full navigation as a last resort.
@@ -59,7 +58,5 @@ export default function Link({ href = '#', onClick, replace, ...rest }: LinkProp
   // Render a normal anchor for full compatibility (SEO, right-click,
   // middle-click, screen readers). We only intercept clicks when it's
   // safe to do SPA-style navigation.
-  return (
-    <a href={href} onClick={handleClick} {...rest} />
-  );
+  return <a href={href} onClick={handleClick} {...rest} />;
 }

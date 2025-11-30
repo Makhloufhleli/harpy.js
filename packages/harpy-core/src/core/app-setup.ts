@@ -1,5 +1,5 @@
-import type { NestFastifyApplication } from '@nestjs/platform-fastify';
-import * as path from 'path';
+import type { NestFastifyApplication } from "@nestjs/platform-fastify";
+import * as path from "path";
 // Use runtime `require` for optional fastify plugins so consumers don't need
 // to install them as direct dependencies of the core package at compile time.
 // We'll type them as `any` to avoid TypeScript module resolution errors here.
@@ -10,18 +10,18 @@ let fastifyStatic: any;
 let fastifyCookie: any;
 try {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
-  fastifyStatic = require('@fastify/static');
+  fastifyStatic = require("@fastify/static");
 } catch (e) {
   // Module not installed — we'll skip registering static handler below.
   fastifyStatic = undefined;
 }
 try {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
-  fastifyCookie = require('@fastify/cookie');
+  fastifyCookie = require("@fastify/cookie");
 } catch (e) {
   fastifyCookie = undefined;
 }
-import { withJsxEngine } from './jsx.engine';
+import { withJsxEngine } from "./jsx.engine";
 
 export interface HarpyAppOptions {
   /** JSX Default layout used by the app (optional) */
@@ -43,7 +43,7 @@ export async function configureHarpyApp(
   app: NestFastifyApplication,
   opts: HarpyAppOptions = {},
 ) {
-  const { layout, distDir = 'dist' } = opts;
+  const { layout, distDir = "dist" } = opts;
 
   if (layout) {
     withJsxEngine(app, layout);
@@ -61,7 +61,9 @@ export async function configureHarpyApp(
     // We intentionally do not throw here to avoid breaking projects that
     // don't need cookie support.
     // eslint-disable-next-line no-console
-    console.warn('[harpy-core] optional dependency `@fastify/cookie` is not installed; skipping cookie registration.');
+    console.warn(
+      "[harpy-core] optional dependency `@fastify/cookie` is not installed; skipping cookie registration.",
+    );
   }
 
   // Ensure hydration chunks and other built assets are served from `dist`
@@ -74,7 +76,7 @@ export async function configureHarpyApp(
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     await fastify.register(fastifyStatic, {
       root: path.join(process.cwd(), distDir),
-      prefix: '/',
+      prefix: "/",
       decorateReply: false,
     });
   } else {
@@ -82,7 +84,9 @@ export async function configureHarpyApp(
     // Consumers who need hydration chunk serving in production should add
     // `@fastify/static` as a dependency in their application.
     // eslint-disable-next-line no-console
-    console.warn('[harpy-core] optional dependency `@fastify/static` is not installed; static `dist` handler not registered.');
+    console.warn(
+      "[harpy-core] optional dependency `@fastify/static` is not installed; static `dist` handler not registered.",
+    );
   }
 
   // Note: we intentionally do not register a `public` static handler by

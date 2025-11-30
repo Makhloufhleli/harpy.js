@@ -6,15 +6,15 @@ import {
   Res,
   Get,
   HttpStatus,
-} from '@nestjs/common';
-import { I18nHelper } from './i18n.helper';
+} from "@nestjs/common";
+import { I18nHelper } from "./i18n.helper";
 
 /**
  * API Controller for handling locale switching
  *
  * Provides a proper API endpoint for changing locales
  */
-@Controller('api/i18n')
+@Controller("api/i18n")
 export class I18nSwitcherController {
   constructor(private readonly i18nHelper: I18nHelper) {}
 
@@ -30,9 +30,9 @@ export class I18nSwitcherController {
    * });
    * ```
    */
-  @Post('switch-locale')
+  @Post("switch-locale")
   switchLocale(
-    @Body('locale') locale: string,
+    @Body("locale") locale: string,
     @Req() req: any,
     @Res() res: any,
   ) {
@@ -40,7 +40,7 @@ export class I18nSwitcherController {
     if (!locale) {
       return res
         .status(HttpStatus.BAD_REQUEST)
-        .send({ error: 'Locale is required' });
+        .send({ error: "Locale is required" });
     }
 
     // Validate and normalize locale
@@ -50,18 +50,18 @@ export class I18nSwitcherController {
     this.i18nHelper.setLocaleCookie(res, validatedLocale);
 
     // Get the referer (where the user came from) or default to homepage
-    const referer = req.headers.referer || req.headers.origin || '/';
-    let currentPath = '/';
+    const referer = req.headers.referer || req.headers.origin || "/";
+    let currentPath = "/";
     let query: Record<string, string> = {};
 
     try {
       const refererUrl = new URL(referer);
       // Security check: validate it's from the same origin to prevent open redirect
-      const requestOrigin = `${req.protocol}://${req.hostname}${req.hostname === 'localhost' && req.port ? ':' + req.port : ''}`;
-      
+      const requestOrigin = `${req.protocol}://${req.hostname}${req.hostname === "localhost" && req.port ? ":" + req.port : ""}`;
+
       if (refererUrl.origin !== requestOrigin) {
         // External origin - use root path for security
-        currentPath = '/';
+        currentPath = "/";
       } else {
         currentPath = refererUrl.pathname;
         // Parse query params from referer
@@ -71,7 +71,7 @@ export class I18nSwitcherController {
       }
     } catch {
       // If referer is not a valid URL, use root path
-      currentPath = '/';
+      currentPath = "/";
     }
 
     // Build redirect URL based on the page the user was on
@@ -92,7 +92,7 @@ export class I18nSwitcherController {
   /**
    * Get i18n configuration for client-side usage
    */
-  @Get('config')
+  @Get("config")
   getConfig() {
     return this.i18nHelper.getClientConfig();
   }

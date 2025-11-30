@@ -20,9 +20,9 @@
  * ```
  */
 
-'use client';
+"use client";
 
-import { useEffect } from 'react';
+import { useEffect } from "react";
 
 interface UseI18nReturn {
   switchLocale: (locale: string) => void;
@@ -34,11 +34,14 @@ export function useI18n(): UseI18nReturn {
   // Register that this component uses i18n, so the navigation script gets injected
   useEffect(() => {
     // Mark that i18n is being used in this render
-    if (typeof window !== 'undefined' && !(window as any).__HARPY_I18N_INITIALIZED__) {
+    if (
+      typeof window !== "undefined" &&
+      !(window as any).__HARPY_I18N_INITIALIZED__
+    ) {
       (window as any).__HARPY_I18N_INITIALIZED__ = true;
-      
+
       // Inject language-aware navigation script
-      const script = document.createElement('script');
+      const script = document.createElement("script");
       script.textContent = `
         (function() {
           if (window.__HARPY_I18N_NAV_INSTALLED__) return;
@@ -68,10 +71,10 @@ export function useI18n(): UseI18nReturn {
    * Switch to a new locale by updating the URL and reloading the page
    */
   const switchLocale = (locale: string): void => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === "undefined") return;
 
     const url = new URL(window.location.href);
-    url.searchParams.set('lang', locale);
+    url.searchParams.set("lang", locale);
     window.location.href = url.toString();
   };
 
@@ -79,10 +82,10 @@ export function useI18n(): UseI18nReturn {
    * Get the current locale from the URL
    */
   const getCurrentLocale = (): string | null => {
-    if (typeof window === 'undefined') return null;
+    if (typeof window === "undefined") return null;
 
     const url = new URL(window.location.href);
-    return url.searchParams.get('lang');
+    return url.searchParams.get("lang");
   };
 
   /**
@@ -90,13 +93,13 @@ export function useI18n(): UseI18nReturn {
    * Useful for navigation links that should maintain the language
    */
   const buildUrl = (path: string, locale?: string): string => {
-    if (typeof window === 'undefined') return path;
+    if (typeof window === "undefined") return path;
 
     const currentLocale = locale || getCurrentLocale();
     if (!currentLocale) return path;
 
     const url = new URL(path, window.location.origin);
-    url.searchParams.set('lang', currentLocale);
+    url.searchParams.set("lang", currentLocale);
     return url.pathname + url.search;
   };
 

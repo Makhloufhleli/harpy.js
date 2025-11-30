@@ -3,8 +3,8 @@
  * Reads the generated hydration manifest at runtime to map component names to chunked filenames
  */
 
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from "fs";
+import * as path from "path";
 
 export interface HydrationManifest {
   [componentName: string]: string; // componentName -> chunkFileName
@@ -23,8 +23,8 @@ export function getHydrationManifest(): HydrationManifest {
 
   // Try dist folder first (where it's generated), then legacy src location
   const manifestPaths = [
-    path.join(process.cwd(), 'dist', 'hydration-manifest.json'),
-    path.join(process.cwd(), 'src', 'hydration-manifest.json'), // legacy fallback
+    path.join(process.cwd(), "dist", "hydration-manifest.json"),
+    path.join(process.cwd(), "src", "hydration-manifest.json"), // legacy fallback
   ];
 
   let manifestPath: string | null = null;
@@ -37,19 +37,19 @@ export function getHydrationManifest(): HydrationManifest {
 
   if (!manifestPath) {
     console.warn(
-      '[Hydration] Manifest file not found at any of:',
+      "[Hydration] Manifest file not found at any of:",
       manifestPaths,
-      '- ensure build:hydration has been run',
+      "- ensure build:hydration has been run",
     );
     return {};
   }
 
   try {
-    const content = fs.readFileSync(manifestPath, 'utf-8');
+    const content = fs.readFileSync(manifestPath, "utf-8");
     cachedManifest = JSON.parse(content) as HydrationManifest;
     return cachedManifest;
   } catch (error) {
-    console.error('[Hydration] Failed to load hydration manifest:', error);
+    console.error("[Hydration] Failed to load hydration manifest:", error);
     cachedManifest = {};
     return cachedManifest;
   }

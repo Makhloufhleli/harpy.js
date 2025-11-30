@@ -3,7 +3,7 @@
  * This script is injected into the HTML and runs in the browser to hydrate interactive components.
  */
 
-import React from 'react';
+import React from "react";
 
 /**
  * Client-side hydration entry point.
@@ -53,7 +53,7 @@ function getHydrationProps(propsId: string): Record<string, any> {
   if (!propsScript) return {};
 
   try {
-    return JSON.parse(propsScript.textContent || '{}');
+    return JSON.parse(propsScript.textContent || "{}");
   } catch (e) {
     console.warn(`Failed to parse props for ${propsId}:`, e);
     return {};
@@ -83,7 +83,7 @@ export function hydrateComponent(
     const props = getHydrationProps(marker.propsId);
 
     // Dynamically import React for hydration
-    Promise.all([import('react-dom/client')]).then(([{ hydrateRoot }]) => {
+    Promise.all([import("react-dom/client")]).then(([{ hydrateRoot }]) => {
       try {
         hydrateRoot(container, React.createElement(Component, props));
       } catch (error) {
@@ -94,6 +94,6 @@ export function hydrateComponent(
 }
 
 // Export for use in component bundles
-if (typeof window !== 'undefined') {
+if (typeof window !== "undefined") {
   (window as any).__HYDRATION__ = { hydrateComponent };
 }

@@ -8,11 +8,11 @@
  * wrapping transparently without requiring explicit wrapper calls in user code.
  */
 
-import * as fs from 'fs';
-import * as path from 'path';
-import React from 'react';
-import { autoWrapClientComponent } from './client-component-wrapper';
-import { getComponentNameFromPath } from './component-analyzer';
+import * as fs from "fs";
+import * as path from "path";
+import React from "react";
+import { autoWrapClientComponent } from "./client-component-wrapper";
+import { getComponentNameFromPath } from "./component-analyzer";
 
 /**
  * Cache of analyzed components
@@ -41,9 +41,9 @@ function findComponentSourceFile(
     if (!componentName) return null;
 
     // Look in src/features/*/views/ directories
-    const srcRoot = path.join(process.cwd(), 'src');
+    const srcRoot = path.join(process.cwd(), "src");
     const viewsDirs = fs.readdirSync(srcRoot).flatMap((feature) => {
-      const viewsPath = path.join(srcRoot, 'features', feature, 'views');
+      const viewsPath = path.join(srcRoot, "features", feature, "views");
       if (fs.existsSync(viewsPath)) {
         return fs
           .readdirSync(viewsPath)
@@ -54,7 +54,7 @@ function findComponentSourceFile(
 
     // Find matching file
     const kebabName = componentName
-      .replace(/([A-Z])/g, '-$1')
+      .replace(/([A-Z])/g, "-$1")
       .toLowerCase()
       .substring(1);
 
@@ -75,7 +75,7 @@ function findComponentSourceFile(
  */
 function hasUseClientDirective(filePath: string): boolean {
   try {
-    const content = fs.readFileSync(filePath, 'utf-8');
+    const content = fs.readFileSync(filePath, "utf-8");
     return /^['"]use client['"];?\s*/.test(content);
   } catch {
     return false;
@@ -104,7 +104,7 @@ export function autoWrapIfUsesClient(
     // Can't find source, cache as non-client component
     componentAnalysisCache.set(component, {
       isClientComponent: false,
-      componentName: component.displayName || component.name || 'Unknown',
+      componentName: component.displayName || component.name || "Unknown",
     });
     return component;
   }
@@ -142,7 +142,7 @@ export const createAutoWrapCreateElement = (
     ...children: React.ReactNode[]
   ) => {
     // Only process function components
-    if (typeof type === 'function' && !type.prototype?.isReactComponent) {
+    if (typeof type === "function" && !type.prototype?.isReactComponent) {
       try {
         // Auto-wrap if it has 'use client'
         const wrappedType = autoWrapIfUsesClient(type);

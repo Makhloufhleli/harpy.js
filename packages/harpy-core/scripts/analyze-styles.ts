@@ -4,11 +4,11 @@
  * This helps identify page-specific vs common styles
  */
 
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from "fs";
+import * as path from "path";
 
-const SRC_DIR = path.join(__dirname, '../src');
-const FEATURES_DIR = path.join(SRC_DIR, 'features');
+const SRC_DIR = path.join(__dirname, "../src");
+const FEATURES_DIR = path.join(SRC_DIR, "features");
 
 interface PageInfo {
   name: string;
@@ -24,8 +24,8 @@ function extractClasses(content: string): Set<string> {
 
   classMatches.forEach((match) => {
     const classContent = match
-      .replace(/(?:className|class)="/, '')
-      .replace(/"$/, '');
+      .replace(/(?:className|class)="/, "")
+      .replace(/"$/, "");
     const tokens = classContent.split(/\s+/);
     tokens.forEach((token) => {
       if (token.trim()) classes.add(token);
@@ -46,16 +46,16 @@ function analyzePages(): PageInfo[] {
     .filter((f) => fs.statSync(path.join(FEATURES_DIR, f)).isDirectory());
 
   featureDirs.forEach((featureName) => {
-    const viewsDir = path.join(FEATURES_DIR, featureName, 'views');
+    const viewsDir = path.join(FEATURES_DIR, featureName, "views");
     if (fs.existsSync(viewsDir)) {
       const viewFiles = fs
         .readdirSync(viewsDir)
-        .filter((f) => f.endsWith('.tsx') || f.endsWith('.ts'))
+        .filter((f) => f.endsWith(".tsx") || f.endsWith(".ts"))
         .map((f) => path.join(viewsDir, f));
 
       const classes = new Set<string>();
       viewFiles.forEach((file) => {
-        const content = fs.readFileSync(file, 'utf-8');
+        const content = fs.readFileSync(file, "utf-8");
         const fileClasses = extractClasses(content);
         fileClasses.forEach((c) => classes.add(c));
       });
@@ -73,9 +73,9 @@ function analyzePages(): PageInfo[] {
 
 // Also extract classes from layout
 function getLayoutClasses(): Set<string> {
-  const layoutFile = path.join(SRC_DIR, 'core/views/layout.tsx');
+  const layoutFile = path.join(SRC_DIR, "core/views/layout.tsx");
   if (fs.existsSync(layoutFile)) {
-    const content = fs.readFileSync(layoutFile, 'utf-8');
+    const content = fs.readFileSync(layoutFile, "utf-8");
     return extractClasses(content);
   }
   return new Set();
@@ -85,17 +85,17 @@ function main() {
   const pages = analyzePages();
   const layoutClasses = getLayoutClasses();
 
-  console.log('📊 Page Style Analysis:\n');
+  console.log("📊 Page Style Analysis:\n");
 
   pages.forEach((page) => {
     console.log(`${page.name}: ${page.classes.size} classes`);
     console.log(
-      `  Files: ${page.viewFiles.map((f) => path.basename(f)).join(', ')}`,
+      `  Files: ${page.viewFiles.map((f) => path.basename(f)).join(", ")}`,
     );
   });
 
   console.log(`\nlayout: ${layoutClasses.size} classes`);
-  console.log('\nCommon classes (used across multiple pages):');
+  console.log("\nCommon classes (used across multiple pages):");
 
   const commonClasses = new Set<string>();
   const classUsage = new Map<string, number>();
@@ -116,8 +116,8 @@ function main() {
 
   console.log(`Total common: ${commonClasses.size}`);
   console.log(
-    'Sample common classes:',
-    Array.from(commonClasses).slice(0, 10).join(', '),
+    "Sample common classes:",
+    Array.from(commonClasses).slice(0, 10).join(", "),
   );
 }
 

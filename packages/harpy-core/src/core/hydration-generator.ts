@@ -1,9 +1,9 @@
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from "fs";
+import * as path from "path";
 import {
   getClientComponents,
   getComponentNameFromPath,
-} from './component-analyzer';
+} from "./component-analyzer";
 
 /**
  * Generates separate entry point files for each client component
@@ -27,14 +27,14 @@ export function generateHydrationEntryFiles(
     const relativePath = path.relative(srcDir, componentPath);
 
     // Compute relative import path from assets/hydrate to the component
-    const fromAssets = path.join(outputDir, 'dummy.ts');
+    const fromAssets = path.join(outputDir, "dummy.ts");
     let importPath = path.relative(path.dirname(fromAssets), componentPath);
 
     // Normalize path separators to forward slashes (required for imports)
-    importPath = importPath.replace(/\\/g, '/');
+    importPath = importPath.replace(/\\/g, "/");
 
     // Remove .tsx/.ts extension if present and add it explicitly
-    importPath = importPath.replace(/\.tsx?$/, '');
+    importPath = importPath.replace(/\.tsx?$/, "");
 
     // Create entry file for this component
     const entryFileName = `${componentName}.ts`;
@@ -70,7 +70,7 @@ instances.forEach((element) => {
 });
 `.trim();
 
-    fs.writeFileSync(entryFilePath, entryContent, 'utf-8');
+    fs.writeFileSync(entryFilePath, entryContent, "utf-8");
     entryFiles.push(entryFilePath);
 
     console.log(`Generated hydration entry: ${entryFileName}`);
@@ -89,6 +89,6 @@ export function getHydrationEntryFiles(outputDir: string): string[] {
 
   return fs
     .readdirSync(outputDir)
-    .filter((file) => file.endsWith('.ts') && !file.endsWith('.spec.ts'))
+    .filter((file) => file.endsWith(".ts") && !file.endsWith(".spec.ts"))
     .map((file) => path.join(outputDir, file));
 }

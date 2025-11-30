@@ -7,10 +7,10 @@
  * The wrapping happens transparently at the component definition level.
  */
 
-import * as fs from 'fs';
-import React from 'react';
-import { autoWrapClientComponent } from './client-component-wrapper';
-import { getComponentNameFromPath } from './component-analyzer';
+import * as fs from "fs";
+import React from "react";
+import { autoWrapClientComponent } from "./client-component-wrapper";
+import { getComponentNameFromPath } from "./component-analyzer";
 
 /**
  * Cache of file paths and whether they have 'use client' directive
@@ -27,7 +27,7 @@ function hasUseClientDirective(filePath: string): boolean {
   }
 
   try {
-    const content = fs.readFileSync(filePath, 'utf-8');
+    const content = fs.readFileSync(filePath, "utf-8");
     // Match "use client" at the very start of the file
     const hasDirective = /^(['"]use client['"];?\s*)/m.test(content);
     clientComponentCache.set(filePath, hasDirective);
@@ -53,7 +53,7 @@ export function autoWrap<T extends React.ComponentType<any>>(
   fileUrl: string,
 ): T {
   // Convert URL to file path
-  const filePath = fileUrl.replace('file://', '');
+  const filePath = fileUrl.replace("file://", "");
 
   // If this component file doesn't have 'use client', return it unwrapped
   if (!hasUseClientDirective(filePath)) {
