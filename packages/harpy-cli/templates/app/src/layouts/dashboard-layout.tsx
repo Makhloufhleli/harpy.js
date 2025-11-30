@@ -1,5 +1,5 @@
-import * as React from 'react';
-import { JsxLayoutProps } from '@hepta-solutions/harpy-core';
+import * as React from "react";
+import { JsxLayoutProps } from "@hepta-solutions/harpy-core";
 
 /**
  * Dashboard Layout - Sidebar layout for admin/dashboard pages
@@ -18,8 +18,10 @@ export default function DashboardLayout({
       <head>
         <meta charSet="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>{meta?.title || 'Dashboard'}</title>
-        {meta?.description && <meta name="description" content={meta.description} />}
+        <title>{meta?.title || "Dashboard"}</title>
+        {meta?.description && (
+          <meta name="description" content={meta.description} />
+        )}
         <link rel="stylesheet" href="/styles/styles.css" />
       </head>
       <body className="min-h-screen bg-gray-100">
@@ -30,16 +32,36 @@ export default function DashboardLayout({
             </div>
             <ul className="list-none">
               <li className="my-2">
-                <a href="/dashboard" className="block px-8 py-3 text-white/80 hover:bg-white/10 hover:text-white transition-all">Overview</a>
+                <a
+                  href="/dashboard"
+                  className="block px-8 py-3 text-white/80 hover:bg-white/10 hover:text-white transition-all"
+                >
+                  Overview
+                </a>
               </li>
               <li className="my-2">
-                <a href="/dashboard/analytics" className="block px-8 py-3 text-white/80 hover:bg-white/10 hover:text-white transition-all">Analytics</a>
+                <a
+                  href="/dashboard/analytics"
+                  className="block px-8 py-3 text-white/80 hover:bg-white/10 hover:text-white transition-all"
+                >
+                  Analytics
+                </a>
               </li>
               <li className="my-2">
-                <a href="/dashboard/settings" className="block px-8 py-3 text-white/80 hover:bg-white/10 hover:text-white transition-all">Settings</a>
+                <a
+                  href="/dashboard/settings"
+                  className="block px-8 py-3 text-white/80 hover:bg-white/10 hover:text-white transition-all"
+                >
+                  Settings
+                </a>
               </li>
               <li className="mt-8">
-                <a href="/" className="block px-8 py-3 text-white/80 hover:bg-white/10 hover:text-white transition-all">← Exit Dashboard</a>
+                <a
+                  href="/"
+                  className="block px-8 py-3 text-white/80 hover:bg-white/10 hover:text-white transition-all"
+                >
+                  ← Exit Dashboard
+                </a>
               </li>
             </ul>
           </aside>
@@ -48,12 +70,12 @@ export default function DashboardLayout({
               <h1 className="text-slate-700 text-2xl">Dashboard</h1>
               <div className="flex gap-4 items-center">
                 <span>👤 Admin</span>
-                <a href="/auth/logout" className="text-slate-700 font-medium">Logout</a>
+                <a href="/auth/logout" className="text-slate-700 font-medium">
+                  Logout
+                </a>
               </div>
             </header>
-            <main className="flex-1 p-8">
-              {children}
-            </main>
+            <main className="flex-1 p-8">{children}</main>
           </div>
         </div>
         {/* Auto-injected hydration scripts */}

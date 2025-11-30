@@ -1,11 +1,11 @@
 module.exports = {
   plugins: {
-    '@tailwindcss/postcss': {},
-    ...(process.env.NODE_ENV === 'production'
+    "@tailwindcss/postcss": {},
+    ...(process.env.NODE_ENV === "production"
       ? {
           cssnano: {
             preset: [
-              'default',
+              "default",
               {
                 discardComments: { removeAll: true },
                 normalizeWhitespace: true,

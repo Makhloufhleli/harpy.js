@@ -9,7 +9,7 @@
 
 module.exports = function (api) {
   return {
-    name: 'client-component-wrapper',
+    name: "client-component-wrapper",
 
     visitor: {
       Program: {
@@ -28,11 +28,11 @@ module.exports = function (api) {
 
           // Find the default export
           path.node.body.forEach((stmt, index) => {
-            if (stmt.type === 'ExportDefaultDeclaration') {
+            if (stmt.type === "ExportDefaultDeclaration") {
               const declaration = stmt.declaration;
 
               // Handle: export default function Component() { ... }
-              if (declaration.type === 'FunctionDeclaration') {
+              if (declaration.type === "FunctionDeclaration") {
                 const componentName = declaration.id.name;
                 const wrappedName = `__wrapped_${componentName}`;
 
@@ -41,18 +41,18 @@ module.exports = function (api) {
 
                 // Replace export with wrapped version
                 stmt.declaration = {
-                  type: 'CallExpression',
+                  type: "CallExpression",
                   callee: {
-                    type: 'Identifier',
-                    name: 'autoWrapClientComponent',
+                    type: "Identifier",
+                    name: "autoWrapClientComponent",
                   },
                   arguments: [
                     {
-                      type: 'Identifier',
+                      type: "Identifier",
                       name: wrappedName,
                     },
                     {
-                      type: 'StringLiteral',
+                      type: "StringLiteral",
                       value: componentName,
                     },
                   ],
@@ -61,28 +61,28 @@ module.exports = function (api) {
                 // Add import for autoWrapClientComponent if not already present
                 addImportIfNeeded(
                   path,
-                  'autoWrapClientComponent',
-                  '@/core/client-component-wrapper',
+                  "autoWrapClientComponent",
+                  "@/core/client-component-wrapper",
                 );
               }
               // Handle: export default Component (identifier)
-              else if (declaration.type === 'Identifier') {
+              else if (declaration.type === "Identifier") {
                 const componentName = declaration.name;
 
                 // Wrap the identifier in a call
                 stmt.declaration = {
-                  type: 'CallExpression',
+                  type: "CallExpression",
                   callee: {
-                    type: 'Identifier',
-                    name: 'autoWrapClientComponent',
+                    type: "Identifier",
+                    name: "autoWrapClientComponent",
                   },
                   arguments: [
                     {
-                      type: 'Identifier',
+                      type: "Identifier",
                       name: componentName,
                     },
                     {
-                      type: 'StringLiteral',
+                      type: "StringLiteral",
                       value: componentName,
                     },
                   ],
@@ -90,8 +90,8 @@ module.exports = function (api) {
 
                 addImportIfNeeded(
                   path,
-                  'autoWrapClientComponent',
-                  '@/core/client-component-wrapper',
+                  "autoWrapClientComponent",
+                  "@/core/client-component-wrapper",
                 );
               }
             }
@@ -107,7 +107,7 @@ module.exports = function (api) {
 
     path.node.body.forEach((stmt) => {
       if (
-        stmt.type === 'ImportDeclaration' &&
+        stmt.type === "ImportDeclaration" &&
         stmt.source.value === fromModule
       ) {
         // Check if the specific import exists
@@ -126,29 +126,29 @@ module.exports = function (api) {
       // Skip 'use client' directive
       if (
         path.node.body[0] &&
-        path.node.body[0].type === 'ExpressionStatement' &&
-        path.node.body[0].expression.type === 'StringLiteral'
+        path.node.body[0].type === "ExpressionStatement" &&
+        path.node.body[0].expression.type === "StringLiteral"
       ) {
         insertIndex = 1;
       }
 
       const importStatement = {
-        type: 'ImportDeclaration',
+        type: "ImportDeclaration",
         specifiers: [
           {
-            type: 'ImportSpecifier',
+            type: "ImportSpecifier",
             imported: {
-              type: 'Identifier',
+              type: "Identifier",
               name: importName,
             },
             local: {
-              type: 'Identifier',
+              type: "Identifier",
               name: importName,
             },
           },
         ],
         source: {
-          type: 'StringLiteral',
+          type: "StringLiteral",
           value: fromModule,
         },
       };

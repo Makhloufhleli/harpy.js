@@ -1,12 +1,11 @@
-import type { JsxLayoutProps } from '@hepta-solutions/harpy-core';
+import type { JsxLayoutProps } from "@hepta-solutions/harpy-core";
 
-export default function DefaultLayout({
-  children,
-  meta,
-}: JsxLayoutProps) {
-  const title = meta?.title ?? 'Harpy Framework';
-  const description = meta?.description ?? 'A powerful NestJS + React framework with automatic hydration. Built for speed, precision, and adaptability.';
-  const canonical = meta?.canonical ?? 'https://example.com';
+export default function DefaultLayout({ children, meta }: JsxLayoutProps) {
+  const title = meta?.title ?? "Harpy Framework";
+  const description =
+    meta?.description ??
+    "A powerful NestJS + React framework with automatic hydration. Built for speed, precision, and adaptability.";
+  const canonical = meta?.canonical ?? "https://example.com";
 
   const og = meta?.openGraph ?? {};
   const twitter = meta?.twitter ?? {};
@@ -24,19 +23,31 @@ export default function DefaultLayout({
 
         {/* Open Graph tags */}
         <meta property="og:title" content={og.title || title} />
-        <meta property="og:description" content={og.description || description} />
-        <meta property="og:type" content={og.type || 'website'} />
+        <meta
+          property="og:description"
+          content={og.description || description}
+        />
+        <meta property="og:type" content={og.type || "website"} />
         {og.image && <meta property="og:image" content={og.image} />}
         {og.url && <meta property="og:url" content={og.url} />}
 
         {/* Twitter cards */}
-        <meta name="twitter:card" content={twitter.card || 'summary_large_image'} />
+        <meta
+          name="twitter:card"
+          content={twitter.card || "summary_large_image"}
+        />
         <meta name="twitter:title" content={twitter.title || title} />
-        <meta name="twitter:description" content={twitter.description || description} />
+        <meta
+          name="twitter:description"
+          content={twitter.description || description}
+        />
         {twitter.image && <meta name="twitter:image" content={twitter.image} />}
-        
+
         {/* Favicon */}
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🦅</text></svg>" />
+        <link
+          rel="icon"
+          href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🦅</text></svg>"
+        />
       </head>
       <body className="bg-slate-50">
         {/* Header */}
@@ -44,22 +55,36 @@ export default function DefaultLayout({
           <div className="container mx-auto max-w-6xl px-4">
             <div className="flex items-center justify-between h-16">
               <a href="/" className="flex items-center gap-2 group">
-                <span className="text-3xl group-hover:scale-110 transition-transform">🦅</span>
+                <span className="text-3xl group-hover:scale-110 transition-transform">
+                  🦅
+                </span>
                 <span className="text-xl font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
                   Harpy
                 </span>
               </a>
               <nav className="flex gap-6">
-                <a href="/" className="text-slate-600 hover:text-amber-600 font-medium transition-colors">
+                <a
+                  href="/"
+                  className="text-slate-600 hover:text-amber-600 font-medium transition-colors"
+                >
                   Home
                 </a>
-                <a href="/about" className="text-slate-600 hover:text-amber-600 font-medium transition-colors">
+                <a
+                  href="/about"
+                  className="text-slate-600 hover:text-amber-600 font-medium transition-colors"
+                >
                   About
                 </a>
-                <a href="/auth/login" className="text-slate-600 hover:text-amber-600 font-medium transition-colors">
+                <a
+                  href="/auth/login"
+                  className="text-slate-600 hover:text-amber-600 font-medium transition-colors"
+                >
                   Login
                 </a>
-                <a href="/dashboard" className="text-slate-600 hover:text-amber-600 font-medium transition-colors">
+                <a
+                  href="/dashboard"
+                  className="text-slate-600 hover:text-amber-600 font-medium transition-colors"
+                >
                   Dashboard
                 </a>
               </nav>
@@ -87,9 +112,36 @@ export default function DefaultLayout({
               <div>
                 <h3 className="font-bold mb-4">Resources</h3>
                 <ul className="space-y-2 text-slate-400">
-                  <li><a href="https://github.com/Makhloufhleli/harpy.js" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">GitHub</a></li>
-                  <li><a href="https://www.npmjs.com/package/@hepta-solutions/harpy-core" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">NPM Core</a></li>
-                  <li><a href="https://www.npmjs.com/package/@hepta-solutions/harpy-cli" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">NPM CLI</a></li>
+                  <li>
+                    <a
+                      href="https://github.com/Makhloufhleli/harpy.js"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hover:text-white transition-colors"
+                    >
+                      GitHub
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="https://www.npmjs.com/package/@hepta-solutions/harpy-core"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hover:text-white transition-colors"
+                    >
+                      NPM Core
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="https://www.npmjs.com/package/@hepta-solutions/harpy-cli"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hover:text-white transition-colors"
+                    >
+                      NPM CLI
+                    </a>
+                  </li>
                 </ul>
               </div>
               <div>
@@ -103,7 +155,11 @@ export default function DefaultLayout({
               </div>
             </div>
             <div className="border-t border-slate-800 pt-8 text-center text-slate-400">
-              <p>Powered by <span className="text-amber-500 font-semibold">Harpy</span> - Soar above the competition 🦅</p>
+              <p>
+                Powered by{" "}
+                <span className="text-amber-500 font-semibold">Harpy</span> -
+                Soar above the competition 🦅
+              </p>
             </div>
           </div>
         </footer>

@@ -105,9 +105,9 @@ This starts the development server with:
 Just add `'use client'` at the top of your component:
 
 ```tsx
-'use client';
+"use client";
 
-import React from 'react';
+import React from "react";
 
 export default function Counter() {
   const [count, setCount] = React.useState(0);
@@ -135,6 +135,7 @@ pnpm start:prod
 ```
 
 The production build includes:
+
 - ✅ Minified JavaScript bundles
 - ✅ Optimized CSS with cssnano
 - ✅ Tree-shaken dependencies
@@ -165,18 +166,18 @@ Your new project comes with:
 Use the `@WithLayout` decorator to specify custom layouts for routes:
 
 ```typescript
-import { Controller, Get } from '@nestjs/common';
-import { JsxRender, WithLayout } from '@hepta-solutions/harpy-core';
-import AuthLayout from './layouts/auth-layout';
-import LoginPage from './views/login-page';
+import { Controller, Get } from "@nestjs/common";
+import { JsxRender, WithLayout } from "@hepta-solutions/harpy-core";
+import AuthLayout from "./layouts/auth-layout";
+import LoginPage from "./views/login-page";
 
-@Controller('auth')
-@WithLayout(AuthLayout)  // Apply to entire controller
+@Controller("auth")
+@WithLayout(AuthLayout) // Apply to entire controller
 export class AuthController {
-  @Get('login')
+  @Get("login")
   @JsxRender(LoginPage)
   login() {
-    return { title: 'Login' };
+    return { title: "Login" };
   }
 }
 ```

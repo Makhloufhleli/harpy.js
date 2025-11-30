@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
+import { useState } from "react";
 
 function AboutCounter() {
   const [count, setCount] = useState(0);
