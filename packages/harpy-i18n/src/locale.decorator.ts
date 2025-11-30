@@ -1,4 +1,4 @@
-import { createParamDecorator, ExecutionContext } from '@nestjs/common';
+import { createParamDecorator, ExecutionContext } from "@nestjs/common";
 
 export const CurrentLocale = createParamDecorator(
   (data: unknown, ctx: ExecutionContext): string => {

@@ -5,6 +5,7 @@ Lightweight i18n utilities and NestJS integration for Harpy.js apps.
 This package provides a server-side i18n module, request-scoped locale handling, a `CurrentLocale` decorator, and the `t` translation helper used in templates and controllers.
 
 **Features**
+
 - NestJS `I18nModule` with lazy-loaded dictionaries
 - `CurrentLocale` decorator for controllers/services
 - `t()` helper for typed translation lookups
@@ -24,17 +25,17 @@ pnpm add @hepta-solutions/harpy-i18n
 
 ```ts
 // src/app.module.ts
-import { Module } from '@nestjs/common';
-import { I18nModule } from '@hepta-solutions/harpy-i18n';
+import { Module } from "@nestjs/common";
+import { I18nModule } from "@hepta-solutions/harpy-i18n";
 
 @Module({
   imports: [
     I18nModule.forRoot({
-      defaultLocale: 'en',
-      supportedLocales: ['en', 'fr', 'ar'],
+      defaultLocale: "en",
+      supportedLocales: ["en", "fr", "ar"],
       dictionaries: {
-        en: () => import('./dictionaries/en.json'),
-        fr: () => import('./dictionaries/fr.json'),
+        en: () => import("./dictionaries/en.json"),
+        fr: () => import("./dictionaries/fr.json"),
       },
     }),
   ],
@@ -45,17 +46,17 @@ export class AppModule {}
 2. Use the `CurrentLocale` decorator in controllers or services:
 
 ```ts
-import { Controller, Get } from '@nestjs/common';
-import { CurrentLocale, JsxRender, t } from '@hepta-solutions/harpy-i18n';
-import Homepage from './views/homepage';
+import { Controller, Get } from "@nestjs/common";
+import { CurrentLocale, JsxRender, t } from "@hepta-solutions/harpy-i18n";
+import Homepage from "./views/homepage";
 
 @Controller()
 export class HomeController {
   @Get()
-  @JsxRender(Homepage, { meta: { title: 'Welcome' } })
+  @JsxRender(Homepage, { meta: { title: "Welcome" } })
   home(@CurrentLocale() locale: string) {
     // Return data that may be used by your page component
-    return { message: t(locale, 'home.welcome', { name: 'Visitor' }) };
+    return { message: t(locale, "home.welcome", { name: "Visitor" }) };
   }
 }
 ```
@@ -64,14 +65,14 @@ export class HomeController {
 
 ```tsx
 // src/views/homepage.tsx
-import React from 'react';
-import { t } from '@hepta-solutions/harpy-i18n';
+import React from "react";
+import { t } from "@hepta-solutions/harpy-i18n";
 
 export default function Homepage({ message, locale }) {
   return (
     <div>
       <h1>{message}</h1>
-      <p>{t(locale, 'home.subtitle')}</p>
+      <p>{t(locale, "home.subtitle")}</p>
     </div>
   );
 }
