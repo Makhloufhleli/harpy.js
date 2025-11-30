@@ -4,9 +4,23 @@ import * as path from 'path';
 // to install them as direct dependencies of the core package at compile time.
 // We'll type them as `any` to avoid TypeScript module resolution errors here.
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const fastifyStatic: any = require('@fastify/static');
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const fastifyCookie: any = require('@fastify/cookie');
+// Load optional fastify plugins with graceful fallback so consumers that
+// don't install these packages don't crash at runtime.
+let fastifyStatic: any;
+let fastifyCookie: any;
+try {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  fastifyStatic = require('@fastify/static');
+} catch (e) {
+  // Module not installed — we'll skip registering static handler below.
+  fastifyStatic = undefined;
+}
+try {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  fastifyCookie = require('@fastify/cookie');
+} catch (e) {
+  fastifyCookie = undefined;
+}
 import { withJsxEngine } from './jsx.engine';
 
 export interface HarpyAppOptions {
@@ -37,20 +51,39 @@ export async function configureHarpyApp(
 
   const fastify = app.getHttpAdapter().getInstance();
 
-  // Cookie support is required by i18n and other helpers
-  // Register with defaults — callers can still register another plugin if needed.
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-  await fastify.register(fastifyCookie);
+  // Cookie support is used by i18n and other helpers if available.
+  if (fastifyCookie) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    await fastify.register(fastifyCookie);
+  } else {
+    // If cookie plugin is not installed, warn but continue. Consumers who
+    // rely on cookie-based features should install `@fastify/cookie`.
+    // We intentionally do not throw here to avoid breaking projects that
+    // don't need cookie support.
+    // eslint-disable-next-line no-console
+    console.warn('[harpy-core] optional dependency `@fastify/cookie` is not installed; skipping cookie registration.');
+  }
 
   // Ensure hydration chunks and other built assets are served from `dist`
   // This is important: hydration chunks are expected at the root ("/").
   // Use absolute path to be robust when invoked from different CWDs.
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-  await fastify.register(fastifyStatic, {
-    root: path.join(process.cwd(), distDir),
-    prefix: '/',
-    decorateReply: false,
-  });
+  if (fastifyStatic) {
+    // Ensure hydration chunks and other built assets are served from `dist`
+    // This is important: hydration chunks are expected at the root ("/").
+    // Use absolute path to be robust when invoked from different CWDs.
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    await fastify.register(fastifyStatic, {
+      root: path.join(process.cwd(), distDir),
+      prefix: '/',
+      decorateReply: false,
+    });
+  } else {
+    // If the static plugin is not available, emit a warning and continue.
+    // Consumers who need hydration chunk serving in production should add
+    // `@fastify/static` as a dependency in their application.
+    // eslint-disable-next-line no-console
+    console.warn('[harpy-core] optional dependency `@fastify/static` is not installed; static `dist` handler not registered.');
+  }
 
   // Note: we intentionally do not register a `public` static handler by
   // default. Some applications prefer to control their public asset handling
