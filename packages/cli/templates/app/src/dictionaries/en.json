@@ -32,11 +32,6 @@
       "icon": "🎨",
       "title": "Modern Stack",
       "description": "React 19, Tailwind CSS, TypeScript, and SWC for the best developer experience"
-    },
-    "i18n": {
-      "icon": "🌍",
-      "title": "Built-in i18n",
-      "description": "Advanced internationalization with dictionary caching and locale switching"
     }
   },
   "getStarted": {
