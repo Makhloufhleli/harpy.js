@@ -1,11 +1,8 @@
-import { Dictionary } from '../../../i18n/get-dictionary';
-
 export interface PageProps {
-  dict: Dictionary;
-  locale: string;
+  items?: string[];
 }
 
-export default function HomePage() {
+export default function HomePage({ items = [] }: PageProps) {
   return (
     <div className="relative min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       {/* Hero Section */}

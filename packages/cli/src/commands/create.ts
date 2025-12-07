@@ -414,6 +414,12 @@ export default function Homepage({ items = [] }: Props) {
           fs.unlinkSync(i18nGuideTarget);
         }
 
+        // Remove dictionaries folder
+        const dictionariesDir = path.join(projectPath, "src", "dictionaries");
+        if (fs.existsSync(dictionariesDir)) {
+          fs.removeSync(dictionariesDir);
+        }
+
         if (fs.existsSync(appModulePath)) {
           let appModuleContent = fs.readFileSync(appModulePath, "utf-8");
           // Remove import lines for I18nModule and i18nConfig
@@ -431,6 +437,72 @@ export default function Homepage({ items = [] }: Props) {
             "",
           );
           fs.writeFileSync(appModulePath, appModuleContent, "utf-8");
+        }
+
+        // Rewrite home controller to remove i18n references
+        const homeControllerPath = path.join(
+          projectPath,
+          "src",
+          "features",
+          "home",
+          "home.controller.ts",
+        );
+        if (fs.existsSync(homeControllerPath)) {
+          const homeControllerContent = `import { JsxRender } from '@harpy-js/core';
+import { Controller, Get } from '@nestjs/common';
+import HomePage, { type PageProps } from './views/homepage';
+import { HomeService } from './home.service';
+
+@Controller()
+export class HomeController {
+  constructor(private readonly homeService: HomeService) {}
+
+  @Get()
+  @JsxRender(HomePage)
+  async homepage(): Promise<PageProps> {
+    return { items: this.homeService.getItems() };
+  }
+}`;
+          fs.writeFileSync(homeControllerPath, homeControllerContent, "utf-8");
+        }
+
+        // Rewrite homepage view to remove i18n references
+        const homepageViewPath = path.join(
+          projectPath,
+          "src",
+          "features",
+          "home",
+          "views",
+          "homepage.tsx",
+        );
+        if (fs.existsSync(homepageViewPath)) {
+          const homepageViewContent = `import React from 'react';
+
+type PageProps = { items?: string[] };
+
+export default function HomePage({ items = [] }: PageProps) {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center p-4">
+      <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full">
+        <h1 className="text-3xl font-bold text-gray-800 mb-4">Welcome to Harpy</h1>
+        <p className="text-gray-600 mb-6">
+          A modern full-stack framework built on NestJS with server-side React rendering.
+        </p>
+        {items.length > 0 && (
+          <ul className="space-y-2">
+            {items.map((item) => (
+              <li key={item} className="flex items-center text-gray-700">
+                <span className="text-blue-500 mr-2">✓</span>
+                {item}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </div>
+  );
+}`;
+          fs.writeFileSync(homepageViewPath, homepageViewContent, "utf-8");
         }
       } catch (err) {
         console.warn(
