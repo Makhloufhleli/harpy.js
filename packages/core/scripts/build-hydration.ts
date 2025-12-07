@@ -132,7 +132,21 @@ containers.forEach((container) => {
   }
 
   try {
-    hydrateRoot(containerElement, React.createElement(${component.componentName}, props));
+    // Hydrate the entire container with the component and props script
+    // This matches the server-rendered structure from client-component-wrapper.ts
+    hydrateRoot(
+      containerElement,
+      React.createElement(
+        React.Fragment,
+        null,
+        React.createElement(${component.componentName}, props),
+        React.createElement('script', {
+          type: 'application/json',
+          id: \`\${container.id}-props\`,
+          dangerouslySetInnerHTML: { __html: JSON.stringify(props) }
+        })
+      )
+    );
     console.log('[Hydration] Hydrated ${component.componentName}');
   } catch (error) {
     console.error('[Hydration] Failed to hydrate ${component.componentName}:', error);
