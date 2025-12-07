@@ -1,5 +1,6 @@
 import React from 'react';
 import type { PageProps } from '@harpy-js/core';
+import Logo from '../../components/logo';
 
 interface HomePageProps extends PageProps {
   translations?: any;
@@ -15,6 +16,11 @@ export default function HomePage({ translations: t }: HomePageProps) {
       {/* Hero Section */}
       <div className="relative z-10 container mx-auto max-w-7xl px-4 pt-20 pb-32">
         <div className="text-center mb-16">
+          {/* Logo */}
+          <div className="flex justify-center mb-6">
+            <Logo className="text-amber-500 group-hover:scale-110 transition-transform size-12" />
+          </div>
+
           {/* Title */}
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold mb-6">
             <span className="bg-gradient-to-r from-amber-400 via-orange-500 to-red-500 bg-clip-text text-transparent">
