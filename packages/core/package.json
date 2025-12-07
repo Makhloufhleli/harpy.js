@@ -1,0 +1,79 @@
+{
+  "name": "@harpy-js/core",
+  "version": "0.4.7",
+  "description": "Harpy - A powerful NestJS + React/JSX SSR framework with automatic hydration and i18n support",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./client": {
+      "types": "./dist/client/use-i18n.d.ts",
+      "default": "./dist/client/use-i18n.js"
+    },
+    "./client/getActiveItemId": {
+      "types": "./dist/client/getActiveItemId.d.ts",
+      "default": "./dist/client/getActiveItemId.js"
+    },
+    "./client/Link": {
+      "types": "./dist/client/Link.d.ts",
+      "default": "./dist/client/Link.js"
+    }
+  },
+  "bin": {
+    "harpy": "./dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "scripts",
+    "src"
+  ],
+  "scripts": {
+    "build": "tsc && cp src/core/live-reload-client.js dist/core/",
+    "dev": "tsc --watch",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "nestjs",
+    "react",
+    "jsx",
+    "ssr",
+    "hydration"
+  ],
+  "author": "",
+  "license": "MIT",
+  "peerDependencies": {
+    "@nestjs/common": "^11.0.0",
+    "@nestjs/core": "^11.0.0",
+    "@nestjs/platform-fastify": "^11.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "dependencies": {
+    "@fastify/cookie": "^11.0.1",
+    "chokidar": "^3.6.0",
+    "esbuild": "^0.24.2",
+    "rxjs": "^7.8.1",
+    "tsx": "^4.20.6"
+  },
+  "devDependencies": {
+    "@nestjs/testing": "^11.0.0",
+    "@types/jest": "^29.5.0",
+    "@types/node": "^22.19.1",
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.2",
+    "fastify": "^5.6.2",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.0",
+    "typescript": "^5.7.2"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "gitHead": "d7a4f2ad108c68f2b441ad0c24385b45b1e046a3"
+}
