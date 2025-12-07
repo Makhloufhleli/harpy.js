@@ -1,7 +1,10 @@
 import { JsxRender } from '@harpy-js/core';
+import type { PageProps } from '@harpy-js/core';
 import { Controller, Get } from '@nestjs/common';
-import HomePage, { type PageProps } from './views/homepage';
+import { CurrentLocale } from '@harpy-js/i18n';
+import HomePage from './views/homepage';
 import { HomeService } from './home.service';
+import { getDictionary } from '../../i18n/get-dictionary';
 
 @Controller()
 export class HomeController {
@@ -30,9 +33,8 @@ export class HomeController {
       },
     },
   })
-  async homepage(): Promise<PageProps> {
-    return {
-      items: this.homeService.getItems(),
-    };
+  async homepage(@CurrentLocale() locale: string): Promise<PageProps> {
+    const translations = await getDictionary(locale);
+    return { translations };
   }
 }
