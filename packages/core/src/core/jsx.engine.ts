@@ -3,17 +3,18 @@ import { FastifyReply } from "fastify";
 import * as React from "react";
 import { renderToPipeableStream, renderToString } from "react-dom/server";
 import { MetaOptions, RenderOptions } from "../decorators/jsx.decorator";
+import {
+  JsxLayout,
+  JsxLayoutProps,
+  PageProps,
+} from "../types/jsx.types";
 import { hydrationContext, initializeHydrationContext } from "./hydration";
 import { getChunkPath, getHydrationManifest } from "./hydration-manifest";
 import { LiveReloadController } from "./live-reload.controller";
 import { StaticAssetsController } from "./static-assets.controller";
 
-export interface JsxLayoutProps {
-  children: React.ReactNode;
-  meta?: MetaOptions;
-}
-
-export type JsxLayout = (props: JsxLayoutProps) => React.ReactElement;
+// Export types for use in applications
+export type { JsxLayout, JsxLayoutProps, PageProps };
 
 // Cache for component-to-chunk path mappings (loaded once at startup)
 const chunkPathCache = new Map<string, string>();
