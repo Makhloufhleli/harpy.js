@@ -1,4 +1,4 @@
-# @hepta-solutions/harpy-core
+# @harpy-js/core
 
 Core package for NestJS + React/JSX with server-side rendering and automatic client-side hydration.
 
@@ -16,11 +16,11 @@ Core package for NestJS + React/JSX with server-side rendering and automatic cli
 ## Installation
 
 ```bash
-npm install @hepta-solutions/harpy-core react react-dom
+npm install @harpy-js/core react react-dom
 # or
-yarn add @hepta-solutions/harpy-core react react-dom
+yarn add @harpy-js/core react react-dom
 # or
-pnpm add @hepta-solutions/harpy-core react react-dom
+pnpm add @harpy-js/core react react-dom
 ```
 
 **Required peer dependencies:**
@@ -42,7 +42,7 @@ import {
   FastifyAdapter,
   NestFastifyApplication,
 } from "@nestjs/platform-fastify";
-import { withJsxEngine } from "@hepta-solutions/harpy-core";
+import { withJsxEngine } from "@harpy-js/core";
 import { AppModule } from "./app.module";
 import DefaultLayout from "./views/layout";
 import * as path from "path";
@@ -78,7 +78,7 @@ bootstrap();
 ```tsx
 // src/views/layout.tsx
 import React from "react";
-import { JsxLayoutProps } from "@hepta-solutions/harpy-core";
+import { JsxLayoutProps } from "@ harpy-js/core";
 
 export default function Layout({
   children,
@@ -116,7 +116,7 @@ export default function Layout({
 
 ```typescript
 import { Controller, Get } from "@nestjs/common";
-import { JsxRender } from "@hepta-solutions/harpy-core";
+import { JsxRender } from "@ harpy-js/core";
 import Homepage from "./views/homepage";
 
 @Controller()
@@ -243,7 +243,7 @@ Built-in support for multi-language applications:
 ```typescript
 // app.module.ts
 import { Module } from "@nestjs/common";
-import { I18nModule } from "@hepta-solutions/harpy-i18n";
+import { I18nModule } from "@ harpy-js/i18n";
 
 @Module({
   imports: [
@@ -266,7 +266,7 @@ export class AppModule {}
 ```tsx
 // Client component
 "use client";
-import { useI18n } from "@hepta-solutions/harpy-core/client";
+import { useI18n } from "@ harpy-js/core/client";
 
 export default function MyComponent() {
   const { t, locale, setLocale } = useI18n();
@@ -284,8 +284,8 @@ export default function MyComponent() {
 
 ```typescript
 import { Controller, Get } from "@nestjs/common";
-import { JsxRender } from "@hepta-solutions/harpy-core";
-import { CurrentLocale, t } from "@hepta-solutions/harpy-i18n";
+import { JsxRender } from "@ harpy-js/core";
+import { CurrentLocale, t } from "@ harpy-js/i18n";
 import { getDictionary } from "./i18n/get-dictionary";
 
 @Controller()

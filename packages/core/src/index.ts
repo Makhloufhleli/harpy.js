@@ -11,7 +11,7 @@ export { JsxRender } from "./decorators/jsx.decorator";
 export { WithLayout } from "./decorators/layout.decorator";
 export type { MetaOptions, RenderOptions } from "./decorators/jsx.decorator";
 
-// I18n is provided in a separate package: @hepta-solutions/harpy-i18n
+// I18n is provided in a separate package: @harpy-js/i18n
 // Consumers should import i18n types and modules from that package.
 
 // Types

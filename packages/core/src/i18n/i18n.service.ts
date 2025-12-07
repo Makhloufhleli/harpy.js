@@ -11,7 +11,7 @@ import type { I18nModuleOptions } from "./i18n-module.options";
  *
  * @example
  * ```typescript
- * import { I18nService } from '@hepta-solutions/harpy-core';
+ * import { I18nService } from '@harpy-js/core';
  *
  * @Controller()
  * export class MyController {

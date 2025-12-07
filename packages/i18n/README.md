@@ -1,4 +1,4 @@
-# @hepta-solutions/harpy-i18n
+# @harpy-js/i18n
 
 Lightweight i18n utilities and NestJS integration for Harpy.js apps.
 
@@ -14,9 +14,9 @@ This package provides a server-side i18n module, request-scoped locale handling,
 **Install**
 
 ```bash
-npm install @hepta-solutions/harpy-i18n
+npm install @harpy-js/i18n
 # or
-pnpm add @hepta-solutions/harpy-i18n
+pnpm add @harpy-js/i18n
 ```
 
 **Quick Start**
@@ -26,7 +26,7 @@ pnpm add @hepta-solutions/harpy-i18n
 ```ts
 // src/app.module.ts
 import { Module } from "@nestjs/common";
-import { I18nModule } from "@hepta-solutions/harpy-i18n";
+import { I18nModule } from "@harpy-js/i18n";
 
 @Module({
   imports: [
@@ -47,7 +47,7 @@ export class AppModule {}
 
 ```ts
 import { Controller, Get } from "@nestjs/common";
-import { CurrentLocale, JsxRender, t } from "@hepta-solutions/harpy-i18n";
+import { CurrentLocale, JsxRender, t } from "@harpy-js/i18n";
 import Homepage from "./views/homepage";
 
 @Controller()
@@ -66,7 +66,7 @@ export class HomeController {
 ```tsx
 // src/views/homepage.tsx
 import React from "react";
-import { t } from "@hepta-solutions/harpy-i18n";
+import { t } from "@harpy-js/i18n";
 
 export default function Homepage({ message, locale }) {
   return (

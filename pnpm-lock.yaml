@@ -71,7 +71,7 @@ importers:
         specifier: ^5.7.2
         version: 5.9.3
 
-  packages/harpy-core:
+  packages/core:
     dependencies:
       '@fastify/cookie':
         specifier: ^11.0.1
@@ -132,7 +132,7 @@ importers:
         specifier: ^5.7.2
         version: 5.9.3
 
-  packages/harpy-i18n:
+  packages/i18n:
     dependencies:
       react:
         specifier: ^19.0.0

@@ -20,20 +20,20 @@ Import paths
 - Server-side (or from package root exports):
 
 ```ts
-import { buildHrefIndex, getActiveItemIdFromManifest } from '@hepta-solutions/harpy-core';
+import { buildHrefIndex, getActiveItemIdFromManifest } from '@ harpy-js/core';
 ```
 
 - Client-side direct import (explicit client path):
 
 ```ts
-import { buildHrefIndex, getActiveItemIdFromManifest } from '@hepta-solutions/harpy-core/client/getActiveItemId';
-import Link from '@hepta-solutions/harpy-core/client/Link';
+import { buildHrefIndex, getActiveItemIdFromManifest } from '@ harpy-js/core/client/getActiveItemId';
+import Link from '@ harpy-js/core/client/Link';
 ```
 
 Basic usage (client)
 
 ```ts
-import { buildHrefIndex, getActiveItemIdFromManifest } from '@hepta-solutions/harpy-core/client/getActiveItemId';
+import { buildHrefIndex, getActiveItemIdFromManifest } from '@ harpy-js/core/client/getActiveItemId';
 
 // flatten your nav manifest into an array of items: [{ id, href }, ...]
 const items = [

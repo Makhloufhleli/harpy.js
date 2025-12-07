@@ -1,6 +1,6 @@
 # configureHarpyApp
 
-`configureHarpyApp(app, opts?)` is the centralized helper provided by `@hepta-solutions/harpy-core` to register the minimal runtime pieces that Harpy needs to function in a Nest + Fastify app.
+`configureHarpyApp(app, opts?)` is the centralized helper provided by `@hepta-js/core` to register the minimal runtime pieces that Harpy needs to function in a Nest + Fastify app.
 
 Why use it
 
@@ -11,7 +11,7 @@ Why use it
 Usage
 
 ```ts
-import { configureHarpyApp } from "@hepta-solutions/harpy-core";
+import { configureHarpyApp } from "@hepta-js/core";
 import DefaultLayout from "./layouts/layout";
 
 await configureHarpyApp(app, { layout: DefaultLayout, distDir: "dist" });

@@ -45,7 +45,7 @@ jobs:
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
         with:
-          files: ./packages/harpy-core/coverage/lcov.info,./packages/harpy-cli/coverage/lcov.info
+          files: ./packages/core/coverage/lcov.info,./packages/cli/coverage/lcov.info,./packages/i18n/coverage/lcov.info
           flags: unittests
           name: codecov-umbrella
 
@@ -76,11 +76,15 @@ jobs:
 
       - name: Check build artifacts
         run: |
-          if [ ! -d "packages/harpy-core/dist" ]; then
-            echo "harpy-core build failed"
+          if [ ! -d "packages/core/dist" ]; then
+            echo "core build failed"
             exit 1
           fi
-          if [ ! -d "packages/harpy-cli/dist" ]; then
-            echo "harpy-cli build failed"
+          if [ ! -d "packages/cli/dist" ]; then
+            echo "cli build failed"
+            exit 1
+          fi
+          if [ ! -d "packages/i18n/dist" ]; then
+            echo "i18n build failed"
             exit 1
           fi

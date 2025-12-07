@@ -4,7 +4,7 @@
  * @example
  * ```typescript
  * // In app.module.ts
- * import { I18nModule } from '@hepta-solutions/harpy-core';
+ * import { I18nModule } from '@harpy-js/core';
  *
  * @Module({
  *   imports: [

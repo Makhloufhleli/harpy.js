@@ -11,7 +11,7 @@
  *
  * @example
  * ```tsx
- * import { useI18n } from '@hepta-solutions/harpy-core/client';
+ * import { useI18n } from '@harpy-js/core/client';
  *
  * function MyComponent() {
  *   const { switchLocale } = useI18n();
