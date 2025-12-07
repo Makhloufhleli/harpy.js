@@ -15,7 +15,7 @@ export type { MetaOptions, RenderOptions } from "./decorators/jsx.decorator";
 // Consumers should import i18n types and modules from that package.
 
 // Types
-export type { JsxLayout, JsxLayoutProps } from "./core/jsx.engine";
+export type { JsxLayout, JsxLayoutProps, PageProps } from "./types/jsx.types";
 export { RouterModule } from "./core/router.module";
 export { NavigationService } from "./core/navigation.service";
 export { AutoRegisterModule } from "./core/auto-register.module";

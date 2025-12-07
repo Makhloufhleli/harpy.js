@@ -1,111 +1,90 @@
 /**
  * React hook for i18n locale switching (Client-side only)
  *
- * This hook provides a simple way to switch locales from any component
- * (buttons, dropdowns, selects, etc.)
- *
- * The hook updates the URL with the selected locale and reloads the page.
- * The server-side interceptor will automatically set the cookie based on the URL.
- *
- * When used in a component, it automatically injects the language-aware navigation script.
+ * This hook provides a Next.js-style server action pattern for locale switching.
+ * It posts form data to the server, which sets the locale cookie and returns
+ * a redirect URL. Then we navigate to that URL to reload with the new locale.
  *
  * @example
  * ```tsx
  * import { useI18n } from '@harpy-js/core/client';
  *
  * function MyComponent() {
- *   const { switchLocale } = useI18n();
- *   return <button onClick={() => switchLocale('fr')}>French</button>;
+ *   const { switchLocale, isLoading } = useI18n();
+ *   return (
+ *     <>
+ *       <button onClick={() => switchLocale('fr')} disabled={isLoading}>
+ *         {isLoading ? 'Loading...' : 'French'}
+ *       </button>
+ *     </>
+ *   );
  * }
  * ```
  */
 
-"use client";
+'use client';
 
-import { useEffect } from "react";
+import { useState } from 'react';
 
 interface UseI18nReturn {
-  switchLocale: (locale: string) => void;
-  getCurrentLocale: () => string | null;
-  buildUrl: (path: string, locale?: string) => string;
+  switchLocale: (locale: string) => Promise<void>;
+  isLoading: boolean;
 }
 
 export function useI18n(): UseI18nReturn {
-  // Register that this component uses i18n, so the navigation script gets injected
-  useEffect(() => {
-    // Mark that i18n is being used in this render
-    if (
-      typeof window !== "undefined" &&
-      !(window as any).__HARPY_I18N_INITIALIZED__
-    ) {
-      (window as any).__HARPY_I18N_INITIALIZED__ = true;
+  const [isLoading, setIsLoading] = useState(false);
 
-      // Inject language-aware navigation script
-      const script = document.createElement("script");
-      script.textContent = `
-        (function() {
-          if (window.__HARPY_I18N_NAV_INSTALLED__) return;
-          window.__HARPY_I18N_NAV_INSTALLED__ = true;
-          
-          document.addEventListener('click', function(e) {
-            var target = e.target;
-            while (target && target.tagName !== 'A') {
-              target = target.parentElement;
-            }
-            if (target && target.tagName === 'A' && target.href) {
-              var url = new URL(target.href, window.location.origin);
-              var currentLang = new URLSearchParams(window.location.search).get('lang');
-              if (currentLang && url.origin === window.location.origin && !url.searchParams.has('lang')) {
-                url.searchParams.set('lang', currentLang);
-                target.href = url.toString();
-              }
-            }
-          });
-        })();
-      `;
-      document.head.appendChild(script);
+  /**
+   * Switch to a new locale by posting to the server endpoint
+   * The server will set the locale cookie and return a redirect URL
+   */
+  const switchLocale = async (locale: string): Promise<void> => {
+    if (typeof window === 'undefined') return;
+
+    setIsLoading(true);
+
+    try {
+      console.log('[useI18n] Switching locale to:', locale);
+
+      // Create FormData to send as application/x-www-form-urlencoded
+      const formData = new URLSearchParams();
+      formData.append('locale', locale);
+      formData.append('redirect', window.location.pathname + window.location.search);
+
+      const response = await fetch('/api/i18n/switch-locale', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: formData.toString(),
+        redirect: 'manual', // Don't follow redirects automatically
+      });
+
+      console.log('[useI18n] Response status:', response.status);
+
+      // Server will return 302 redirect, which fetch sees as status 0 with 'opaqueredirect' type
+      // Or it might return the redirect URL in the response body
+      if (response.type === 'opaqueredirect' || response.status === 302 || response.status === 0) {
+        // Cookie is set, just reload the current page
+        window.location.reload();
+      } else if (response.ok || response.redirected) {
+        // If we got a response, reload
+        window.location.reload();
+      } else {
+        console.error('[useI18n] Unexpected response:', response.status);
+        // Try to reload anyway since cookie might be set
+        window.location.reload();
+      }
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : String(err);
+      console.error('[useI18n] Error:', errorMsg);
+      // Even on error, try to reload in case cookie was set
+      window.location.reload();
     }
-  }, []);
-
-  /**
-   * Switch to a new locale by updating the URL and reloading the page
-   */
-  const switchLocale = (locale: string): void => {
-    if (typeof window === "undefined") return;
-
-    const url = new URL(window.location.href);
-    url.searchParams.set("lang", locale);
-    window.location.href = url.toString();
-  };
-
-  /**
-   * Get the current locale from the URL
-   */
-  const getCurrentLocale = (): string | null => {
-    if (typeof window === "undefined") return null;
-
-    const url = new URL(window.location.href);
-    return url.searchParams.get("lang");
-  };
-
-  /**
-   * Build a URL with the current locale preserved
-   * Useful for navigation links that should maintain the language
-   */
-  const buildUrl = (path: string, locale?: string): string => {
-    if (typeof window === "undefined") return path;
-
-    const currentLocale = locale || getCurrentLocale();
-    if (!currentLocale) return path;
-
-    const url = new URL(path, window.location.origin);
-    url.searchParams.set("lang", currentLocale);
-    return url.pathname + url.search;
   };
 
   return {
     switchLocale,
-    getCurrentLocale,
-    buildUrl,
+    isLoading,
   };
 }
