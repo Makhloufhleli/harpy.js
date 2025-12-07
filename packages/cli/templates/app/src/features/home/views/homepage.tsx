@@ -1,6 +1,6 @@
 import React from 'react';
-import type { PageProps } from '@harpy-js/core';
-import Logo from '../../components/logo';
+import { Link, type PageProps } from '@harpy-js/core';
+import Logo from '../../../components/logo';
 
 interface HomePageProps extends PageProps {
   translations?: any;
@@ -43,13 +43,13 @@ export default function HomePage({ translations: t }: HomePageProps) {
 
           {/* CTA Buttons */}
           <div className="flex flex-wrap justify-center gap-4 mb-8">
-            <a
+            <Link
               href="/docs"
               className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold rounded-xl shadow-2xl transition-all hover:shadow-amber-500/50 hover:scale-105 text-lg"
             >
               📖 {t.hero.cta.getStarted}
               <span>→</span>
-            </a>
+            </Link>
           </div>
 
           {/* Version Badges */}
@@ -140,7 +140,7 @@ export default function HomePage({ translations: t }: HomePageProps) {
           <p className="text-slate-400 text-center mb-8 px-4">
             {t.architecture.subtitle}
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 justify-items-center">
             {Object.entries(t.architecture)
               .filter(([key]) => !['title', 'subtitle'].includes(key))
               .map(([key, section]: [string, any]) => (
@@ -173,24 +173,18 @@ export default function HomePage({ translations: t }: HomePageProps) {
             {t.community.subtitle}
           </p>
           <div className="flex flex-wrap justify-center gap-3 sm:gap-4">
-            <a
-              href="https://discord.gg/harpyjs"
-              className="px-4 sm:px-6 py-2 sm:py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg transition-colors text-sm sm:text-base break-words"
-            >
-              💬 {t.community.discord}
-            </a>
-            <a
+            <Link
               href="https://github.com/harpyjs/harpy"
               className="px-4 sm:px-6 py-2 sm:py-3 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-lg transition-colors text-sm sm:text-base break-words"
             >
               ⭐ {t.community.github}
-            </a>
-            <a
-              href="/docs"
+            </Link>
+            <Link
+              href="https://harpyjs.org/docs"
               className="px-4 sm:px-6 py-2 sm:py-3 bg-amber-600 hover:bg-amber-700 text-white font-semibold rounded-lg transition-colors text-sm sm:text-base break-words"
             >
               📚 {t.community.docs}
-            </a>
+            </Link>
           </div>
         </div>
       </div>
