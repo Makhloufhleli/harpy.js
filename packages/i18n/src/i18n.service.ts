@@ -6,23 +6,27 @@ import type { I18nModuleOptions } from "./i18n-module.options";
 @Injectable({ scope: Scope.REQUEST })
 export class I18nService {
   private dict: Record<string, any> | null = null;
-  private getDictionaryFn: ((locale: string) => Promise<any>) | null = null;
+  private static getDictionaryFn: ((locale: string) => Promise<any>) | null = null;
 
   constructor(
     @Inject(REQUEST) private request: any,
     @Inject(I18N_MODULE_OPTIONS) private options: I18nModuleOptions,
   ) {}
 
+  static registerDictionaryLoader(fn: (locale: string) => Promise<any>): void {
+    I18nService.getDictionaryFn = fn;
+  }
+
   registerDictionaryLoader(fn: (locale: string) => Promise<any>): void {
-    this.getDictionaryFn = fn;
+    I18nService.registerDictionaryLoader(fn);
   }
 
   async getDict(): Promise<Record<string, any>> {
     if (!this.dict) {
       const locale = this.request.locale || this.options.defaultLocale;
 
-      if (this.getDictionaryFn) {
-        this.dict = await this.getDictionaryFn(locale);
+      if (I18nService.getDictionaryFn) {
+        this.dict = await I18nService.getDictionaryFn(locale);
       } else {
         console.warn(
           "No dictionary loader registered. Call registerDictionaryLoader() in your app.",
