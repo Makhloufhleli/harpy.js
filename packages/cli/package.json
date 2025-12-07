@@ -1,6 +1,6 @@
 {
   "name": "@harpy-js/cli",
-  "version": "0.3.7",
+  "version": "0.3.8",
   "description": "Harpy CLI - Create and manage Harpy projects with React/JSX and i18n support",
   "main": "dist/index.js",
   "bin": {
