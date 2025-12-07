@@ -3,28 +3,87 @@
   "home": "Accueil",
   "about": "À propos",
   "hero": {
-    "title": "Bienvenue sur Harpy",
-    "subtitle": "Un framework puissant NestJS + React avec hydratation automatique.",
-    "description": "Conçu pour la vitesse, la précision et l'adaptabilité.",
+    "title": "Harpy.js",
+    "badge": "BETA",
+    "subtitle": "Framework Full-Stack NestJS avec React SSR",
+    "description": "Créez des applications full-stack puissantes en exploitant l'écosystème NestJS avec le rendu React côté serveur et l'hydratation automatique côté client.",
+    "cta": {
+      "getStarted": "Commencer",
+      "viewDocs": "Voir la Documentation"
+    },
     "meta": {
       "title": "Bienvenue dans Mon Application",
       "description": "Ceci est la page d'accueil de mon application géniale."
     }
   },
   "features": {
-    "title": "Pourquoi choisir Harpy ?",
-    "lightning": {
-      "title": "Ultra Rapide",
-      "description": "SSR optimisé avec hydratation automatique"
-    },
-    "zeroConfig": {
-      "title": "Zéro Configuration",
-      "description": "Ajoutez simplement 'use client' et c'est parti"
-    },
+    "title": "Pourquoi Choisir Harpy ?",
     "nestjs": {
-      "title": "Propulsé par NestJS",
-      "description": "Construit sur une architecture prête pour l'entreprise"
+      "icon": "🚀",
+      "title": "Écosystème NestJS",
+      "description": "Construisez sur le puissant framework NestJS avec toutes ses fonctionnalités et modules"
+    },
+    "lightning": {
+      "icon": "⚡",
+      "title": "Ultra Rapide",
+      "description": "Rendu côté serveur avec des temps de 1-7ms et hydratation client automatique"
+    },
+    "modern": {
+      "icon": "🎨",
+      "title": "Stack Moderne",
+      "description": "React 19, Tailwind CSS, TypeScript et SWC pour la meilleure expérience développeur"
+    },
+    "i18n": {
+      "icon": "🌍",
+      "title": "i18n Intégré",
+      "description": "Internationalisation avancée avec mise en cache des dictionnaires et changement de langue"
     }
+  },
+  "getStarted": {
+    "title": "Démarrez en Quelques Secondes",
+    "subtitle": "Créez votre première application Harpy.js avec une seule commande",
+    "install": "Installez le CLI globalement",
+    "create": "Créez un nouveau projet",
+    "start": "Démarrez le serveur de développement",
+    "ready": "Votre application est prête sur"
+  },
+  "architecture": {
+    "title": "Architecture Puissante",
+    "subtitle": "Construite sur des technologies éprouvées pour des applications d'entreprise",
+    "server": {
+      "title": "Côté Serveur",
+      "items": [
+        "Framework NestJS",
+        "Backend Fastify",
+        "Support TypeScript",
+        "Injection de Dépendances"
+      ]
+    },
+    "frontend": {
+      "title": "Frontend",
+      "items": [
+        "React 19 SSR",
+        "Hydratation Automatique",
+        "Tailwind CSS",
+        "Compilateur SWC"
+      ]
+    },
+    "devtools": {
+      "title": "Outils Développeur",
+      "items": [
+        "Hot Module Reload",
+        "TypeScript IntelliSense",
+        "Générateur CLI",
+        "Routeur Intégré"
+      ]
+    }
+  },
+  "community": {
+    "title": "Rejoignez la Communauté",
+    "subtitle": "Obtenez de l'aide, partagez des idées et contribuez au projet",
+    "discord": "Rejoindre Discord",
+    "github": "Voir sur GitHub",
+    "docs": "Lire la Documentation"
   },
   "demo": {
     "title": "Essayez-le"

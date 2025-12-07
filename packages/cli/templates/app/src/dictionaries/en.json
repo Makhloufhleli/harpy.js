@@ -3,9 +3,14 @@
   "home": "Home",
   "about": "About",
   "hero": {
-    "title": "Welcome to Harpy",
-    "subtitle": "A powerful NestJS + React framework with automatic hydration.",
-    "description": "Built for speed, precision, and adaptability.",
+    "title": "Harpy.js",
+    "badge": "BETA",
+    "subtitle": "Full-Stack NestJS Framework with React SSR",
+    "description": "Build powerful full-stack applications leveraging the NestJS ecosystem with server-side React rendering and automatic client-side hydration.",
+    "cta": {
+      "getStarted": "Get Started",
+      "viewDocs": "View Documentation"
+    },
     "meta": {
       "title": "Welcome to My App",
       "description": "This is the homepage of my awesome app."
@@ -13,18 +18,72 @@
   },
   "features": {
     "title": "Why Choose Harpy?",
-    "lightning": {
-      "title": "Lightning Fast",
-      "description": "Optimized SSR with automatic hydration"
-    },
-    "zeroConfig": {
-      "title": "Zero Config",
-      "description": "Just add 'use client' and go"
-    },
     "nestjs": {
-      "title": "NestJS Powered",
-      "description": "Built on enterprise-ready architecture"
+      "icon": "🚀",
+      "title": "NestJS Ecosystem",
+      "description": "Build on top of the powerful NestJS framework with all its features and modules"
+    },
+    "lightning": {
+      "icon": "⚡",
+      "title": "Lightning Fast",
+      "description": "Server-side rendering with 1-7ms render times and automatic client hydration"
+    },
+    "modern": {
+      "icon": "🎨",
+      "title": "Modern Stack",
+      "description": "React 19, Tailwind CSS, TypeScript, and SWC for the best developer experience"
+    },
+    "i18n": {
+      "icon": "🌍",
+      "title": "Built-in i18n",
+      "description": "Advanced internationalization with dictionary caching and locale switching"
     }
+  },
+  "getStarted": {
+    "title": "Get Started in Seconds",
+    "subtitle": "Create your first Harpy.js application with a single command",
+    "install": "Install the CLI globally",
+    "create": "Create a new project",
+    "start": "Start development server",
+    "ready": "Your app is ready at"
+  },
+  "architecture": {
+    "title": "Powerful Architecture",
+    "subtitle": "Built on proven technologies for enterprise-grade applications",
+    "server": {
+      "title": "Server-Side",
+      "items": [
+        "NestJS Framework",
+        "Fastify Backend",
+        "TypeScript Support",
+        "Dependency Injection"
+      ]
+    },
+    "frontend": {
+      "title": "Frontend",
+      "items": [
+        "React 19 SSR",
+        "Automatic Hydration",
+        "Tailwind CSS",
+        "SWC Compiler"
+      ]
+    },
+    "devtools": {
+      "title": "Developer Tools",
+      "items": [
+        "Hot Module Reload",
+        "TypeScript IntelliSense",
+        "CLI Generator",
+        "Built-in Router"
+      ]
+    }
+  },
+  "community": {
+    "title": "Join the Community",
+    "subtitle": "Get help, share ideas, and contribute to the project",
+    "discord": "Join Discord",
+    "github": "View on GitHub",
+    "docs": "Read Documentation"
   },
   "demo": {
     "title": "Try It Out"

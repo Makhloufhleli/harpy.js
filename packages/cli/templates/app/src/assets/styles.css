@@ -2,6 +2,18 @@
 @source "../../dist/**/*.js";
 @source "../**/*.{ts,tsx}";
 
+/* Define the keyframes animation */
+@keyframes border-spin {
+  100% {
+    transform: rotate(-360deg);
+  }
+}
+
+/* Define the custom utility */
+@utility animate-border-spin {
+  animation: border-spin 7s linear infinite;
+}
+
 /* Custom global styles */
 html {
   scroll-behavior: smooth;
@@ -13,4 +25,73 @@ body {
 
 main {
   @apply min-h-screen;
+}
+
+/* Move styles outside @layer */
+.card-wrapper {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1rem;
+  background: linear-gradient(to bottom, rgb(51 65 85), rgb(30 41 59));
+  width: 100%; 
+  height: auto;
+  min-height: 200px; 
+}
+
+.card-wrapper::before {
+  content: '';
+  position: absolute;
+  left: -25%;
+  top: -25%;
+  height: 150%;
+  width: 150%;
+  background: conic-gradient(
+    from 0deg,
+    rgba(245, 158, 11, 0.8) 0deg,      /* amber-500 */
+    rgba(249, 115, 22, 0.8) 60deg,     /* orange-600 */
+    rgba(234, 88, 12, 0.6) 120deg,     /* orange-700 */
+    transparent 200deg,
+    transparent 360deg
+  );
+  animation: border-spin 7s linear infinite;
+}
+
+.card-wrapper:hover::before {
+  background: conic-gradient(
+    rgba(217, 119, 6, 0.8) 0deg,       /* amber-600 */
+    rgba(234, 88, 12, 0.8) 90deg,      /* orange-700 */
+    transparent 180deg
+  );
+  animation: border-spin 3s linear infinite; /* Speed up on hover */
+}
+
+.card-content {
+  position: relative; /* Change from absolute to relative */
+  margin: 2px; /* Instead of absolute positioning */
+  border-radius: calc(1rem - 1px);
+  background: linear-gradient(to bottom, rgb(30 41 59), rgb(15 23 42));
+}
+
+.card-wrapper:hover::before {
+  animation: border-spin 3s linear infinite; /* Speed up on hover */
+}
+
+.card-wrapper:hover {
+  box-shadow: 0 25px 50px -12px rgba(251, 191, 36, 0.25); /* amber shadow */
+}
+
+.card-wrapper:nth-child(1)::before {
+  animation-delay: 0s;
+}
+
+.card-wrapper:nth-child(2)::before {
+  animation-delay: -1.75s; /* 1/4 of 7s */
+}
+
+.card-wrapper:nth-child(3)::before {
+  animation-delay: -3.5s; /* 1/2 of 7s */
+}
+
+.card-wrapper:nth-child(4)::before {
+  animation-delay: -5.25s; /* 3/4 of 7s */
 }
