@@ -7,7 +7,9 @@
 import { execSync } from "child_process";
 import * as fs from "fs";
 import * as path from "path";
+import { Logger } from "./logger";
 
+const logger = new Logger("StylesBuilder");
 const projectRoot = process.cwd();
 const distDir = path.join(projectRoot, "dist");
 const stylesDir = path.join(distDir, "styles");
@@ -15,7 +17,7 @@ const srcAssetsDir = path.join(projectRoot, "src/assets");
 const outputCssPath = path.join(stylesDir, "styles.css");
 
 async function main(): Promise<void> {
-  console.log("🎨 Building styles...");
+  logger.log("Building styles...");
 
   try {
     // Ensure styles directory exists
@@ -24,7 +26,7 @@ async function main(): Promise<void> {
     }
 
     // Compile Tailwind CSS
-    console.log("   Compiling Tailwind CSS...");
+    logger.log("Compiling Tailwind CSS...");
     execSync(
       `NODE_ENV=production postcss ${path.join(srcAssetsDir, "styles.css")} -o ${outputCssPath}`,
       {
@@ -32,10 +34,9 @@ async function main(): Promise<void> {
       },
     );
 
-    console.log(`   ✓ Generated styles.css`);
-    console.log("✨ Styles build complete!");
+    logger.log("Styles build complete!");
   } catch (error: any) {
-    console.error("❌ CSS generation failed:", error.message);
+    logger.error(`CSS generation failed: ${error.message}`);
     process.exit(1);
   }
 }

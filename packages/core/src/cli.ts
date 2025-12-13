@@ -10,12 +10,14 @@ const scripts: Record<string, string> = {
   "build-hydration": path.join(__dirname, "../scripts/build-hydration.ts"),
   "auto-wrap": path.join(__dirname, "../scripts/auto-wrap-exports.ts"),
   "build-styles": path.join(__dirname, "../scripts/build-page-styles.ts"),
+  build: path.join(__dirname, "../scripts/build.ts"),
+  start: path.join(__dirname, "../scripts/start.ts"),
   dev: path.join(__dirname, "../scripts/dev.ts"),
 };
 
 if (!command || !scripts[command]) {
   console.error("Usage: harpy <command>");
-  console.error("Commands: build-hydration, auto-wrap, build-styles, dev");
+  console.error("Commands: build, start, dev, build-hydration, auto-wrap, build-styles");
   process.exit(1);
 }
 

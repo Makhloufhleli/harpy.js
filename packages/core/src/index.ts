@@ -33,3 +33,4 @@ export {
   getActiveItemIdFromIndex,
   getActiveItemIdFromManifest,
 } from "./client/getActiveItemId";
+export { useI18n } from "./client/use-i18n";
