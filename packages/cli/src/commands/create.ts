@@ -21,7 +21,13 @@ export async function createCommand(
 
   try {
     console.log("");
-    console.log(chalk.green("🦅  Harpy CLI"));
+    // ASCII art logo with gradient colors (orange to red)
+    console.log(chalk.hex("#f59e0b")("    __  __                           "));
+    console.log(chalk.hex("#f97316")("   / / / /___ __________  __  __     "));
+    console.log(chalk.hex("#fb923c")("  / /_/ / __ `/ ___/ __ \\/ / / /     "));
+    console.log(chalk.hex("#f97316")(" / __  / /_/ / /  / /_/ / /_/ /      "));
+    console.log(chalk.hex("#ef4444")("/_/ /_/\\__,_/_/  / .___/\\__, /       "));
+    console.log(chalk.hex("#dc2626")("                /_/    /____/        ") + chalk.gray(" CLI"));
     console.log("");
 
     const projectPath = path.resolve(process.cwd(), projectName);
@@ -80,8 +86,8 @@ export async function createCommand(
       includeExamples = Boolean(examplesResponse.includeExamples);
     }
 
-    // Step 1: Create NestJS project
-    console.log(chalk.gray("CREATE Creating NestJS project..."));
+    // Step 1: Create NestJS project (silently)
+    console.log(chalk.green("[CREATE]") + " " + projectName);
     await execa(
       "npx",
       [
@@ -93,15 +99,12 @@ export async function createCommand(
         "--skip-git",
       ],
       {
-        stdio: "inherit",
+        stdio: "pipe",
       },
     );
-    console.log(chalk.green("✔ NestJS project created"));
 
     // Step 2: Install React and Harpy dependencies
-    console.log(
-      chalk.gray("INSTALL Installing React, Harpy, and other dependencies..."),
-    );
+    console.log(chalk.green("[INSTALL]") + " React, Harpy, and other dependencies");
     const installCmd = packageManager === "yarn" ? "add" : "install";
     const baseDeps = [
       "react@^19.0.0",
@@ -128,13 +131,10 @@ export async function createCommand(
         chalk.yellow("⚠ Skipping dependency installation (--skip-install)"),
       );
     }
-    console.log(chalk.green("✔ React and Harpy dependencies installed"));
 
     // Step 3: Install @nestjs/platform-fastify and reflect-metadata
     console.log(
-      chalk.gray(
-        "INSTALL Installing @nestjs/platform-fastify and reflect-metadata...",
-      ),
+      chalk.green("[INSTALL]") + " @nestjs/platform-fastify and reflect-metadata",
     );
     await execa(
       packageManager,
@@ -144,13 +144,10 @@ export async function createCommand(
         stdio: "pipe",
       },
     );
-    console.log(
-      chalk.green("✔ @nestjs/platform-fastify and reflect-metadata installed"),
-    );
 
     // Step 4: Install Tailwind CSS and build tools
     console.log(
-      chalk.gray("INSTALL Installing Tailwind CSS and build tools..."),
+      chalk.green("[INSTALL]") + " Tailwind CSS and build tools",
     );
     await execa(
       packageManager,
@@ -171,10 +168,9 @@ export async function createCommand(
         stdio: "pipe",
       },
     );
-    console.log(chalk.green("✔ Tailwind CSS and build tools installed"));
 
     // Step 5: Copy template files
-    console.log(chalk.gray("CREATE Setting up project structure..."));
+    console.log(chalk.green("[CREATE]") + " Project structure");
     const templatePath = path.join(__dirname, "../../templates/app");
 
     // Copy src directory
@@ -205,8 +201,6 @@ export async function createCommand(
     if (fs.existsSync(i18nGuidePath)) {
       fs.copyFileSync(i18nGuidePath, path.join(projectPath, "I18N_GUIDE.md"));
     }
-
-    console.log(chalk.green("✔ Project structure created"));
 
     // If the user opted out of example pages, replace the features folder
     if (!includeExamples) {
@@ -318,27 +312,32 @@ export default function HomePage({ items = [] }: HomePageProps) {
     });
 
     // Step 6: Update package.json scripts
-    console.log(chalk.gray("UPDATE Updating package.json..."));
+    console.log(chalk.green("[UPDATE]") + " package.json");
     const packageJsonPath = path.join(projectPath, "package.json");
     const packageJson = fs.readJsonSync(packageJsonPath);
 
+    // Keep only specific NestJS scripts that don't conflict with Harpy
+    const scriptsToKeep = {
+      format: packageJson.scripts.format,
+      lint: packageJson.scripts.lint,
+      test: packageJson.scripts.test,
+      "test:watch": packageJson.scripts["test:watch"],
+      "test:cov": packageJson.scripts["test:cov"],
+      "test:debug": packageJson.scripts["test:debug"],
+      "test:e2e": packageJson.scripts["test:e2e"],
+    };
+
     packageJson.scripts = {
-      ...packageJson.scripts,
-      build:
-        "nest build && harpy build-hydration && harpy auto-wrap && harpy build-styles",
-      "build:hydration": "harpy build-hydration",
-      "auto-wrap": "harpy auto-wrap",
-      "build:styles": "harpy build-styles",
-      start: "node dist/main",
+      ...scriptsToKeep,
+      build: "harpy build",
+      start: "harpy start",
       dev: "harpy dev",
-      "start:prod": "node dist/main",
     };
 
     fs.writeJsonSync(packageJsonPath, packageJson, { spaces: 2 });
-    console.log(chalk.green("✔ package.json updated"));
 
     // Step 6.5: Update tsconfig.json for JSX support
-    console.log(chalk.gray("UPDATE Configuring TypeScript for JSX..."));
+    console.log(chalk.green("[UPDATE]") + " TypeScript configuration for JSX");
     const tsconfigPath = path.join(projectPath, "tsconfig.json");
     const tsconfig = fs.readJsonSync(tsconfigPath);
 
@@ -349,10 +348,9 @@ export default function HomePage({ items = [] }: HomePageProps) {
     };
 
     fs.writeJsonSync(tsconfigPath, tsconfig, { spaces: 2 });
-    console.log(chalk.green("✔ TypeScript configured for JSX"));
 
     // Step 6.6: Update .gitignore to include dist folder
-    console.log(chalk.gray("UPDATE Updating .gitignore..."));
+    console.log(chalk.green("[UPDATE]") + " .gitignore");
     const gitignorePath = path.join(projectPath, ".gitignore");
 
     // Check if .gitignore exists, if not create it
@@ -366,7 +364,6 @@ export default function HomePage({ items = [] }: HomePageProps) {
       gitignoreContent += "\n# Build outputs\ndist\n*.js.map\n";
       fs.writeFileSync(gitignorePath, gitignoreContent);
     }
-    console.log(chalk.green("✔ .gitignore updated"));
 
     // Post-process templates depending on i18n selection
     const appModulePath = path.join(projectPath, "src", "app.module.ts");
@@ -377,9 +374,10 @@ export default function HomePage({ items = [] }: HomePageProps) {
       try {
         if (fs.existsSync(appModulePath)) {
           let appModuleContent = fs.readFileSync(appModulePath, "utf-8");
+          // Only replace I18nModule import, not all @harpy-js/core imports
           appModuleContent = appModuleContent.replace(
-            /from '\@harpy-js\/core'/g,
-            "from '@harpy-js/i18n'",
+            /import\s*\{\s*I18nModule\s*\}\s*from\s*['"]@harpy-js\/core['"]/g,
+            "import { I18nModule } from '@harpy-js/i18n'",
           );
           fs.writeFileSync(appModulePath, appModuleContent, "utf-8");
         }
@@ -435,6 +433,111 @@ export default function HomePage({ items = [] }: HomePageProps) {
           fs.unlinkSync(languageSwitcherPath);
         }
 
+        // Update layout.tsx to remove LanguageSwitcher import and usage
+        const layoutPath = path.join(
+          projectPath,
+          "src",
+          "layouts",
+          "layout.tsx",
+        );
+        if (fs.existsSync(layoutPath)) {
+          let layoutContent = fs.readFileSync(layoutPath, "utf-8");
+          // Remove import line for LanguageSwitcher
+          layoutContent = layoutContent.replace(
+            /import\s+\{[^}]*LanguageSwitcher[^}]*\}[^;]*;\s*/g,
+            "",
+          );
+          // Remove <LanguageSwitcher /> usage
+          layoutContent = layoutContent.replace(
+            /<LanguageSwitcher\s*\/>/g,
+            "",
+          );
+          fs.writeFileSync(layoutPath, layoutContent, "utf-8");
+        }
+
+        // Update homepage.tsx to remove i18n usage
+        const homepagePath = path.join(
+          projectPath,
+          "src",
+          "features",
+          "home",
+          "views",
+          "homepage.tsx",
+        );
+        if (fs.existsSync(homepagePath)) {
+          let homepageContent = fs.readFileSync(homepagePath, "utf-8");
+          // Remove getDictionary import
+          homepageContent = homepageContent.replace(
+            /import\s+\{[^}]*getDictionary[^}]*\}[^;]*;\s*/g,
+            "",
+          );
+          // Replace interface with simpler version
+          homepageContent = homepageContent.replace(
+            /interface HomePageProps extends PageProps \{[^}]*\}/s,
+            "interface HomePageProps extends PageProps {}",
+          );
+          // Replace function body to use static content
+          homepageContent = homepageContent.replace(
+            /export default function HomePage\([^)]*\) \{[\s\S]*?return \(/s,
+            `export default function HomePage({}: HomePageProps) {
+  return (`,
+          );
+          // Replace translation references with static text
+          homepageContent = homepageContent.replace(
+            /\{t\.hero\.title\}/g,
+            "Harpy.js",
+          );
+          homepageContent = homepageContent.replace(
+            /\{t\.hero\.subtitle\}/g,
+            "Full-Stack NestJS Framework with React SSR",
+          );
+          homepageContent = homepageContent.replace(
+            /\{t\.hero\.description\}/g,
+            "Build powerful full-stack applications leveraging the NestJS ecosystem with server-side React rendering and automatic client-side hydration.",
+          );
+          homepageContent = homepageContent.replace(
+            /\{t\.hero\.cta\.getStarted\}/g,
+            "Get Started",
+          );
+          homepageContent = homepageContent.replace(
+            /\{t\.hero\.cta\.viewDocs\}/g,
+            "GitHub",
+          );
+          fs.writeFileSync(homepagePath, homepageContent, "utf-8");
+        }
+
+        // Update home.controller.ts to remove i18n usage
+        const homeControllerPath = path.join(
+          projectPath,
+          "src",
+          "features",
+          "home",
+          "home.controller.ts",
+        );
+        if (fs.existsSync(homeControllerPath)) {
+          let controllerContent = fs.readFileSync(homeControllerPath, "utf-8");
+          // Remove CurrentLocale import
+          controllerContent = controllerContent.replace(
+            /import\s+\{[^}]*CurrentLocale[^}]*\}[^;]*;\s*/g,
+            "",
+          );
+          // Remove getDictionary import
+          controllerContent = controllerContent.replace(
+            /import\s+\{[^}]*getDictionary[^}]*\}[^;]*;\s*/g,
+            "",
+          );
+          // Replace homepage method - use literal string replacement for exact match
+          const oldMethod = `async homepage(@CurrentLocale() locale: string): Promise<PageProps> {
+    const translations = await getDictionary(locale);
+    return { translations };
+  }`;
+          const newMethod = `async homepage(): Promise<PageProps> {
+    return {};
+  }`;
+          controllerContent = controllerContent.replace(oldMethod, newMethod);
+          fs.writeFileSync(homeControllerPath, controllerContent, "utf-8");
+        }
+
         if (fs.existsSync(appModulePath)) {
           let appModuleContent = fs.readFileSync(appModulePath, "utf-8");
           // Remove import lines for I18nModule and i18nConfig
@@ -462,13 +565,12 @@ export default function HomePage({ items = [] }: HomePageProps) {
 
     // Step 7: Initialize git
     if (!options.skipGit) {
-      console.log(chalk.gray("GIT Initializing git repository..."));
+      console.log(chalk.green("[GIT]") + " Initializing repository");
       await execa("git", ["init"], { cwd: projectPath });
       await execa("git", ["add", "."], { cwd: projectPath });
       await execa("git", ["commit", "-m", "Initial commit from harpy-cli"], {
         cwd: projectPath,
       });
-      console.log(chalk.green("✔ Git repository initialized"));
     } else {
       console.log(chalk.yellow("⚠ Skipping git initialization (--skip-git)"));
     }
