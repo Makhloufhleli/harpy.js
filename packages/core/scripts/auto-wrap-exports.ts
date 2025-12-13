@@ -11,6 +11,9 @@
 
 import * as fs from "fs";
 import * as path from "path";
+import { Logger } from "./logger";
+
+const logger = new Logger("AutoWrapper");
 
 const PROJECT_ROOT = process.cwd();
 const SRC_DIR = path.join(PROJECT_ROOT, "src");
@@ -213,16 +216,16 @@ function transformCompiledFile(
  * Main function
  */
 function main(): void {
-  console.log("🔄 Auto-wrapping client component exports...\n");
+  logger.log("Auto-wrapping client component exports...");
 
   const clientComponents = findClientComponentsInSource();
 
   if (clientComponents.size === 0) {
-    console.log("⚠️  No client components found\n");
+    logger.warn("No client components found");
     return;
   }
 
-  console.log(`Found ${clientComponents.size} client component(s):\n`);
+  logger.log(`Found ${clientComponents.size} client component(s)`);
 
   let wrapped = 0;
   for (const [compiledPath, componentName] of clientComponents) {
@@ -231,9 +234,7 @@ function main(): void {
     }
   }
 
-  console.log(
-    `\n✨ Auto-wrap complete: ${wrapped}/${clientComponents.size} components wrapped\n`,
-  );
+  logger.log(`Auto-wrap complete: ${wrapped}/${clientComponents.size} components wrapped`);
 }
 
 main();

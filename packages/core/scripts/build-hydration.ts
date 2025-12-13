@@ -13,6 +13,9 @@ import { execSync } from "child_process";
 import * as crypto from "crypto";
 import * as fs from "fs";
 import * as path from "path";
+import { Logger } from "./logger";
+
+const logger = new Logger("HydrationBuilder");
 
 const PROJECT_ROOT = process.cwd();
 const SRC_DIR = path.join(PROJECT_ROOT, "src");
@@ -181,11 +184,11 @@ function main(): void {
     fs.mkdirSync(HYDRATION_ENTRIES_DIR, { recursive: true });
   }
 
-  console.log("🔍 Detecting client components...");
+  logger.log("Detecting client components...");
   const clientComponents = findClientComponents();
 
   if (clientComponents.length === 0) {
-    console.log("⚠️  No client components found");
+    logger.warn("No client components found");
     // Still ensure chunks directory exists and clear manifest
     if (!fs.existsSync(CHUNKS_DIR)) {
       fs.mkdirSync(CHUNKS_DIR, { recursive: true });
@@ -207,7 +210,7 @@ function main(): void {
     fs.mkdirSync(CHUNKS_DIR, { recursive: true });
   }
 
-  console.log("\n📝 Generating hydration entries...");
+  logger.log("Generating hydration entries...");
 
   // Generate hydration entry files
   const entryFiles: { path: string; componentName: string }[] = [];
@@ -223,11 +226,10 @@ function main(): void {
       path: entryPath,
       componentName: component.componentName,
     });
-    console.log(`   ✓ ${component.componentName}.tsx`);
   }
 
   // Build shared vendor bundle first
-  console.log("\n📦 Building shared vendor bundle...");
+  logger.log("Building shared vendor bundle...");
   const vendorEntryPath = path.join(HYDRATION_ENTRIES_DIR, "_vendor.js");
   const vendorContent = `
 import React from 'react';
@@ -242,16 +244,15 @@ window.ReactDOM = ReactDOM;
 
   const vendorOutputPath = path.join(CHUNKS_DIR, VENDOR_BUNDLE);
   try {
-    const vendorCommand = `npx esbuild "${vendorEntryPath}" --bundle --minify --target=es2020 --format=iife --outfile="${vendorOutputPath}" --platform=browser --tree-shaking=true --define:process.env.NODE_ENV=\\"production\\"`;
+    const vendorCommand = `npx esbuild "${vendorEntryPath}" --bundle --minify --target=es2020 --format=iife --outfile="${vendorOutputPath}" --platform=browser --tree-shaking=true --define:process.env.NODE_ENV='"production"'`;
     execSync(vendorCommand, { stdio: "inherit" });
-    console.log(`   ✓ vendor.js (React + ReactDOM)`);
   } catch (error) {
-    console.error(`   ✗ Failed to bundle vendor:`, error);
+    logger.error(`Failed to bundle vendor: ${error}`);
     process.exit(1);
   }
 
   // Bundle each entry file separately with cache-busted names
-  console.log("\n📦 Bundling hydration scripts...");
+  logger.log("Bundling hydration scripts...");
 
   // Create React shim files for aliasing
   const SHIMS_DIR = path.join(DIST_DIR, ".shims");
@@ -301,27 +302,25 @@ module.exports = {
 
     try {
       // Use aliases to redirect React imports to window.React from vendor bundle
-      const command = `npx esbuild "${entry.path}" --bundle --minify --target=es2020 --format=iife --keep-names --outfile="${outputPath}" --platform=browser --tree-shaking=true --define:process.env.NODE_ENV=\\"production\\" --alias:react=${reactShimPath} --alias:react-dom=${reactDomShimPath} --alias:react-dom/client=${reactDomClientShimPath} --alias:react/jsx-runtime=${jsxRuntimeShimPath}`;
+      const command = `npx esbuild "${entry.path}" --bundle --minify --target=es2020 --format=iife --keep-names --outfile="${outputPath}" --platform=browser --tree-shaking=true --define:process.env.NODE_ENV='"production"' --alias:react=${reactShimPath} --alias:react-dom=${reactDomShimPath} --alias:react-dom/client=${reactDomClientShimPath} --alias:react/jsx-runtime=${jsxRuntimeShimPath}`;
       execSync(command, { stdio: "inherit" });
       manifest[entry.componentName] = chunkFilename;
-      console.log(`   ✓ ${entry.componentName} -> ${chunkFilename}`);
     } catch (error) {
-      console.error(`   ✗ Failed to bundle ${entry.componentName}:`, error);
+      logger.error(`Failed to bundle ${entry.componentName}: ${error}`);
       process.exit(1);
     }
   }
 
   // Write manifest file for server-side lookup
-  console.log("\n📋 Writing hydration manifest...");
+  logger.log("Writing hydration manifest...");
   fs.writeFileSync(MANIFEST_FILE, JSON.stringify(manifest, null, 2), "utf-8");
-  console.log(`   ✓ Manifest written to ${MANIFEST_FILE}`);
 
   // Clean up temporary entries directory
   if (fs.existsSync(HYDRATION_ENTRIES_DIR)) {
     fs.rmSync(HYDRATION_ENTRIES_DIR, { recursive: true });
   }
 
-  console.log("\n✨ Hydration build complete!");
+  logger.log("Hydration build complete!");
 }
 
 main();

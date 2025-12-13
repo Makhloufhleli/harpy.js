@@ -3,6 +3,9 @@
 import { spawn } from "child_process";
 import * as fs from "fs";
 import * as http from "http";
+import { Logger } from "./logger";
+
+const logger = new Logger("DevServer");
 
 let nestProcess: any = null;
 let isRebuilding = false;
@@ -43,43 +46,52 @@ async function runCommand(cmd: string, args: string[] = []): Promise<void> {
 }
 
 async function buildHydration(): Promise<void> {
-  console.log("🔧 Building hydration...");
+  logger.log("Building hydration components...");
   try {
-    await runCommand("pnpm", ["build:hydration"]);
-    console.log("✅ Hydration built");
+    const tsxPath = require("child_process")
+      .execSync("which tsx", { encoding: "utf-8" })
+      .trim();
+    await runCommand(tsxPath, [
+      require("path").join(__dirname, "build-hydration.ts"),
+    ]);
   } catch (error) {
-    console.error("❌ Hydration build failed:", error);
+    logger.error(`Hydration build failed: ${error}`);
     throw error;
   }
 }
 
 async function autoWrap(): Promise<void> {
-  console.log("🔄 Auto-wrapping client components...");
+  logger.log("Auto-wrapping client components...");
   try {
-    await runCommand("pnpm", ["auto-wrap"]);
-    console.log("✅ Auto-wrap complete");
+    const tsxPath = require("child_process")
+      .execSync("which tsx", { encoding: "utf-8" })
+      .trim();
+    await runCommand(tsxPath, [
+      require("path").join(__dirname, "auto-wrap-exports.ts"),
+    ]);
   } catch (error) {
-    console.error("❌ Auto-wrap failed:", error);
-    throw error;
+    logger.error(`Auto-wrap failed: ${error}`);
   }
 }
 
 async function buildStyles(): Promise<void> {
-  console.log("🎨 Building styles...");
+  logger.log("Building styles...");
   try {
-    await runCommand("pnpm", ["build:styles"]);
-    console.log("✅ Styles built");
+    const tsxPath = require("child_process")
+      .execSync("which tsx", { encoding: "utf-8" })
+      .trim();
+    await runCommand(tsxPath, [
+      require("path").join(__dirname, "build-page-styles.ts"),
+    ]);
   } catch (error) {
-    console.error("❌ Styles build failed:", error);
-    throw error;
+    logger.error(`Styles build failed: ${error}`);
   }
 }
 
 async function startNestServer(): Promise<void> {
   return new Promise((resolve) => {
-    console.log("🚀 Starting NestJS server from compiled dist...");
+    logger.log("Starting NestJS application...");
     // Run compiled dist/main.js instead of using ts-node
-    // This ensures auto-wrapped components are used
     nestProcess = spawn("node", ["--watch", "dist/main.js"], {
       stdio: "pipe",
       shell: false,
@@ -106,15 +118,14 @@ async function startNestServer(): Promise<void> {
           setTimeout(async () => {
             if (isRebuilding) return;
             isRebuilding = true;
-            console.log("\n🔄 NestJS rebuild detected, rebuilding assets...");
+            logger.log("Rebuilding assets after code change...");
             try {
               await buildHydration();
               await autoWrap();
               await buildStyles();
-              console.log("✅ Assets rebuilt\n");
               triggerBrowserReload();
             } catch (error) {
-              console.error("❌ Asset rebuild failed:", error);
+              logger.error(`Asset rebuild failed: ${error}`);
             } finally {
               isRebuilding = false;
             }
@@ -139,10 +150,9 @@ async function startNestServer(): Promise<void> {
 }
 
 function watchSourceChanges(): void {
-  console.log("👀 Watching source files for changes...");
+  logger.log("Watching source files for changes...");
 
   let debounceTimer: NodeJS.Timeout | null = null;
-  const watchedFiles = new Set<string>();
 
   // Watch src for CSS changes only (TS/TSX changes are handled by NestJS watch + stdout detection)
   fs.watch("src", { recursive: true }, async (eventType, filename) => {
@@ -168,14 +178,13 @@ function watchSourceChanges(): void {
 
     debounceTimer = setTimeout(async () => {
       isRebuilding = true;
-      console.log(`\n📝 CSS file changed: ${filename}`);
+      logger.log(`CSS file changed: ${filename}`);
 
       try {
         await buildStyles();
-        console.log("✅ Styles rebuilt\n");
         triggerBrowserReload();
       } catch (error) {
-        console.error("Build error:", error);
+        logger.error(`Style rebuild failed: ${error}`);
       } finally {
         watchedFiles.delete(filename);
         isRebuilding = false;
@@ -188,7 +197,7 @@ let tscProcess: any = null;
 
 async function startTypeScriptWatch(): Promise<void> {
   return new Promise((resolve) => {
-    console.log("⚙️  Starting TypeScript compiler in watch mode...");
+    logger.log("Starting TypeScript compiler in watch mode...");
     tscProcess = spawn("pnpm", ["nest", "build", "--watch"], {
       stdio: "pipe",
       shell: true,
@@ -215,13 +224,13 @@ async function startTypeScriptWatch(): Promise<void> {
 
 async function main(): Promise<void> {
   try {
-    console.log("📦 Initializing development environment...\n");
+    logger.log("Initializing development environment...");
 
     // First: Start TypeScript compiler in watch mode
     await startTypeScriptWatch();
 
     // Build initial assets after first compilation
-    console.log("\n🔧 Building hydration assets...");
+    logger.log("Building initial assets...");
     await buildHydration();
     await autoWrap();
     await buildStyles();
@@ -229,27 +238,27 @@ async function main(): Promise<void> {
     // Now start the node server with compiled dist files
     await startNestServer();
 
-    console.log("\n✅ Development server ready!\n");
+    logger.log("Development server ready!");
 
     // Watch for source changes
     watchSourceChanges();
 
     // Handle graceful shutdown
     process.on("SIGINT", async () => {
-      console.log("\n\n🛑 Stopping development server...");
+      logger.log("Stopping development server...");
       if (tscProcess) tscProcess.kill();
       if (nestProcess) nestProcess.kill();
       process.exit(0);
     });
 
     process.on("SIGTERM", async () => {
-      console.log("\n\n🛑 Stopping development server...");
+      logger.log("Stopping development server...");
       if (tscProcess) tscProcess.kill();
       if (nestProcess) nestProcess.kill();
       process.exit(0);
     });
   } catch (error) {
-    console.error("Fatal error:", error);
+    logger.error(`Fatal error: ${error}`);
     process.exit(1);
   }
 }
