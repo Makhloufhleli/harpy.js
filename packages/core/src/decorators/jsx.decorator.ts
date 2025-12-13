@@ -4,6 +4,7 @@ import { JsxLayout } from "../core/jsx.engine";
 export interface MetaOptions {
   title?: string;
   description?: string;
+  keywords?: string;
   canonical?: string;
   openGraph?: {
     title?: string;
