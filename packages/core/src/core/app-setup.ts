@@ -28,6 +28,8 @@ export interface HarpyAppOptions {
   layout?: any;
   /** Folder containing built server assets (chunks) — defaults to `dist` */
   distDir?: string;
+  /** Optional folder containing public assets (favicon, manifest, etc.) */
+  publicDir?: string;
 }
 
 /**
@@ -43,7 +45,7 @@ export async function configureHarpyApp(
   app: NestFastifyApplication,
   opts: HarpyAppOptions = {},
 ) {
-  const { layout, distDir = "dist" } = opts;
+  const { layout, distDir = "dist", publicDir } = opts;
 
   if (layout) {
     withJsxEngine(app, layout);
@@ -79,6 +81,16 @@ export async function configureHarpyApp(
       prefix: "/",
       decorateReply: false,
     });
+
+    // If publicDir is provided, register it as well for public assets
+    if (publicDir) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+      await fastify.register(fastifyStatic, {
+        root: path.join(process.cwd(), publicDir),
+        prefix: "/",
+        decorateReply: false,
+      });
+    }
   } else {
     // If the static plugin is not available, emit a warning and continue.
     // Consumers who need hydration chunk serving in production should add
