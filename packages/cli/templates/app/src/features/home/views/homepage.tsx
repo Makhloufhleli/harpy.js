@@ -37,7 +37,7 @@ export default function HomePage({ translations: t }: HomePageProps) {
           {/* CTA Buttons */}
           <div className="flex flex-wrap justify-center gap-4 mb-8">
             <Link
-              href="https://harpyjs.com"
+              href="https://harpyjs.org"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold rounded-xl shadow-2xl transition-all hover:shadow-amber-500/50 hover:scale-105 text-lg"
