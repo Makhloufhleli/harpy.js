@@ -11,6 +11,10 @@ export { JsxRender } from "./decorators/jsx.decorator";
 export { WithLayout } from "./decorators/layout.decorator";
 export type { MetaOptions, RenderOptions } from "./decorators/jsx.decorator";
 
+// SEO Module
+export { SeoModule, BaseSeoService, DefaultSeoService } from "./seo";
+export type { SitemapUrl, RobotsConfig, SeoModuleOptions } from "./seo";
+
 // I18n is provided in a separate package: @harpy-js/i18n
 // Consumers should import i18n types and modules from that package.
 
