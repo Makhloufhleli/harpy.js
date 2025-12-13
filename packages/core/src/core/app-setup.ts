@@ -72,21 +72,19 @@ export async function configureHarpyApp(
   // This is important: hydration chunks are expected at the root ("/").
   // Use absolute path to be robust when invoked from different CWDs.
   if (fastifyStatic) {
-    // Ensure hydration chunks and other built assets are served from `dist`
-    // This is important: hydration chunks are expected at the root ("/").
-    // Use absolute path to be robust when invoked from different CWDs.
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-    await fastify.register(fastifyStatic, {
-      root: path.join(process.cwd(), distDir),
-      prefix: "/",
-      decorateReply: false,
-    });
-
-    // If publicDir is provided, register it as well for public assets
+    // If publicDir is provided, register both directories
     if (publicDir) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       await fastify.register(fastifyStatic, {
-        root: path.join(process.cwd(), publicDir),
+        root: [path.join(process.cwd(), publicDir), path.join(process.cwd(), distDir)],
+        prefix: "/",
+        decorateReply: false,
+      });
+    } else {
+      // Only register dist directory
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+      await fastify.register(fastifyStatic, {
+        root: path.join(process.cwd(), distDir),
         prefix: "/",
         decorateReply: false,
       });
