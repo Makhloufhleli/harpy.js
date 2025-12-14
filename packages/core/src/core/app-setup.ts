@@ -22,6 +22,12 @@ try {
   fastifyCookie = undefined;
 }
 import { withJsxEngine } from "./jsx.engine";
+import { JsxExceptionFilter, ErrorPagesConfig } from "./jsx-exception.filter";
+import { APP_FILTER } from "@nestjs/core";
+import React from "react";
+import { renderToString } from "react-dom/server";
+import Default404Page from "./error-pages/default-404";
+import ErrorLayout from "./error-pages/error-layout";
 
 export interface HarpyAppOptions {
   /** JSX Default layout used by the app (optional) */
@@ -30,6 +36,8 @@ export interface HarpyAppOptions {
   distDir?: string;
   /** Optional folder containing public assets (favicon, manifest, etc.) */
   publicDir?: string;
+  /** Custom error pages for different HTTP status codes */
+  errorPages?: ErrorPagesConfig;
 }
 
 /**
@@ -45,13 +53,46 @@ export async function configureHarpyApp(
   app: NestFastifyApplication,
   opts: HarpyAppOptions = {},
 ) {
-  const { layout, distDir = "dist", publicDir } = opts;
+  const { layout, distDir = "dist", publicDir, errorPages } = opts;
 
   if (layout) {
     withJsxEngine(app, layout);
   }
 
   const fastify = app.getHttpAdapter().getInstance();
+
+  // Set custom error handler BEFORE other plugins to catch 404s
+  // This works with @fastify/static and catches all errors including 404s
+  const NotFoundComponent = errorPages?.["404"] || Default404Page;
+  fastify.setErrorHandler((error: any, request, reply) => {
+    // Check if it's a 404 error
+    if (error?.statusCode === 404 || reply.statusCode === 404) {
+      try {
+        const props = {
+          message: "Page Not Found",
+          path: request.url,
+        };
+        
+        // Wrap the error page content in ErrorLayout for proper styling
+        const errorPageContent = React.createElement(NotFoundComponent, props);
+        const wrappedInLayout = React.createElement(ErrorLayout, {
+          title: "404 - Page Not Found",
+          children: errorPageContent,
+        });
+        const html = renderToString(wrappedInLayout);
+        
+        void reply
+          .status(404)
+          .header("Content-Type", "text/html; charset=utf-8")
+          .send(`<!DOCTYPE html>${html}`);
+        return;
+      } catch (renderError) {
+        console.error("Error rendering 404 page:", renderError);
+      }
+    }
+    // For other errors, send them to NestJS exception filters
+    throw error;
+  });
 
   // Cookie support is used by i18n and other helpers if available.
   if (fastifyCookie) {
@@ -107,6 +148,11 @@ export async function configureHarpyApp(
 
   // Analytics injection is intentionally omitted — keep analytics opt-in for
   // application authors so they can wire up their provider of choice.
+
+  // Register global JSX exception filter for custom error pages
+  // This must be done via app.useGlobalFilters since we can't modify module providers
+  const exceptionFilter = new JsxExceptionFilter(errorPages);
+  app.useGlobalFilters(exceptionFilter);
 }
 
 /**
