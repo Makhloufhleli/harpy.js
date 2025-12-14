@@ -6,6 +6,15 @@ export { withJsxEngine } from "./core/jsx.engine";
 export { LiveReloadController } from "./core/live-reload.controller";
 export { StaticAssetsController } from "./core/static-assets.controller";
 
+// Exception filter & error pages
+export { JsxExceptionFilter } from "./core/jsx-exception.filter";
+export type { ErrorPagesConfig } from "./core/jsx-exception.filter";
+export { default as Default404Page } from "./core/error-pages/default-404";
+export { default as Default500Page } from "./core/error-pages/default-500";
+export { default as Default401Page } from "./core/error-pages/default-401";
+export { default as Default403Page } from "./core/error-pages/default-403";
+export { default as ErrorLayout } from "./core/error-pages/error-layout";
+
 // Decorators
 export { JsxRender } from "./decorators/jsx.decorator";
 export { WithLayout } from "./decorators/layout.decorator";
