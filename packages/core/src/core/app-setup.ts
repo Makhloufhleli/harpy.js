@@ -38,6 +38,16 @@ export interface HarpyAppOptions {
   publicDir?: string;
   /** Custom error pages for different HTTP status codes */
   errorPages?: ErrorPagesConfig;
+  /**
+   * Optional redirect settings. When `enforceRedirects` is true (default false)
+   * Harpy will register a Fastify `onRequest` hook to redirect requests to
+   * the canonical domain and HTTPS. Configure `mainDomain` to your primary
+   * host (e.g. `harpyjs.org`).
+   */
+  enforceRedirects?: boolean;
+  mainDomain?: string;
+  enforceHttps?: boolean;
+  redirectWww?: boolean;
 }
 
 /**
@@ -60,6 +70,60 @@ export async function configureHarpyApp(
   }
 
   const fastify = app.getHttpAdapter().getInstance();
+
+  // Optional redirects to canonical domain / HTTPS
+  const {
+    enforceRedirects = false,
+    mainDomain,
+    enforceHttps = true,
+    redirectWww = true,
+  } = opts as HarpyAppOptions;
+
+  if (enforceRedirects && (mainDomain || enforceHttps || redirectWww)) {
+    // Register early hook to redirect incoming requests to the canonical URL
+    // This keeps redirect handling in Harpy core so consumers can opt-in.
+    // Uses x-forwarded-proto when behind proxies (Vercel, Cloudflare)
+    // and falls back to socket encryption detection.
+    // NOTE: Make sure your proxy forwards `x-forwarded-proto`.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    fastify.addHook('onRequest', (req: any, reply: any, done: any) => {
+      try {
+        const hostHeader = (req.headers && (req.headers.host || '')).toString();
+        const normalizedHost = hostHeader.replace(/:\d+$/, '');
+
+        // Skip redirects for localhost/127.0.0.1 (local development)
+        if (normalizedHost === 'localhost' || normalizedHost === '127.0.0.1' || normalizedHost === '0.0.0.0') {
+          done();
+          return;
+        }
+
+        const forwardedProto = (req.headers['x-forwarded-proto'] || '').toString();
+        const proto = forwardedProto || (req.raw && req.raw.socket && (req.raw.socket as any).encrypted ? 'https' : 'http');
+
+        // Decide whether to redirect: http -> https, www -> apex, or host mismatch
+        const isHttp = enforceHttps && proto !== 'https';
+        const isWww = redirectWww && normalizedHost.startsWith('www.');
+        const hostMismatch = mainDomain && normalizedHost !== mainDomain && normalizedHost !== `www.${mainDomain}`;
+
+        if (isHttp || isWww || hostMismatch) {
+          // Build target host (prefer configured mainDomain, else strip www.)
+          const targetHost = mainDomain ? mainDomain : normalizedHost.replace(/^www\./, '');
+          const targetProto = enforceHttps ? 'https' : proto;
+          const targetUrl = `${targetProto}://${targetHost}${req.url}`;
+
+          // Permanent redirect
+          reply.status(301).header('Cache-Control', 'public, max-age=31536000').redirect(targetUrl);
+          return;
+        }
+      } catch (e) {
+        // swallow errors and continue to avoid blocking requests
+        // eslint-disable-next-line no-console
+        console.warn('[harpy-core] redirect hook error', e);
+      }
+
+      done();
+    });
+  }
 
   // Set custom error handler BEFORE other plugins to catch 404s
   // This works with @fastify/static and catches all errors including 404s
