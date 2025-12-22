@@ -4,6 +4,10 @@ import ora from "ora";
 import * as path from "path";
 import prompts from "prompts";
 import execa = require("execa");
+import {
+  runPreflightChecks,
+  displayPreflightResults,
+} from "../utils/preflight-checks";
 
 interface CreateOptions {
   packageManager?: "npm" | "pnpm" | "yarn";
@@ -11,6 +15,7 @@ interface CreateOptions {
   examples?: boolean;
   skipInstall?: boolean;
   skipGit?: boolean;
+  skipPreflight?: boolean;
 }
 
 export async function createCommand(
@@ -58,6 +63,39 @@ export async function createCommand(
     if (!packageManager) {
       console.error(chalk.red("\n✖ Package manager selection cancelled"));
       process.exit(1);
+    }
+
+    // Run pre-flight checks before proceeding (unless skipped)
+    if (!options.skipPreflight) {
+      console.log(chalk.gray("Verifying system requirements..."));
+      const preflightResult = await runPreflightChecks({
+        packageManager,
+        verbose: false,
+      });
+
+      if (!preflightResult.success) {
+        displayPreflightResults(preflightResult);
+        console.log(
+          chalk.gray(
+            "\nTo skip pre-flight checks, use: " +
+              chalk.cyan("harpy create <project-name> --skip-preflight"),
+          ),
+        );
+        console.log(
+          chalk.gray(
+            "To diagnose issues, run: " + chalk.cyan("harpy doctor --verbose"),
+          ),
+        );
+        console.log("");
+        process.exit(1);
+      }
+
+      // Display warnings if any (but continue)
+      if (preflightResult.warnings.length > 0) {
+        displayPreflightResults(preflightResult);
+      }
+    } else {
+      console.log(chalk.yellow("⚠ Skipping pre-flight checks (--skip-preflight)"));
     }
 
     // Decide whether to include i18n: prefer CLI option, otherwise ask interactively

@@ -2,6 +2,7 @@
 
 import { Command } from "commander";
 import { createCommand } from "./commands/create";
+import { doctorCommand } from "./commands/doctor";
 import { readFileSync } from "fs";
 import { join } from "path";
 
@@ -31,11 +32,18 @@ program
   .option("--include-i18n", "Include i18n support in the generated project")
   .option("--skip-git", "Skip git repository initialization")
   .option("--skip-install", "Skip dependency installation")
+  .option("--skip-preflight", "Skip pre-flight system checks")
   .option(
     "--no-examples",
     "Do not include example pages in the generated project",
   )
   .action(createCommand);
+
+program
+  .command("doctor")
+  .description("Check system requirements and diagnose common issues")
+  .option("-v, --verbose", "Show detailed diagnostic information")
+  .action(doctorCommand);
 
 program.parse(process.argv);
 

@@ -66,6 +66,7 @@ describe("createCommand integration", () => {
         includeI18n: true,
         skipInstall: true,
         skipGit: true,
+        skipPreflight: true,
       }),
     ).resolves.toBeUndefined();
 
@@ -93,6 +94,7 @@ describe("createCommand integration", () => {
         includeI18n: false,
         skipInstall: true,
         skipGit: true,
+        skipPreflight: true,
       }),
     ).resolves.toBeUndefined();
 
