@@ -14,6 +14,11 @@ export interface NavItem {
    * If omitted, registration order is used as a tiebreaker.
    */
   order?: number;
+  /**
+   * Optional badge to display next to the item (e.g., 'NEW', 'BETA', 'UPDATED').
+   * Used to highlight newly added or updated navigation items.
+   */
+  badge?: string;
 }
 
 export interface NavSection {
