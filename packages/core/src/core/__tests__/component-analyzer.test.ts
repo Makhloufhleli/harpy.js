@@ -1,15 +1,8 @@
-import * as fs from "fs";
-import * as path from "path";
-
-jest.mock("fs");
-jest.mock("path");
+import { describe, it, expect, beforeEach } from "bun:test";
 
 describe("Component Analyzer", () => {
-  const mockFs = fs as jest.Mocked<typeof fs>;
-  const mockPath = path as jest.Mocked<typeof path>;
-
   beforeEach(() => {
-    jest.clearAllMocks();
+    // Reset any mocks if needed
   });
 
   describe("client component detection", () => {

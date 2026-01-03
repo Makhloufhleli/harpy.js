@@ -1,0 +1,25 @@
+{
+  "hero": {
+    "title": "Harpy.js",
+    "subtitle": "Framework Full-Stack com Bun e React SSR",
+    "description": "Construa aplicações full-stack ultrarrápidas com Bun, renderização do lado do servidor com React e hidratação automática.",
+    "cta": {
+      "getStarted": "Começar",
+      "viewDocs": "Ver Docs"
+    }
+  },
+  "features": {
+    "fast": {
+      "title": "Ultra Rápido",
+      "description": "Construído sobre Bun para máximo desempenho"
+    },
+    "ssr": {
+      "title": "React SSR",
+      "description": "Renderização do servidor com hidratação automática"
+    },
+    "dx": {
+      "title": "Ótima DX",
+      "description": "TypeScript-first com decoradores como NestJS"
+    }
+  }
+}

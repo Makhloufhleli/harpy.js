@@ -1,326 +1,263 @@
-#!/usr/bin/env node
+#!/usr/bin/env bun
 
 /**
- * Build script to:
+ * Bun-native build script to:
  * 1. Analyze components for 'use client' directive
  * 2. Generate separate hydration entry files
- * 3. Bundle them with esbuild to dist/chunks with cache-busted names
+ * 3. Bundle them with Bun to .harpy/chunks
  * 4. Create a manifest file for server-side lookup
- * 5. Create shared vendor bundle for React/ReactDOM to eliminate duplication
  */
 
-import { execSync } from "child_process";
-import * as crypto from "crypto";
-import * as fs from "fs";
-import * as path from "path";
-import { Logger } from "./logger";
-
-const logger = new Logger("HydrationBuilder");
-
 const PROJECT_ROOT = process.cwd();
-const SRC_DIR = path.join(PROJECT_ROOT, "src");
-const DIST_DIR = path.join(PROJECT_ROOT, "dist");
-const HYDRATION_ENTRIES_DIR = path.join(SRC_DIR, ".hydration-entries");
-const CHUNKS_DIR = path.join(DIST_DIR, "chunks");
-// Write manifest directly to dist (no need for temp since this runs after nest build)
-const MANIFEST_FILE = path.join(DIST_DIR, "hydration-manifest.json");
-const VENDOR_BUNDLE = "vendor.js";
-
-// Check if running in production mode (add cache-busting hashes only in production)
-const IS_PRODUCTION = process.argv.includes("--prod");
+const SRC_DIR = `${PROJECT_ROOT}/src`;
+const HARPY_DIR = `${PROJECT_ROOT}/.harpy`;
+const CHUNKS_DIR = `${HARPY_DIR}/chunks`;
+const BACKUPS_DIR = `${HARPY_DIR}/component-originals`;
+const MANIFEST_FILE = `${HARPY_DIR}/hydration-manifest.json`;
 
 interface ComponentFile {
   filePath: string;
   componentName: string;
-  isNamedExport: boolean; // Track if it's a named export
 }
 
-interface HydrationManifest {
-  [componentName: string]: string; // componentName -> chunkFileName
+/**
+ * Restore original components from backups
+ */
+async function restoreOriginalComponents(): Promise<void> {
+  try {
+    const backupsExist = await Bun.file(BACKUPS_DIR).exists();
+    if (!backupsExist) return;
+
+    const glob = new Bun.Glob("*.original.tsx");
+    const backups = await Array.fromAsync(glob.scan({ cwd: BACKUPS_DIR, onlyFiles: true }));
+
+    for (const backup of backups) {
+      const backupPath = `${BACKUPS_DIR}/${backup}`;
+      const originalContent = await Bun.file(backupPath).text();
+      
+      // Find the component name from backup filename
+      const componentName = backup.replace('.original.tsx', '');
+      
+      // Find the source file (search for it)
+      const srcGlob = new Bun.Glob(`**/${componentName.toLowerCase()}.tsx`);
+      const srcFiles = await Array.fromAsync(srcGlob.scan({ cwd: SRC_DIR, onlyFiles: true }));
+      
+      if (srcFiles.length > 0) {
+        const srcPath = `${SRC_DIR}/${srcFiles[0]}`;
+        await Bun.write(srcPath, originalContent);
+      }
+    }
+  } catch (error) {
+    // Silently ignore restoration errors on first run
+  }
+}
+
+interface ComponentFile {
+  filePath: string;
+  componentName: string;
 }
 
 /**
  * Find all files with 'use client' directive
  */
-function findClientComponents(): ComponentFile[] {
+async function findClientComponents(): Promise<ComponentFile[]> {
   const components: ComponentFile[] = [];
-  const extensions = [".ts", ".tsx"];
+  
+  const glob = new Bun.Glob("**/*.{ts,tsx}");
+  const files = await Array.fromAsync(glob.scan({ cwd: SRC_DIR, onlyFiles: true }));
 
-  function walkDir(dir: string) {
-    if (!fs.existsSync(dir)) return;
+  for (const file of files) {
+    const fullPath = `${SRC_DIR}/${file}`;
+    const content = await Bun.file(fullPath).text();
 
-    const entries = fs.readdirSync(dir, { withFileTypes: true });
-
-    for (const entry of entries) {
-      const fullPath = path.join(dir, entry.name);
-
-      if (entry.isDirectory()) {
-        if (!entry.name.startsWith(".") && entry.name !== "node_modules") {
-          walkDir(fullPath);
-        }
-      } else if (extensions.includes(path.extname(entry.name))) {
-        try {
-          const content = fs.readFileSync(fullPath, "utf-8");
-
-          // Check for 'use client' directive at the start of the file
-          if (/^['"]use client['"]/.test(content.trim())) {
-            const fileName = path.basename(fullPath, path.extname(fullPath));
-            // Convert kebab-case to PascalCase
-            const componentName = fileName
-              .split("-")
-              .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-              .join("");
-
-            // Detect if it's a named export by checking for patterns like:
-            // export function ComponentName or export const ComponentName
-            const hasNamedExport = new RegExp(
-              `export\\s+(function|const|class)\\s+${componentName}\\b`,
-            ).test(content);
-
-            components.push({
-              filePath: fullPath,
-              componentName,
-              isNamedExport: hasNamedExport,
-            });
-          }
-        } catch (error) {
-          console.error(`Error reading file ${fullPath}:`, error);
-        }
+    // Check for 'use client' directive at the start
+    if (/^['"]use client['"]/.test(content.trim())) {
+      // Check if file has a default export (required for hydration)
+      const hasDefaultExport = /export\s+default\s+(function|class|const|let|var|\{)/.test(content);
+      
+      if (!hasDefaultExport) {
+        // Skip files without default export (e.g., context providers with only named exports)
+        continue;
       }
+      
+      const fileName = file.split("/").pop()!.replace(/\.(ts|tsx)$/, "");
+      // Convert kebab-case to PascalCase
+      const componentName = fileName
+        .split("-")
+        .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+        .join("");
+
+      components.push({
+        filePath: fullPath,
+        componentName,
+      });
     }
   }
 
-  walkDir(SRC_DIR);
   return components;
 }
 
 /**
  * Generate hydration entry file for a client component
- * Uses window.React from vendor bundle
  */
 function generateHydrationEntry(component: ComponentFile): string {
-  const relativePath = path.relative(HYDRATION_ENTRIES_DIR, component.filePath);
-  const importPath = `./${relativePath.replace(/\\\\/g, "/")}`;
-
-  // Generate appropriate import statement based on export type
-  const importStatement = component.isNamedExport
-    ? `import { ${component.componentName} } from '${importPath}';`
-    : `import ${component.componentName} from '${importPath}';`;
-
-  const content = `
-// Use React from vendor bundle
-const React = window.React;
-const { hydrateRoot } = window.ReactDOM;
-
-${importStatement}
-
-/**
- * Auto-generated hydration entry for ${component.componentName}
- */
+  return `
+import React from 'react';
+import { hydrateRoot } from 'react-dom/client';
+import Component from '${component.filePath}';
 
 // Find all hydration containers for this component
-const containers = document.querySelectorAll('[id^="hydrate-${component.componentName}"]');
+const containers = document.querySelectorAll('[data-harpy-hydrate="${component.componentName}"]');
 
 containers.forEach((container) => {
   const containerElement = container as HTMLElement;
-  const propsElement = document.getElementById(\`\${container.id}-props\`);
+  const propsAttr = containerElement.getAttribute('data-harpy-props');
   
   let props = {};
-  if (propsElement) {
+  if (propsAttr) {
     try {
-      props = JSON.parse(propsElement.textContent || '{}');
+      props = JSON.parse(propsAttr);
     } catch (error) {
-      console.error('Error parsing props:', error);
+      console.error('[Hydration] Error parsing props:', error);
     }
   }
 
   try {
-    // Hydrate the entire container with the component and props script
-    // This matches the server-rendered structure from client-component-wrapper.ts
-    hydrateRoot(
-      containerElement,
-      React.createElement(
-        React.Fragment,
-        null,
-        React.createElement(${component.componentName}, props),
-        React.createElement('script', {
-          type: 'application/json',
-          id: \`\${container.id}-props\`,
-          dangerouslySetInnerHTML: { __html: JSON.stringify(props) }
-        })
-      )
-    );
-    console.log('[Hydration] Hydrated ${component.componentName}');
+    hydrateRoot(containerElement, React.createElement(Component, props));
+    console.log('[Hydration] Hydrated ${component.componentName} at', containerElement);
   } catch (error) {
     console.error('[Hydration] Failed to hydrate ${component.componentName}:', error);
   }
 });
 `.trim();
-
-  return content;
-}
-
-/**
- * Generate cache-busted filename (production only)
- * In dev mode, uses consistent filenames so the browser doesn't re-download
- */
-function generateChunkFilename(componentName: string): string {
-  if (IS_PRODUCTION) {
-    // Production: use cache-busting hash
-    const hash = crypto.randomBytes(8).toString("hex");
-    return `${componentName}.${hash}.js`;
-  } else {
-    // Development: use consistent filename
-    return `${componentName}.js`;
-  }
 }
 
 /**
  * Main build process
  */
-function main(): void {
-  // Ensure hydration entries directory exists
-  if (!fs.existsSync(HYDRATION_ENTRIES_DIR)) {
-    fs.mkdirSync(HYDRATION_ENTRIES_DIR, { recursive: true });
-  }
-
-  logger.log("Detecting client components...");
-  const clientComponents = findClientComponents();
+async function main() {
+  console.log("🔍 Detecting client components...");
+  const clientComponents = await findClientComponents();
 
   if (clientComponents.length === 0) {
-    logger.warn("No client components found");
-    // Still ensure chunks directory exists and clear manifest
-    if (!fs.existsSync(CHUNKS_DIR)) {
-      fs.mkdirSync(CHUNKS_DIR, { recursive: true });
-    }
-    fs.writeFileSync(MANIFEST_FILE, JSON.stringify({}, null, 2), "utf-8");
+    console.log("⚠️  No client components found");
+    // Ensure directory exists and create empty manifest
+    await Bun.$`mkdir -p ${CHUNKS_DIR}`.quiet();
+    await Bun.write(MANIFEST_FILE, JSON.stringify({}, null, 2));
     return;
   }
 
   console.log(`✅ Found ${clientComponents.length} client component(s):`);
-  clientComponents.forEach((c) => console.log(`   - ${c.componentName}`));
-
-  // Create hydration entries directory
-  if (!fs.existsSync(HYDRATION_ENTRIES_DIR)) {
-    fs.mkdirSync(HYDRATION_ENTRIES_DIR, { recursive: true });
-  }
+  clientComponents.forEach(c => console.log(`   - ${c.componentName}`));
 
   // Ensure chunks directory exists
-  if (!fs.existsSync(CHUNKS_DIR)) {
-    fs.mkdirSync(CHUNKS_DIR, { recursive: true });
-  }
+  await Bun.$`mkdir -p ${CHUNKS_DIR}`.quiet();
 
-  logger.log("Generating hydration entries...");
+  const manifest: Record<string, string> = {};
 
-  // Generate hydration entry files
-  const entryFiles: { path: string; componentName: string }[] = [];
+  // Step 1: Generate SSR wrapper files in .harpy/wrappers/
+  console.log("\n📝 Generating SSR wrappers...");
+  
+  const WRAPPERS_DIR = `${HARPY_DIR}/wrappers`;
+  await Bun.$`mkdir -p ${WRAPPERS_DIR}`.quiet();
+  
   for (const component of clientComponents) {
-    const entryContent = generateHydrationEntry(component);
-    const entryPath = path.join(
-      HYDRATION_ENTRIES_DIR,
-      `${component.componentName}.tsx`,
-    );
-
-    fs.writeFileSync(entryPath, entryContent, "utf-8");
-    entryFiles.push({
-      path: entryPath,
-      componentName: component.componentName,
-    });
-  }
-
-  // Build shared vendor bundle first
-  logger.log("Building shared vendor bundle...");
-  const vendorEntryPath = path.join(HYDRATION_ENTRIES_DIR, "_vendor.js");
-  const vendorContent = `
+    const wrapperContent = `
 import React from 'react';
-import ReactDOM from 'react-dom/client';
+import { registerClientComponent } from '@harpy-js/core/runtime';
+import OriginalComponent from '${component.filePath}';
 
-// Expose React and ReactDOM globally for component chunks
-window.React = React;
-window.ReactDOM = ReactDOM;
+export default function ${component.componentName}(props: any) {
+  const instanceId = \`harpy-\${Math.random().toString(36).slice(2)}\`;
+  
+  if (typeof window === 'undefined') {
+    // Server-side: register and wrap in hydration container
+    if ((global as any).__COMPONENT_REGISTRY__) {
+      (global as any).__COMPONENT_REGISTRY__({
+        instanceId,
+        componentName: '${component.componentName}',
+        props,
+      });
+    }
+    
+    return React.createElement(
+      'div',
+      {
+        'data-harpy-hydrate': '${component.componentName}',
+        'data-harpy-id': instanceId,
+        'data-harpy-props': JSON.stringify(props),
+        style: { display: 'contents' },
+      },
+      React.createElement(OriginalComponent, props)
+    );
+  }
+  
+  // Client-side: just render the component
+  return React.createElement(OriginalComponent, props);
+}
 `.trim();
 
-  fs.writeFileSync(vendorEntryPath, vendorContent, "utf-8");
-
-  const vendorOutputPath = path.join(CHUNKS_DIR, VENDOR_BUNDLE);
-  try {
-    const vendorCommand = `npx esbuild "${vendorEntryPath}" --bundle --minify --target=es2020 --format=iife --outfile="${vendorOutputPath}" --platform=browser --tree-shaking=true --define:process.env.NODE_ENV='"production"'`;
-    execSync(vendorCommand, { stdio: "inherit" });
-  } catch (error) {
-    logger.error(`Failed to bundle vendor: ${error}`);
-    process.exit(1);
+    const wrapperPath = `${WRAPPERS_DIR}/${component.componentName}.wrapper.tsx`;
+    await Bun.write(wrapperPath, wrapperContent);
+    console.log(`   ✓ ${component.componentName} wrapper`);
   }
 
-  // Bundle each entry file separately with cache-busted names
-  logger.log("Bundling hydration scripts...");
+  // Step 2: Build client-side hydration bundles
+  console.log("\n📦 Building hydration chunks...");
+  for (const component of clientComponents) {
+  // Step 2: Build client-side hydration bundles
+  console.log("\n📦 Building hydration chunks...");
+  for (const component of clientComponents) {
+    console.log(`   Building ${component.componentName}...`);
+    
+    // Generate entry content
+    const entryContent = generateHydrationEntry(component);
+    
+    // Write to temp entry file
+    const entryFile = `${CHUNKS_DIR}/${component.componentName}.entry.tsx`;
+    await Bun.write(entryFile, entryContent);
 
-  // Create React shim files for aliasing
-  const SHIMS_DIR = path.join(DIST_DIR, ".shims");
-  if (!fs.existsSync(SHIMS_DIR)) {
-    fs.mkdirSync(SHIMS_DIR, { recursive: true });
-  }
-
-  // Create shim for react
-  const reactShimPath = path.join(SHIMS_DIR, "react.js");
-  fs.writeFileSync(reactShimPath, "module.exports = window.React;", "utf-8");
-
-  // Create shim for react-dom
-  const reactDomShimPath = path.join(SHIMS_DIR, "react-dom.js");
-  fs.writeFileSync(
-    reactDomShimPath,
-    "module.exports = window.ReactDOM;",
-    "utf-8",
-  );
-
-  // Create shim for react-dom/client
-  const reactDomClientShimPath = path.join(SHIMS_DIR, "react-dom-client.js");
-  fs.writeFileSync(
-    reactDomClientShimPath,
-    "module.exports = window.ReactDOM;",
-    "utf-8",
-  );
-
-  // Create shim for react/jsx-runtime
-  const jsxRuntimeShimPath = path.join(SHIMS_DIR, "jsx-runtime.js");
-  fs.writeFileSync(
-    jsxRuntimeShimPath,
-    `
-const React = window.React;
-module.exports = {
-  jsx: React.createElement,
-  jsxs: React.createElement,
-  Fragment: React.Fragment
-};`,
-    "utf-8",
-  );
-
-  const manifest: HydrationManifest = {};
-
-  for (const entry of entryFiles) {
-    const chunkFilename = generateChunkFilename(entry.componentName);
-    const outputPath = path.join(CHUNKS_DIR, chunkFilename);
+    // Bundle with Bun
+    const outputFile = `${component.componentName}.js`;
+    const outputPath = `${CHUNKS_DIR}/${outputFile}`;
 
     try {
-      // Use aliases to redirect React imports to window.React from vendor bundle
-      const command = `npx esbuild "${entry.path}" --bundle --minify --target=es2020 --format=iife --keep-names --outfile="${outputPath}" --platform=browser --tree-shaking=true --define:process.env.NODE_ENV='"production"' --alias:react=${reactShimPath} --alias:react-dom=${reactDomShimPath} --alias:react-dom/client=${reactDomClientShimPath} --alias:react/jsx-runtime=${jsxRuntimeShimPath}`;
-      execSync(command, { stdio: "inherit" });
-      manifest[entry.componentName] = chunkFilename;
+      const result = await Bun.build({
+        entrypoints: [entryFile],
+        outdir: CHUNKS_DIR,
+        naming: outputFile,
+        target: "browser",
+        format: "esm",
+        minify: false,
+        splitting: false,
+      });
+
+      if (!result.success) {
+        console.error(`   ✗ Failed to build ${component.componentName}:`, result.logs);
+        // Clean up entry file even on failure
+        await Bun.$`rm -f ${entryFile}`.quiet();
+        continue;
+      }
+
+      // Clean up entry file
+      await Bun.$`rm -f ${entryFile}`.quiet();
+
+      manifest[component.componentName] = outputFile;
+      console.log(`   ✓ ${outputFile}`);
     } catch (error) {
-      logger.error(`Failed to bundle ${entry.componentName}: ${error}`);
-      process.exit(1);
+      console.error(`   ✗ Failed to build ${component.componentName}:`, error);
     }
   }
 
-  // Write manifest file for server-side lookup
-  logger.log("Writing hydration manifest...");
-  fs.writeFileSync(MANIFEST_FILE, JSON.stringify(manifest, null, 2), "utf-8");
-
-  // Clean up temporary entries directory
-  if (fs.existsSync(HYDRATION_ENTRIES_DIR)) {
-    fs.rmSync(HYDRATION_ENTRIES_DIR, { recursive: true });
-  }
-
-  logger.log("Hydration build complete!");
+  // Write manifest
+  await Bun.write(MANIFEST_FILE, JSON.stringify(manifest, null, 2));
+  console.log(`\n✅ Hydration manifest written to ${MANIFEST_FILE}`);
+  console.log(`📦 ${Object.keys(manifest).length} chunk(s) built`);
+  console.log('💡 Wrappers created in .harpy/wrappers/ - import from there for hydration');
+}
 }
 
-main();
+main().catch((error) => {
+  console.error("❌ Build failed:", error);
+  process.exit(1);
+});

@@ -1,8 +1,9 @@
 {
   "$schema": "node_modules/lerna/schemas/lerna-schema.json",
   "version": "independent",
-  "npmClient": "pnpm",
+  "npmClient": "bun",
   "packages": ["packages/*"],
+  "useWorkspaces": true,
   "command": {
     "version": {
       "allowBranch": "main",

@@ -1,9 +1,0 @@
-packages:
-  - packages/*
-  - apps/*
-ignoredBuiltDependencies:
-  - '@nestjs/core'
-  - esbuild
-  - nx
-onlyBuiltDependencies:
-  - '@nestjs/core'

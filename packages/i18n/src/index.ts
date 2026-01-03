@@ -1,6 +1,11 @@
 /**
  * Harpy i18n package entrypoint
+ * 
+ * This file exports the NestJS-based i18n module for backward compatibility.
+ * For the Bun runtime version, import from '@harpy-js/i18n/runtime'
  */
+
+// NestJS-based exports (legacy)
 export { I18nModule } from "./i18n.module";
 export { I18nService } from "./i18n.service";
 export { I18nInterceptor } from "./i18n.interceptor";

@@ -1,3 +1,5 @@
+import { describe, it, expect } from "bun:test";
+
 /**
  * Unit tests for canonical redirect logic
  */

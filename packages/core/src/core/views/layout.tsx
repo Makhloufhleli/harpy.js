@@ -1,5 +1,5 @@
 import React from "react";
-import type { JsxLayoutProps } from "../jsx.engine";
+import type { JsxLayoutProps } from "../../types/jsx.types";
 
 export default function DefaultLayout({
   children,
@@ -52,7 +52,7 @@ export default function DefaultLayout({
         </main>
 
         {/* Auto-injected hydration scripts at end of body to ensure DOM is ready */}
-        {chunkScripts.map((script) => (
+        {chunkScripts.map((script: { componentName: string; path: string }) => (
           <script key={script.componentName} src={script.path}></script>
         ))}
       </body>

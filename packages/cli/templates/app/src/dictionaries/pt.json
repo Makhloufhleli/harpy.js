@@ -1,0 +1,11 @@
+{
+  "welcome": "Bem-vindo",
+  "home": "Início",
+  "about": "Sobre",
+  "hero": {
+    "title": "Harpy.js",
+    "badge": "BETA",
+    "subtitle": "Framework Full-Stack com Bun e React SSR",
+    "description": "Construa aplicações full-stack poderosas com renderização React do lado do servidor e hidratação automática do cliente."
+  }
+}

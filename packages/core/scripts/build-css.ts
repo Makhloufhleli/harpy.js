@@ -1,38 +1,36 @@
-#!/usr/bin/env node
+#!/usr/bin/env bun
 /**
  * Build script for Tailwind CSS v4
- * Compiles src/assets/styles.css to public/styles.css
+ * Compiles src/assets/global.css to .harpy/static/styles.css
  */
 
-import * as fs from "fs";
-import * as path from "path";
+const PROJECT_ROOT = process.cwd();
+const inputFile = `${PROJECT_ROOT}/src/assets/global.css`;
+const outputDir = `${PROJECT_ROOT}/.harpy/static`;
+const outputFile = `${outputDir}/styles.css`;
 
-const inputFile = path.join(__dirname, "../src/assets/styles.css");
-const outputFile = path.join(__dirname, "../public/styles.css");
-
-// Create public directory if it doesn't exist
-const publicDir = path.dirname(outputFile);
-if (!fs.existsSync(publicDir)) {
-  fs.mkdirSync(publicDir, { recursive: true });
-}
+// Ensure output directory exists
+await Bun.$`mkdir -p ${outputDir}`.quiet();
 
 // Read the input CSS file
-const inputCSS = fs.readFileSync(inputFile, "utf8");
+const inputCSS = await Bun.file(inputFile).text();
 
-// Import and compile with Tailwind v4
-(async () => {
+// Import and compile with Tailwind v4 PostCSS
+try {
   const tailwindModule = await import("@tailwindcss/postcss");
-  const compile =
-    (tailwindModule as any).default || (tailwindModule as any).compile;
+  const postcss = await import("postcss");
+  
+  const tailwindPlugin = tailwindModule.default || tailwindModule;
 
-  try {
-    const output = await compile(inputCSS, {
-      file: inputFile,
-    });
-    fs.writeFileSync(outputFile, output.toString());
-    console.log("✅ CSS compiled successfully");
-  } catch (err) {
-    console.error("❌ CSS compilation failed:", err);
-    process.exit(1);
-  }
-})();
+  const result = await postcss.default([tailwindPlugin]).process(inputCSS, {
+    from: inputFile,
+    to: outputFile,
+  });
+  
+  await Bun.write(outputFile, result.css);
+  console.log(`✅ CSS compiled successfully to ${outputFile}`);
+  console.log(`   Generated ${result.css.length} bytes`);
+} catch (err) {
+  console.error("❌ CSS compilation failed:", err);
+  process.exit(1);
+}

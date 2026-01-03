@@ -1,9 +1,19 @@
 {
   "name": "@harpy-js/i18n",
-  "version": "0.1.3",
-  "description": "Harpy i18n support extracted to its own package",
+  "version": "0.2.0",
+  "description": "Harpy i18n support for both NestJS and Bun runtime",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./runtime": {
+      "types": "./dist/runtime/index.d.ts",
+      "default": "./dist/runtime/index.js"
+    }
+  },
   "files": [
     "dist",
     "src"
@@ -11,28 +21,37 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
-    "test": "jest"
+    "test": "bun test",
+    "test:watch": "bun test --watch"
   },
   "peerDependencies": {
-    "@nestjs/common": "^11.0.0",
-    "@nestjs/core": "^11.0.0",
-    "@nestjs/platform-fastify": "^11.0.0",
+    "@harpy-js/core": "^0.6.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
-  "dependencies": {
+  "peerDependenciesMeta": {
+    "@harpy-js/core": {
+      "optional": false
+    }
+  },
+  "optionalDependencies": {
+    "@nestjs/common": "^11.0.0",
+    "@nestjs/core": "^11.0.0",
+    "@nestjs/platform-fastify": "^11.0.0",
     "rxjs": "^7.8.1"
   },
   "devDependencies": {
     "typescript": "^5.7.2",
     "@types/node": "^22.19.1",
+    "@types/bun": "^1.2.7",
     "@nestjs/common": "^11.0.0",
     "@nestjs/core": "^11.0.0",
     "@nestjs/platform-fastify": "^11.0.0",
     "rxjs": "^7.8.1",
     "@nestjs/testing": "^11.0.0",
     "supertest": "^7.0.0",
-    "@types/supertest": "^6.0.2"
+    "@types/supertest": "^6.0.2",
+    "reflect-metadata": "^0.2.0"
   },
   "publishConfig": {
     "access": "public"

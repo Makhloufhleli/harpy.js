@@ -1,5 +1,32 @@
 import React from "react";
-import { MetaOptions } from "../decorators/jsx.decorator";
+
+/**
+ * Metadata options for SEO and social sharing
+ */
+export interface MetaOptions {
+  title?: string;
+  description?: string;
+  canonical?: string;
+  keywords?: string[];
+  openGraph?: {
+    title?: string;
+    description?: string;
+    url?: string;
+    type?: string;
+    image?: string;
+    siteName?: string;
+    locale?: string;
+  };
+  twitter?: {
+    card?: string;
+    title?: string;
+    description?: string;
+    image?: string;
+    creator?: string;
+    site?: string;
+  };
+  structuredData?: object | object[];
+}
 
 /**
  * Base props interface for all page components.

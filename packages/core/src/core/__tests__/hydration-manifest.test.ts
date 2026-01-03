@@ -1,13 +1,8 @@
-import * as fs from "fs";
-import * as path from "path";
-
-jest.mock("fs");
+import { describe, it, expect, beforeEach } from "bun:test";
 
 describe("Hydration Manifest", () => {
-  const mockFs = fs as jest.Mocked<typeof fs>;
-
   beforeEach(() => {
-    jest.clearAllMocks();
+    // Reset any mocks if needed
   });
 
   describe("manifest structure", () => {
@@ -126,7 +121,6 @@ describe("Hydration Manifest", () => {
   describe("file operations", () => {
     it("should serialize manifest for saving", () => {
       const manifest = { components: [] };
-      const filePath = "/output/manifest.json";
       const serialized = JSON.stringify(manifest, null, 2);
 
       expect(serialized).toContain("components");

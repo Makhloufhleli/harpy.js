@@ -1,113 +1,7 @@
-import { withJsxEngine } from "../jsx.engine";
-import { NestFastifyApplication } from "@nestjs/platform-fastify";
+import { describe, it, expect, beforeEach } from "bun:test";
 import * as React from "react";
 
 describe("JSX Engine", () => {
-  let mockApp: NestFastifyApplication;
-  let mockAdapter: any;
-  let mockReply: any;
-
-  beforeEach(() => {
-    mockReply = {
-      raw: {
-        end: jest.fn(),
-        write: jest.fn(),
-        setHeader: jest.fn(),
-        headersSent: false,
-      },
-      statusCode: 200,
-      request: {},
-      status: jest.fn().mockReturnThis(),
-      send: jest.fn(),
-    };
-
-    mockAdapter = {
-      render: null,
-      get: jest.fn(),
-      post: jest.fn(),
-    };
-
-    mockApp = {
-      getHttpAdapter: jest.fn().mockReturnValue(mockAdapter),
-    } as unknown as NestFastifyApplication;
-  });
-
-  describe("withJsxEngine", () => {
-    it("should attach render method to the adapter", () => {
-      const mockLayout = (props: any) =>
-        React.createElement("html", null, props.children);
-
-      withJsxEngine(mockApp, mockLayout);
-
-      expect(mockAdapter.render).toBeDefined();
-      expect(typeof mockAdapter.render).toBe("function");
-    });
-
-    it("should handle redirect status codes without rendering", async () => {
-      const mockLayout = (props: any) =>
-        React.createElement("html", null, props.children);
-      withJsxEngine(mockApp, mockLayout);
-
-      mockReply.statusCode = 301;
-
-      await mockAdapter.render(
-        mockReply,
-        [() => React.createElement("div"), {}],
-        {},
-      );
-
-      expect(mockReply.raw.end).toHaveBeenCalled();
-    });
-
-    it("should handle error status codes without rendering", async () => {
-      const mockLayout = (props: any) =>
-        React.createElement("html", null, props.children);
-      withJsxEngine(mockApp, mockLayout);
-
-      mockReply.statusCode = 500;
-
-      await mockAdapter.render(
-        mockReply,
-        [() => React.createElement("div"), {}],
-        {},
-      );
-
-      expect(mockReply.raw.end).toHaveBeenCalled();
-    });
-
-    it("should accept custom layout in options", () => {
-      const defaultLayout = (props: any) =>
-        React.createElement(
-          "html",
-          null,
-          React.createElement("body", null, props.children),
-        );
-      const customLayout = (props: any) =>
-        React.createElement(
-          "html",
-          null,
-          React.createElement("main", null, props.children),
-        );
-
-      withJsxEngine(mockApp, defaultLayout);
-
-      expect(mockAdapter.render).toBeDefined();
-      expect(typeof customLayout).toBe("function");
-    });
-
-    it("should support component props", () => {
-      const mockLayout = (props: any) =>
-        React.createElement("html", null, props.children);
-      withJsxEngine(mockApp, mockLayout);
-
-      const component = (props: any) =>
-        React.createElement("div", null, `Hello ${props.name}`);
-      const rendered = component({ name: "Harpy" });
-
-      expect(rendered.props.children).toContain("Harpy");
-    });
-  });
-
   describe("React rendering", () => {
     it("should render simple React components", () => {
       const element = React.createElement("div", null, "Hello World");
@@ -132,6 +26,95 @@ describe("JSX Engine", () => {
 
       expect(element.props.className).toBe("test");
       expect(element.props.id).toBe("main");
+    });
+
+    it("should handle functional components", () => {
+      const TestComponent = (props: { name: string }) =>
+        React.createElement("div", null, `Hello ${props.name}`);
+
+      const element = React.createElement(TestComponent, { name: "Harpy" });
+      expect(element).toBeDefined();
+      expect(element.type).toBe(TestComponent);
+    });
+
+    it("should handle children as props", () => {
+      const Layout = (props: { children: React.ReactNode }) =>
+        React.createElement("html", null, props.children);
+
+      const element = React.createElement(
+        Layout,
+        null,
+        React.createElement("body", null, "Content"),
+      );
+
+      expect(element).toBeDefined();
+    });
+  });
+
+  describe("Layout wrapping", () => {
+    it("should wrap content with layout", () => {
+      const Layout = (props: { children: React.ReactNode }) =>
+        React.createElement(
+          "html",
+          null,
+          React.createElement("body", null, props.children),
+        );
+
+      const Page = () => React.createElement("div", null, "Page Content");
+
+      const wrapped = React.createElement(
+        Layout,
+        null,
+        React.createElement(Page),
+      );
+
+      expect(wrapped.type).toBe(Layout);
+    });
+
+    it("should pass props through layout", () => {
+      const Layout = (props: { title: string; children?: React.ReactNode }) =>
+        React.createElement(
+          "html",
+          null,
+          React.createElement("head", null, React.createElement("title", null, props.title)),
+          React.createElement("body", null, props.children),
+        );
+
+      const element = React.createElement(
+        Layout,
+        { title: "Test Page", children: React.createElement("div", null, "Content") },
+      );
+
+      expect(element.props.title).toBe("Test Page");
+    });
+  });
+
+  describe("Component composition", () => {
+    it("should compose multiple components", () => {
+      const Header = () => React.createElement("header", null, "Header");
+      const Main = () => React.createElement("main", null, "Content");
+      const Footer = () => React.createElement("footer", null, "Footer");
+
+      const Page = () =>
+        React.createElement(
+          "div",
+          null,
+          React.createElement(Header),
+          React.createElement(Main),
+          React.createElement(Footer),
+        );
+
+      const element = React.createElement(Page);
+      expect(element).toBeDefined();
+    });
+
+    it("should handle fragments", () => {
+      const items = ["a", "b", "c"].map((item) =>
+        React.createElement("li", { key: item }, item),
+      );
+
+      const list = React.createElement("ul", null, ...items);
+      expect(list.props.children).toHaveLength(3);
     });
   });
 });
