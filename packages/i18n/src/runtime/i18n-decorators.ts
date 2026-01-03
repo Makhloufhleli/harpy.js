@@ -5,6 +5,17 @@
 
 import 'reflect-metadata';
 
+const PARAM_METADATA = {
+  PARAMS: 'harpy:params',
+} as const;
+
+interface ParamMetadata {
+  index: number;
+  type: string;
+  data?: string;
+  factory?: (ctx: any) => any;
+}
+
 const LOCALE_METADATA_KEY = Symbol('locale_param');
 const DICTIONARY_METADATA_KEY = Symbol('dictionary_param');
 
@@ -21,9 +32,22 @@ const DICTIONARY_METADATA_KEY = Symbol('dictionary_param');
  */
 export function CurrentLocale(): ParameterDecorator {
   return (target, propertyKey, parameterIndex) => {
-    const existingParams = Reflect.getMetadata(LOCALE_METADATA_KEY, target, propertyKey!) || [];
-    existingParams.push(parameterIndex);
-    Reflect.defineMetadata(LOCALE_METADATA_KEY, existingParams, target, propertyKey!);
+    if (propertyKey === undefined) return;
+
+    const existingParams: ParamMetadata[] =
+      Reflect.getMetadata(PARAM_METADATA.PARAMS, target, propertyKey) || [];
+
+    existingParams.push({
+      index: parameterIndex,
+      type: 'custom',
+      data: 'locale',
+      factory: (ctx: any) => {
+        // Try to get locale from request.locale (set by i18n middleware)
+        return (ctx.request as any).locale || 'en';
+      },
+    });
+
+    Reflect.defineMetadata(PARAM_METADATA.PARAMS, existingParams, target, propertyKey);
   };
 }
 
@@ -47,9 +71,23 @@ export function getLocaleParams(target: any, propertyKey: string | symbol): numb
  */
 export function CurrentDictionary(): ParameterDecorator {
   return (target, propertyKey, parameterIndex) => {
-    const existingParams = Reflect.getMetadata(DICTIONARY_METADATA_KEY, target, propertyKey!) || [];
-    existingParams.push(parameterIndex);
-    Reflect.defineMetadata(DICTIONARY_METADATA_KEY, existingParams, target, propertyKey!);
+    if (propertyKey === undefined) return;
+
+    const existingParams: ParamMetadata[] =
+      Reflect.getMetadata(PARAM_METADATA.PARAMS, target, propertyKey) || [];
+
+    existingParams.push({
+      index: parameterIndex,
+      type: 'custom',
+      data: 'dictionary',
+      factory: async (ctx: any) => {
+        // Try to get dict from request.i18nContext
+        const i18nCtx = (ctx.request as any).i18nContext;
+        return i18nCtx?.dict || {};
+      },
+    });
+
+    Reflect.defineMetadata(PARAM_METADATA.PARAMS, existingParams, target, propertyKey);
   };
 }
 

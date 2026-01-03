@@ -73,6 +73,11 @@ export function createI18nMiddleware(options: I18nOptions) {
       },
     };
 
+    // If locale was detected from path, store the rewritten path
+    if (result.pathWithoutLocale) {
+      (request as any).__i18nRewrittenPath = result.pathWithoutLocale;
+    }
+
     // Get response from next handler
     let response = await next();
 

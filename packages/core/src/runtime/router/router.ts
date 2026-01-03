@@ -139,7 +139,8 @@ export class Router {
    */
   async handle(request: Request): Promise<Response> {
     const url = new URL(request.url);
-    const pathname = url.pathname;
+    // Check if i18n middleware has rewritten the path
+    const pathname = (request as any).__i18nRewrittenPath || url.pathname;
 
     const match = this.match(request.method, pathname);
     if (!match) {
