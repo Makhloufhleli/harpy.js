@@ -21,12 +21,19 @@ export type { NavigationRegistry } from "./core/types/nav.types";
 
 // Client-side utilities
 export { default as Link } from "./client/Link";
+export type { LinkProps } from "./client/Link";
 export {
   buildHrefIndex,
   getActiveItemIdFromIndex,
   getActiveItemIdFromManifest,
 } from "./client/getActiveItemId";
 export { useI18n } from "./client/use-i18n";
+export {
+  NavigationManager,
+  initNavigation,
+  getNavigation,
+  navigate,
+} from "./client/navigation";
 
 // Navigation service (pure logic - no framework dependency)
 export { NavigationService } from "./core/navigation.service";

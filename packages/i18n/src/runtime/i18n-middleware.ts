@@ -14,6 +14,13 @@ export interface I18nRequest extends Request {
     setLocale: (locale: string) => void;
     availableLocales: string[];
   };
+  __i18nConfig?: {
+    defaultLocale: string;
+    locales: string[];
+    urlPattern: 'query' | 'path' | 'header' | 'cookie';
+    queryParam?: string;
+    cookieName?: string;
+  };
 }
 
 export interface I18nMiddlewareResult {
@@ -71,6 +78,15 @@ export function createI18nMiddleware(options: I18nOptions) {
           (request as I18nRequest).locale = newLocale;
         }
       },
+    };
+    
+    // Attach i18n config for HTML injection
+    (request as I18nRequest).__i18nConfig = {
+      defaultLocale: normalizedOptions.defaultLocale,
+      locales: normalizedOptions.locales,
+      urlPattern: normalizedOptions.urlPattern,
+      queryParam: normalizedOptions.queryParam,
+      cookieName: normalizedOptions.cookieName,
     };
 
     // If locale was detected from path, store the rewritten path

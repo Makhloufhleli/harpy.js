@@ -12,6 +12,10 @@
     "./runtime": {
       "types": "./dist/runtime/index.d.ts",
       "default": "./dist/runtime/index.js"
+    },
+    "./client": {
+      "types": "./dist/client/index.d.ts",
+      "default": "./dist/client/index.js"
     }
   },
   "files": [

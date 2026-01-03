@@ -290,6 +290,18 @@ export async function renderJsx(
   };
 </script>`;
   }
+  
+  // Inject i18n config if available (from @harpy-js/i18n middleware)
+  const i18nConfig = (request as any).__i18nConfig;
+  if (i18nConfig) {
+    const i18nConfigJson = JSON.stringify(i18nConfig)
+      .replace(/</g, '\\u003c')
+      .replace(/>/g, '\\u003e')
+      .replace(/&/g, '\\u0026');
+    
+    hydrationDataScript += `
+<script id="__HARPY_I18N_CONFIG__" type="application/json">${i18nConfigJson}</script>`;
+  }
 
   // Build hydration scripts HTML
   let hydrationScriptsHtml = '';

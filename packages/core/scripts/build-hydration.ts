@@ -254,6 +254,25 @@ export default function ${component.componentName}(props: any) {
   console.log(`\n✅ Hydration manifest written to ${MANIFEST_FILE}`);
   console.log(`📦 ${Object.keys(manifest).length} chunk(s) built`);
   console.log('💡 Wrappers created in .harpy/wrappers/ - import from there for hydration');
+
+  // Build navigation bundle
+  console.log('\n📦 Building navigation bundle...');
+  try {
+    const navResult = await Bun.build({
+      entrypoints: [`${PROJECT_ROOT}/node_modules/@harpy-js/core/dist/client/init-navigation.js`],
+      outdir: `${HARPY_DIR}/static`,
+      naming: 'navigation.js',
+      target: 'browser',
+      minify: false,
+      sourcemap: 'external',
+    });
+
+    if (navResult.success) {
+      console.log(`✅ Navigation bundle: ${HARPY_DIR}/static/navigation.js`);
+    }
+  } catch (error) {
+    console.warn('⚠️  Navigation bundle build skipped (optional)');
+  }
 }
 }
 

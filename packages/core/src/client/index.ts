@@ -22,6 +22,14 @@ export type { HydrationData, ProviderConfig } from './hydration-runtime';
 export { default as Link } from './Link';
 export type { LinkProps } from './Link';
 
+// Client-side navigation system
+export {
+  NavigationManager,
+  initNavigation,
+  getNavigation,
+  navigate,
+} from './navigation';
+
 // Navigation utilities
 export {
   buildHrefIndex,

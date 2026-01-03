@@ -3,6 +3,7 @@
  * 
  * This file exports the NestJS-based i18n module for backward compatibility.
  * For the Bun runtime version, import from '@harpy-js/i18n/runtime'
+ * For client-side hooks, import from '@harpy-js/i18n/client'
  */
 
 // NestJS-based exports (legacy)
@@ -21,3 +22,7 @@ export type {
   ExtractVariables,
   RequiresVariables,
 } from "./i18n-types";
+
+// Client-side exports
+export { useI18n } from './client';
+export type { UseI18nReturn, I18nConfig } from './client';
